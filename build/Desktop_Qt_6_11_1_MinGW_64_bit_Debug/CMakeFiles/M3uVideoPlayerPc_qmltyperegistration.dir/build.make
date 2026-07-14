@@ -77,6 +77,7 @@ m3uvideoplayerpc_qmltyperegistrations.cpp: C:/Qt/6.11.1/mingw_64/metatypes/qt6ne
 m3uvideoplayerpc_qmltyperegistrations.cpp: C:/Qt/6.11.1/mingw_64/metatypes/qt6gui_metatypes.json
 m3uvideoplayerpc_qmltyperegistrations.cpp: C:/Qt/6.11.1/mingw_64/metatypes/qt6quick_metatypes.json
 m3uvideoplayerpc_qmltyperegistrations.cpp: C:/Qt/6.11.1/mingw_64/metatypes/qt6opengl_metatypes.json
+m3uvideoplayerpc_qmltyperegistrations.cpp: C:/Qt/6.11.1/mingw_64/metatypes/qt6quickcontrols2_metatypes.json
 m3uvideoplayerpc_qmltyperegistrations.cpp: C:/Qt/6.11.1/mingw_64/metatypes/qt6sql_metatypes.json
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --blue --bold --progress-dir="D:\c++ project\M3uVideoPlayerPc\build\Desktop_Qt_6_11_1_MinGW_64_bit_Debug\CMakeFiles" --progress-num=$(CMAKE_PROGRESS_1) "Automatic QML type registration for target M3uVideoPlayerPc"
 	call .qt\bin\qt_setup_tool_path.bat C:/Qt/6.11.1/mingw_64/bin/qmltyperegistrar.exe "--generate-qmltypes=D:/c++ project/M3uVideoPlayerPc/build/Desktop_Qt_6_11_1_MinGW_64_bit_Debug/M3uVideoPlayer/M3uVideoPlayerPc.qmltypes" --import-name=M3uVideoPlayer --major-version=1 --minor-version=0 "@D:/c++ project/M3uVideoPlayerPc/build/Desktop_Qt_6_11_1_MinGW_64_bit_Debug/qmltypes/M3uVideoPlayerPc_foreign_types.txt" -o "D:/c++ project/M3uVideoPlayerPc/build/Desktop_Qt_6_11_1_MinGW_64_bit_Debug/m3uvideoplayerpc_qmltyperegistrations.cpp" "D:/c++ project/M3uVideoPlayerPc/build/Desktop_Qt_6_11_1_MinGW_64_bit_Debug/meta_types/qt6m3uvideoplayerpc_metatypes.json"

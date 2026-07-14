@@ -26,6 +26,13 @@ namespace _0x5f_M3uVideoPlayer_src_ui_components_SidebarButton_qml {
         reinterpret_cast<const QV4::CompiledData::Unit*>(&qmlData), &aotBuiltFunctions[0], nullptr
     };
 }
+namespace _0x5f_M3uVideoPlayer_src_ui_components_AddPlaylistDialog_qml { 
+    extern const unsigned char qmlData[];
+    extern const QQmlPrivate::AOTCompiledFunction aotBuiltFunctions[];
+    const QQmlPrivate::CachedQmlUnit unit = {
+        reinterpret_cast<const QV4::CompiledData::Unit*>(&qmlData), &aotBuiltFunctions[0], nullptr
+    };
+}
 namespace _0x5f_M3uVideoPlayer_src_ui_screens_PlaylistListView_qml { 
     extern const unsigned char qmlData[];
     extern const QQmlPrivate::AOTCompiledFunction aotBuiltFunctions[];
@@ -34,6 +41,20 @@ namespace _0x5f_M3uVideoPlayer_src_ui_screens_PlaylistListView_qml {
     };
 }
 namespace _0x5f_M3uVideoPlayer_src_ui_screens_DirectLinkView_qml { 
+    extern const unsigned char qmlData[];
+    extern const QQmlPrivate::AOTCompiledFunction aotBuiltFunctions[];
+    const QQmlPrivate::CachedQmlUnit unit = {
+        reinterpret_cast<const QV4::CompiledData::Unit*>(&qmlData), &aotBuiltFunctions[0], nullptr
+    };
+}
+namespace _0x5f_M3uVideoPlayer_src_ui_screens_GroupListView_qml { 
+    extern const unsigned char qmlData[];
+    extern const QQmlPrivate::AOTCompiledFunction aotBuiltFunctions[];
+    const QQmlPrivate::CachedQmlUnit unit = {
+        reinterpret_cast<const QV4::CompiledData::Unit*>(&qmlData), &aotBuiltFunctions[0], nullptr
+    };
+}
+namespace _0x5f_M3uVideoPlayer_src_ui_screens_ChannelListView_qml { 
     extern const unsigned char qmlData[];
     extern const QQmlPrivate::AOTCompiledFunction aotBuiltFunctions[];
     const QQmlPrivate::CachedQmlUnit unit = {
@@ -57,8 +78,11 @@ Registry::Registry() {
     resourcePathToCachedUnit.insert(QStringLiteral("/M3uVideoPlayer/src/ui/main.qml"), &QmlCacheGeneratedCode::_0x5f_M3uVideoPlayer_src_ui_main_qml::unit);
     resourcePathToCachedUnit.insert(QStringLiteral("/M3uVideoPlayer/src/ui/components/Sidebar.qml"), &QmlCacheGeneratedCode::_0x5f_M3uVideoPlayer_src_ui_components_Sidebar_qml::unit);
     resourcePathToCachedUnit.insert(QStringLiteral("/M3uVideoPlayer/src/ui/components/SidebarButton.qml"), &QmlCacheGeneratedCode::_0x5f_M3uVideoPlayer_src_ui_components_SidebarButton_qml::unit);
+    resourcePathToCachedUnit.insert(QStringLiteral("/M3uVideoPlayer/src/ui/components/AddPlaylistDialog.qml"), &QmlCacheGeneratedCode::_0x5f_M3uVideoPlayer_src_ui_components_AddPlaylistDialog_qml::unit);
     resourcePathToCachedUnit.insert(QStringLiteral("/M3uVideoPlayer/src/ui/screens/PlaylistListView.qml"), &QmlCacheGeneratedCode::_0x5f_M3uVideoPlayer_src_ui_screens_PlaylistListView_qml::unit);
     resourcePathToCachedUnit.insert(QStringLiteral("/M3uVideoPlayer/src/ui/screens/DirectLinkView.qml"), &QmlCacheGeneratedCode::_0x5f_M3uVideoPlayer_src_ui_screens_DirectLinkView_qml::unit);
+    resourcePathToCachedUnit.insert(QStringLiteral("/M3uVideoPlayer/src/ui/screens/GroupListView.qml"), &QmlCacheGeneratedCode::_0x5f_M3uVideoPlayer_src_ui_screens_GroupListView_qml::unit);
+    resourcePathToCachedUnit.insert(QStringLiteral("/M3uVideoPlayer/src/ui/screens/ChannelListView.qml"), &QmlCacheGeneratedCode::_0x5f_M3uVideoPlayer_src_ui_screens_ChannelListView_qml::unit);
     QQmlPrivate::RegisterQmlUnitCacheHook registration;
     registration.structVersion = 0;
     registration.lookupCachedQmlUnit = &lookupCachedUnit;

@@ -7,6 +7,14 @@
                     "entries": [
                         {
                             "codegenResult": 2,
+                            "column": 5,
+                            "durationMicroseconds": 0,
+                            "functionName": "getIconChar",
+                            "line": 33,
+                            "message": "Functions without type annotations won't be compiled"
+                        },
+                        {
+                            "codegenResult": 2,
                             "column": 16,
                             "durationMicroseconds": 0,
                             "functionName": "color",
@@ -15,10 +23,50 @@
                         },
                         {
                             "codegenResult": 2,
+                            "column": 22,
+                            "durationMicroseconds": 0,
+                            "functionName": "visible",
+                            "line": 29,
+                            "message": "Cannot access value for name control"
+                        },
+                        {
+                            "codegenResult": 0,
+                            "column": 28,
+                            "durationMicroseconds": 0,
+                            "functionName": "right",
+                            "line": 21,
+                            "message": ""
+                        },
+                        {
+                            "codegenResult": 0,
+                            "column": 26,
+                            "durationMicroseconds": 0,
+                            "functionName": "top",
+                            "line": 22,
+                            "message": ""
+                        },
+                        {
+                            "codegenResult": 0,
+                            "column": 29,
+                            "durationMicroseconds": 0,
+                            "functionName": "bottom",
+                            "line": 23,
+                            "message": ""
+                        },
+                        {
+                            "codegenResult": 2,
+                            "column": 19,
+                            "durationMicroseconds": 0,
+                            "functionName": "text",
+                            "line": 47,
+                            "message": "Cannot access value for name control"
+                        },
+                        {
+                            "codegenResult": 2,
                             "column": 20,
                             "durationMicroseconds": 0,
                             "functionName": "color",
-                            "line": 27,
+                            "line": 48,
                             "message": "Cannot access value for name control"
                         },
                         {
@@ -26,7 +74,7 @@
                             "column": 19,
                             "durationMicroseconds": 0,
                             "functionName": "text",
-                            "line": 33,
+                            "line": 58,
                             "message": "Cannot access value for name control"
                         },
                         {
@@ -34,7 +82,7 @@
                             "column": 20,
                             "durationMicroseconds": 0,
                             "functionName": "color",
-                            "line": 34,
+                            "line": 59,
                             "message": "Cannot access value for name control"
                         },
                         {
@@ -42,7 +90,7 @@
                             "column": 24,
                             "durationMicroseconds": 0,
                             "functionName": "bold",
-                            "line": 36,
+                            "line": 61,
                             "message": "Cannot access value for name control"
                         }
                     ],

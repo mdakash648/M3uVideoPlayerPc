@@ -1,0 +1,18 @@
+{
+    "classes": [
+        {
+            "className": "TimeZoneManager",
+            "lineNumber": 10,
+            "object": true,
+            "qualifiedClassName": "Infrastructure::TimeZoneManager",
+            "superClasses": [
+                {
+                    "access": "public",
+                    "name": "QObject"
+                }
+            ]
+        }
+    ],
+    "inputFile": "TimeZoneManager.h",
+    "outputRevision": 69
+}

@@ -22,6 +22,7 @@ Rectangle {
             }
             
             Button {
+                id: addPlaylistBtn
                 text: "+ Add Playlist"
                 background: Rectangle {
                     color: "#FFD54F"
@@ -31,10 +32,11 @@ Rectangle {
                 }
                 contentItem: Text {
                     text: parent.text
-                    color: "#121212"
+                    color: addPlaylistBtn.hovered ? "#FFFFFF" : "#121212"
                     font.bold: true
                     horizontalAlignment: Text.AlignHCenter
                     verticalAlignment: Text.AlignVCenter
+                    Behavior on color { ColorAnimation { duration: 150 } }
                 }
                 onClicked: addPlaylistDialog.open()
             }

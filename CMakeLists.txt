@@ -9,7 +9,7 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
 
-find_package(Qt6 COMPONENTS Core Gui Qml Quick Sql Network REQUIRED)
+find_package(Qt6 COMPONENTS Core Gui Qml Quick QuickControls2 Sql Network REQUIRED)
 
 # Try to find libmpv
 # Note: On Windows, you might need to specify the path to mpv headers and lib
@@ -38,10 +38,16 @@ endif()
 # Source files
 set(SOURCES
     src/main.cpp
-    # src/ui/...
-    # src/domain/...
-    # src/data/...
-    # src/infrastructure/...
+    src/domain/FuzzySearch.cpp
+    src/data/DatabaseManager.cpp
+    src/data/PlaylistRepository.cpp
+    src/data/ChannelRepository.cpp
+    src/data/M3uParser.cpp
+    src/data/XtreamApiClient.cpp
+    src/infrastructure/TrustedTimeSource.cpp
+    src/infrastructure/TimeZoneManager.cpp
+    src/ui/AppController.h
+    src/ui/AppController.cpp
 )
 
 # Application executable
@@ -68,6 +74,7 @@ qt_add_qml_module(${PROJECT_NAME}
 
 target_include_directories(${PROJECT_NAME} PRIVATE
     src
+    src/ui
     ${MPV_INCLUDE_DIRS}
 )
 
@@ -76,6 +83,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     Qt6::Gui
     Qt6::Qml
     Qt6::Quick
+    Qt6::QuickControls2
     Qt6::Sql
     Qt6::Network
 )

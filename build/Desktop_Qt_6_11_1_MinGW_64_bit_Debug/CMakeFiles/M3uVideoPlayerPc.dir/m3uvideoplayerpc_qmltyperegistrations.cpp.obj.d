@@ -411,4 +411,55 @@ CMakeFiles/M3uVideoPlayerPc.dir/m3uvideoplayerpc_qmltyperegistrations.cpp.obj: \
  C:/Qt/6.11.1/mingw_64/include/QtCore/q20iterator.h \
  C:/Qt/6.11.1/mingw_64/include/QtQml/qqmlregistration.h \
  C:/Qt/6.11.1/mingw_64/include/QtQmlIntegration/qqmlintegration.h \
- C:/Qt/6.11.1/mingw_64/include/QtQml/qqmlmoduleregistration.h
+ C:/Qt/6.11.1/mingw_64/include/QtQml/qqmlmoduleregistration.h \
+ D:/c++\ project/M3uVideoPlayerPc/src/ui/AppController.h \
+ C:/Qt/6.11.1/mingw_64/include/QtCore/QObject \
+ C:/Qt/6.11.1/mingw_64/include/QtQml/QQmlEngine \
+ C:/Qt/6.11.1/mingw_64/include/QtQml/qqmlengine.h \
+ C:/Qt/6.11.1/mingw_64/include/QtQml/qjsengine.h \
+ C:/Qt/6.11.1/mingw_64/include/QtCore/qtimezone.h \
+ C:/Qt/6.11.1/mingw_64/include/QtQml/qjsmanagedvalue.h \
+ C:/Qt/6.11.1/mingw_64/include/QtQml/qqmldebug.h \
+ C:/Qt/6.11.1/mingw_64/include/QtQml/qqmlerror.h \
+ C:/Qt/6.11.1/mingw_64/include/QtQml/qqmlabstracturlinterceptor.h \
+ C:/Qt/6.11.1/mingw_64/include/QtCore/QTimer \
+ C:/Qt/6.11.1/mingw_64/include/QtCore/qtimer.h \
+ C:/Qt/6.11.1/mingw_64/include/QtCore/qbasictimer.h \
+ C:/Qt/6.11.1/mingw_64/include/QtCore/qabstracteventdispatcher.h \
+ C:/Qt/6.11.1/mingw_64/include/QtCore/qeventloop.h \
+ C:/Qt/6.11.1/mingw_64/include/QtCore/qdeadlinetimer.h \
+ D:/c++\ project/M3uVideoPlayerPc/src/data/DatabaseManager.h \
+ C:/Qt/6.11.1/mingw_64/include/QtSql/QSqlDatabase \
+ C:/Qt/6.11.1/mingw_64/include/QtSql/qsqldatabase.h \
+ C:/Qt/6.11.1/mingw_64/include/QtSql/qtsqlglobal.h \
+ C:/Qt/6.11.1/mingw_64/include/QtSql/qtsql-config.h \
+ C:/Qt/6.11.1/mingw_64/include/QtSql/qtsqlexports.h \
+ C:/Qt/6.11.1/mingw_64/include/QtCore/QString \
+ D:/c++\ project/M3uVideoPlayerPc/src/infrastructure/TrustedTimeSource.h \
+ C:/Qt/6.11.1/mingw_64/include/QtCore/QDateTime \
+ C:/Qt/6.11.1/mingw_64/include/QtNetwork/QNetworkAccessManager \
+ C:/Qt/6.11.1/mingw_64/include/QtNetwork/qnetworkaccessmanager.h \
+ C:/Qt/6.11.1/mingw_64/include/QtNetwork/qnetworkrequest.h \
+ C:/Qt/6.11.1/mingw_64/include/QtNetwork/qhttpheaders.h \
+ C:/Qt/6.11.1/mingw_64/include/QtCore/QSharedDataPointer \
+ C:/Qt/6.11.1/mingw_64/include/QtCore/QString \
+ C:/Qt/6.11.1/mingw_64/include/QtCore/QUrl \
+ C:/Qt/6.11.1/mingw_64/include/QtCore/QVariant \
+ C:/Qt/6.11.1/mingw_64/include/QtCore/q26numeric.h \
+ C:/Qt/6.11.1/mingw_64/include/QtCore/QList \
+ C:/Qt/6.11.1/mingw_64/include/QtCore/QObject \
+ C:/Qt/6.11.1/mingw_64/include/QtNetwork/QSslConfiguration \
+ C:/Qt/6.11.1/mingw_64/include/QtNetwork/qsslconfiguration.h \
+ C:/Qt/6.11.1/mingw_64/include/QtNetwork/qsslsocket.h \
+ C:/Qt/6.11.1/mingw_64/include/QtNetwork/qtcpsocket.h \
+ C:/Qt/6.11.1/mingw_64/include/QtNetwork/qabstractsocket.h \
+ C:/Qt/6.11.1/mingw_64/include/QtCore/qiodevice.h \
+ C:/Qt/6.11.1/mingw_64/include/QtNetwork/qhostaddress.h \
+ C:/Qt/6.11.1/mingw_64/include/QtNetwork/qsslerror.h \
+ C:/Qt/6.11.1/mingw_64/include/QtNetwork/qsslcertificate.h \
+ C:/Qt/6.11.1/mingw_64/include/QtCore/qcryptographichash.h \
+ C:/Qt/6.11.1/mingw_64/include/QtNetwork/qssl.h \
+ C:/Qt/6.11.1/mingw_64/include/QtCore/QFlags \
+ C:/Qt/6.11.1/mingw_64/include/QtNetwork/QSslPreSharedKeyAuthenticator \
+ C:/Qt/6.11.1/mingw_64/include/QtNetwork/qsslpresharedkeyauthenticator.h \
+ C:/Qt/6.11.1/mingw_64/include/QtCore/QMetaType

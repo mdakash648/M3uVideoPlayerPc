@@ -4,11 +4,13 @@
 #include <QtSql/QSqlDatabase>
 #include <QDebug>
 
-// Forward declarations for DI / ViewModels
-// #include "ui/MainViewModel.h"
+#include <QQuickStyle>
+
+#include "ui/AppController.h"
 
 int main(int argc, char *argv[])
 {
+    QQuickStyle::setStyle("Basic");
     QGuiApplication app(argc, argv);
     
     // Application Info
@@ -17,14 +19,9 @@ int main(int argc, char *argv[])
     app.setApplicationName("M3U Video Player Desktop");
     app.setApplicationVersion("1.0.0");
 
-    // Dependency Injection Setup (Manual for now)
-    // auto database = QSqlDatabase::addDatabase("QSQLITE");
-    // database.setDatabaseName("m3uplayer.db");
-    
-    // auto playlistRepo = std::make_shared<PlaylistRepository>(database);
-    // auto channelRepo = std::make_shared<ChannelRepository>(database);
-    
-    // auto mainViewModel = std::make_shared<MainViewModel>(playlistRepo, channelRepo);
+    // Init AppController
+    AppController appController;
+    appController.init();
 
     QQmlApplicationEngine engine;
     
@@ -34,7 +31,7 @@ int main(int argc, char *argv[])
     // Global properties or Enums
     // qmlRegisterType<Enums>("M3uVideoPlayer", 1, 0, "AppEnums");
 
-    const QUrl url(u"qrc:/M3uVideoPlayer/src/ui/main.qml"_qs);
+    const QUrl url("qrc:/M3uVideoPlayer/src/ui/main.qml");
     QObject::connect(
         &engine,
         &QQmlApplicationEngine::objectCreationFailed,

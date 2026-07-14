@@ -9,29 +9,54 @@ Button {
     height: 45
     
     background: Rectangle {
-        color: control.hovered ? "#2A2A2A" : "transparent"
+        color: control.hovered ? "#222222" : "transparent"
         radius: 8
         
         Behavior on color {
             ColorAnimation { duration: 150 }
+        }
+        
+        // Right side 3px border bonus touch
+        Rectangle {
+            anchors.right: parent.right
+            anchors.top: parent.top
+            anchors.bottom: parent.bottom
+            anchors.topMargin: 6
+            anchors.bottomMargin: 6
+            width: 3
+            color: "#FFD54F"
+            radius: 2
+            visible: control.hovered
+        }
+    }
+    
+    function getIconChar(name) {
+        switch (name) {
+            case "list": return "☰"
+            case "link": return "∞"
+            case "history": return "⟲"
+            case "settings": return "⚙"
+            default: return "▪"
         }
     }
     
     contentItem: RowLayout {
         spacing: 12
         
-        // Placeholder for icon (can be replaced with FontAwesome or image later)
-        Rectangle {
-            width: 20
-            height: 20
-            color: control.down ? "#FFD54F" : (control.hovered ? "#FFFFFF" : "#AAAAAA")
-            radius: 4
+        Text {
+            text: getIconChar(control.iconName)
+            color: control.hovered ? "#FFFFFF" : "#AAAAAA"
+            font.pixelSize: 18
             Layout.leftMargin: 10
+            
+            Behavior on color {
+                ColorAnimation { duration: 150 }
+            }
         }
         
         Text {
             text: control.text
-            color: control.down ? "#FFD54F" : (control.hovered ? "#FFFFFF" : "#CCCCCC")
+            color: control.hovered ? "#FFFFFF" : "#AAAAAA"
             font.pixelSize: 16
             font.bold: control.hovered
             Layout.fillWidth: true

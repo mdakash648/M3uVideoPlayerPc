@@ -1,0 +1,18 @@
+{
+    "classes": [
+        {
+            "className": "TrustedTimeSource",
+            "lineNumber": 10,
+            "object": true,
+            "qualifiedClassName": "Infrastructure::TrustedTimeSource",
+            "superClasses": [
+                {
+                    "access": "public",
+                    "name": "QObject"
+                }
+            ]
+        }
+    ],
+    "inputFile": "TrustedTimeSource.h",
+    "outputRevision": 69
+}

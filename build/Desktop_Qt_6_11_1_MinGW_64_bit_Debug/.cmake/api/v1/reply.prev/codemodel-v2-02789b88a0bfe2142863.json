@@ -1,0 +1,222 @@
+{
+	"configurations" : 
+	[
+		{
+			"directories" : 
+			[
+				{
+					"build" : ".",
+					"jsonFile" : "directory-.-Debug-d0094a50bb2071803777.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.16"
+					},
+					"projectIndex" : 0,
+					"source" : ".",
+					"targetIndexes" : 
+					[
+						0,
+						1,
+						2,
+						3,
+						4,
+						5,
+						6,
+						7,
+						8,
+						9,
+						10,
+						11,
+						12,
+						13,
+						14,
+						15,
+						16,
+						17,
+						18
+					]
+				}
+			],
+			"name" : "Debug",
+			"projects" : 
+			[
+				{
+					"directoryIndexes" : 
+					[
+						0
+					],
+					"name" : "M3uVideoPlayerPc",
+					"targetIndexes" : 
+					[
+						0,
+						1,
+						2,
+						3,
+						4,
+						5,
+						6,
+						7,
+						8,
+						9,
+						10,
+						11,
+						12,
+						13,
+						14,
+						15,
+						16,
+						17,
+						18
+					]
+				}
+			],
+			"targets" : 
+			[
+				{
+					"directoryIndex" : 0,
+					"id" : "M3uVideoPlayerPc::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-M3uVideoPlayerPc-Debug-d3a420f950ec095ae12f.json",
+					"name" : "M3uVideoPlayerPc",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "M3uVideoPlayerPc_autogen::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-M3uVideoPlayerPc_autogen-Debug-3ece180fcee11e01918e.json",
+					"name" : "M3uVideoPlayerPc_autogen",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "M3uVideoPlayerPc_autogen_timestamp_deps::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-M3uVideoPlayerPc_autogen_timestamp_deps-Debug-5bf6024ee76639b2798c.json",
+					"name" : "M3uVideoPlayerPc_autogen_timestamp_deps",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "M3uVideoPlayerPc_copy_qml::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-M3uVideoPlayerPc_copy_qml-Debug-15049806fae6b8871f70.json",
+					"name" : "M3uVideoPlayerPc_copy_qml",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "M3uVideoPlayerPc_copy_res::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-M3uVideoPlayerPc_copy_res-Debug-1592b4aae4c1de733ae5.json",
+					"name" : "M3uVideoPlayerPc_copy_res",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "M3uVideoPlayerPc_other_files::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-M3uVideoPlayerPc_other_files-Debug-a58989e72a9eb623e357.json",
+					"name" : "M3uVideoPlayerPc_other_files",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "M3uVideoPlayerPc_qmllint::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-M3uVideoPlayerPc_qmllint-Debug-c05a8de6777df9238638.json",
+					"name" : "M3uVideoPlayerPc_qmllint",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "M3uVideoPlayerPc_qmllint_json::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-M3uVideoPlayerPc_qmllint_json-Debug-9b55f668a32b98258135.json",
+					"name" : "M3uVideoPlayerPc_qmllint_json",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "M3uVideoPlayerPc_qmllint_module::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-M3uVideoPlayerPc_qmllint_module-Debug-b6795df7b7c94394cdae.json",
+					"name" : "M3uVideoPlayerPc_qmllint_module",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "M3uVideoPlayerPc_qmltyperegistration::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-M3uVideoPlayerPc_qmltyperegistration-Debug-e6f0464b00b5f217ca51.json",
+					"name" : "M3uVideoPlayerPc_qmltyperegistration",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "all_aotstats::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-all_aotstats-Debug-b59f9c1b2ba82878de10.json",
+					"name" : "all_aotstats",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "all_qmllint::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-all_qmllint-Debug-0afaacb14784fa547521.json",
+					"name" : "all_qmllint",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "all_qmllint_json::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-all_qmllint_json-Debug-79c47ea6a8814be57a7a.json",
+					"name" : "all_qmllint_json",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "all_qmllint_module::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-all_qmllint_module-Debug-fc7ee6f2865a2d936eb3.json",
+					"name" : "all_qmllint_module",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "all_qmltyperegistrations::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-all_qmltyperegistrations-Debug-36c4fee6175be24527a0.json",
+					"name" : "all_qmltyperegistrations",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "clean_qml_context_properties::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-clean_qml_context_properties-Debug-65ef613bde7f2b9be125.json",
+					"name" : "clean_qml_context_properties",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "dump_qml_context_properties::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-dump_qml_context_properties-Debug-f7e4537d5b1bb9540a95.json",
+					"name" : "dump_qml_context_properties",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "generate_qmlls_build_ini_file::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-generate_qmlls_build_ini_file-Debug-a54247606f57f53d7c93.json",
+					"name" : "generate_qmlls_build_ini_file",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "module_M3uVideoPlayerPc_aotstats_target::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-module_M3uVideoPlayerPc_aotstats_target-Debug-cde73e5dd4bedea94df0.json",
+					"name" : "module_M3uVideoPlayerPc_aotstats_target",
+					"projectIndex" : 0
+				}
+			]
+		}
+	],
+	"kind" : "codemodel",
+	"paths" : 
+	{
+		"build" : "D:/c++ project/M3uVideoPlayerPc/build/Desktop_Qt_6_11_1_MinGW_64_bit_Debug",
+		"source" : "D:/c++ project/M3uVideoPlayerPc"
+	},
+	"version" : 
+	{
+		"major" : 2,
+		"minor" : 7
+	}
+}

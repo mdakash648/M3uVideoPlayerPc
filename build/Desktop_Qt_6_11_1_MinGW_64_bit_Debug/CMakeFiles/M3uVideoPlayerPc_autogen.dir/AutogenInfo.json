@@ -1069,6 +1069,26 @@
 		"C:/Qt/6.11.1/mingw_64/lib/cmake/Qt6Quick/Qt6QuickAdditionalTargetInfo.cmake",
 		"C:/Qt/6.11.1/mingw_64/lib/cmake/Qt6Quick/Qt6QuickPlugins.cmake",
 		"C:/Qt/6.11.1/mingw_64/lib/cmake/Qt6Quick/Qt6QuickVersionlessAliasTargets.cmake",
+		"C:/Qt/6.11.1/mingw_64/lib/cmake/Qt6QuickControls2/Qt6QuickControls2ConfigVersion.cmake",
+		"C:/Qt/6.11.1/mingw_64/lib/cmake/Qt6QuickControls2/Qt6QuickControls2ConfigVersionImpl.cmake",
+		"C:/Qt/6.11.1/mingw_64/lib/cmake/Qt6QuickControls2/Qt6QuickControls2Config.cmake",
+		"C:/Qt/Tools/CMake_64/share/cmake-3.30/Modules/CMakeFindDependencyMacro.cmake",
+		"C:/Qt/6.11.1/mingw_64/lib/cmake/Qt6QuickControls2/Qt6QuickControls2Dependencies.cmake",
+		"C:/Qt/6.11.1/mingw_64/lib/cmake/Qt6QuickTemplates2/Qt6QuickTemplates2ConfigVersion.cmake",
+		"C:/Qt/6.11.1/mingw_64/lib/cmake/Qt6QuickTemplates2/Qt6QuickTemplates2ConfigVersionImpl.cmake",
+		"C:/Qt/6.11.1/mingw_64/lib/cmake/Qt6QuickTemplates2/Qt6QuickTemplates2Config.cmake",
+		"C:/Qt/Tools/CMake_64/share/cmake-3.30/Modules/CMakeFindDependencyMacro.cmake",
+		"C:/Qt/6.11.1/mingw_64/lib/cmake/Qt6QuickTemplates2/Qt6QuickTemplates2Dependencies.cmake",
+		"C:/Qt/6.11.1/mingw_64/lib/cmake/Qt6QuickTemplates2/Qt6QuickTemplates2TargetsPrecheck.cmake",
+		"C:/Qt/6.11.1/mingw_64/lib/cmake/Qt6QuickTemplates2/Qt6QuickTemplates2Targets.cmake",
+		"C:/Qt/6.11.1/mingw_64/lib/cmake/Qt6QuickTemplates2/Qt6QuickTemplates2Targets-relwithdebinfo.cmake",
+		"C:/Qt/6.11.1/mingw_64/lib/cmake/Qt6QuickTemplates2/Qt6QuickTemplates2AdditionalTargetInfo.cmake",
+		"C:/Qt/6.11.1/mingw_64/lib/cmake/Qt6QuickTemplates2/Qt6QuickTemplates2VersionlessAliasTargets.cmake",
+		"C:/Qt/6.11.1/mingw_64/lib/cmake/Qt6QuickControls2/Qt6QuickControls2TargetsPrecheck.cmake",
+		"C:/Qt/6.11.1/mingw_64/lib/cmake/Qt6QuickControls2/Qt6QuickControls2Targets.cmake",
+		"C:/Qt/6.11.1/mingw_64/lib/cmake/Qt6QuickControls2/Qt6QuickControls2Targets-relwithdebinfo.cmake",
+		"C:/Qt/6.11.1/mingw_64/lib/cmake/Qt6QuickControls2/Qt6QuickControls2AdditionalTargetInfo.cmake",
+		"C:/Qt/6.11.1/mingw_64/lib/cmake/Qt6QuickControls2/Qt6QuickControls2VersionlessAliasTargets.cmake",
 		"C:/Qt/6.11.1/mingw_64/lib/cmake/Qt6Sql/Qt6SqlConfigVersion.cmake",
 		"C:/Qt/6.11.1/mingw_64/lib/cmake/Qt6Sql/Qt6SqlConfigVersionImpl.cmake",
 		"C:/Qt/6.11.1/mingw_64/lib/cmake/Qt6Sql/Qt6SqlConfig.cmake",
@@ -1188,7 +1208,63 @@
 	"CROSS_CONFIG" : false,
 	"DEP_FILE" : "D:/c++ project/M3uVideoPlayerPc/build/Desktop_Qt_6_11_1_MinGW_64_bit_Debug/M3uVideoPlayerPc_autogen/deps",
 	"DEP_FILE_RULE_NAME" : "M3uVideoPlayerPc_autogen/timestamp",
-	"HEADERS" : [],
+	"HEADERS" : 
+	[
+		[
+			"D:/c++ project/M3uVideoPlayerPc/src/data/ChannelRepository.h",
+			"MU",
+			"SG3YC7EIDC/moc_ChannelRepository.cpp",
+			null
+		],
+		[
+			"D:/c++ project/M3uVideoPlayerPc/src/data/DatabaseManager.h",
+			"MU",
+			"SG3YC7EIDC/moc_DatabaseManager.cpp",
+			null
+		],
+		[
+			"D:/c++ project/M3uVideoPlayerPc/src/data/M3uParser.h",
+			"MU",
+			"SG3YC7EIDC/moc_M3uParser.cpp",
+			null
+		],
+		[
+			"D:/c++ project/M3uVideoPlayerPc/src/data/PlaylistRepository.h",
+			"MU",
+			"SG3YC7EIDC/moc_PlaylistRepository.cpp",
+			null
+		],
+		[
+			"D:/c++ project/M3uVideoPlayerPc/src/data/XtreamApiClient.h",
+			"MU",
+			"SG3YC7EIDC/moc_XtreamApiClient.cpp",
+			null
+		],
+		[
+			"D:/c++ project/M3uVideoPlayerPc/src/domain/FuzzySearch.h",
+			"MU",
+			"A7EWVEEJ67/moc_FuzzySearch.cpp",
+			null
+		],
+		[
+			"D:/c++ project/M3uVideoPlayerPc/src/infrastructure/TimeZoneManager.h",
+			"MU",
+			"HPTJARPH5Y/moc_TimeZoneManager.cpp",
+			null
+		],
+		[
+			"D:/c++ project/M3uVideoPlayerPc/src/infrastructure/TrustedTimeSource.h",
+			"MU",
+			"HPTJARPH5Y/moc_TrustedTimeSource.cpp",
+			null
+		],
+		[
+			"D:/c++ project/M3uVideoPlayerPc/src/ui/AppController.h",
+			"MU",
+			"YPKJ5OE7LN/moc_AppController.cpp",
+			null
+		]
+	],
 	"HEADER_EXTENSIONS" : [ "h", "hh", "h++", "hm", "hpp", "hxx", "in", "txx" ],
 	"INCLUDE_DIR" : "D:/c++ project/M3uVideoPlayerPc/build/Desktop_Qt_6_11_1_MinGW_64_bit_Debug/M3uVideoPlayerPc_autogen/include",
 	"MOC_COMPILATION_FILE" : "D:/c++ project/M3uVideoPlayerPc/build/Desktop_Qt_6_11_1_MinGW_64_bit_Debug/M3uVideoPlayerPc_autogen/mocs_compilation.cpp",
@@ -1202,6 +1278,7 @@
 		"QT_QMLINTEGRATION_LIB",
 		"QT_QML_DEBUG",
 		"QT_QML_LIB",
+		"QT_QUICKCONTROLS2_LIB",
 		"QT_QUICK_LIB",
 		"QT_SQL_LIB",
 		"UNICODE",
@@ -1222,6 +1299,7 @@
 	[
 		"D:/c++ project/M3uVideoPlayerPc",
 		"D:/c++ project/M3uVideoPlayerPc/src",
+		"D:/c++ project/M3uVideoPlayerPc/src/ui",
 		"C:/Qt/6.11.1/mingw_64/include/QtQml",
 		"C:/Qt/6.11.1/mingw_64/include",
 		"C:/Qt/6.11.1/mingw_64/include/QtCore",
@@ -1231,6 +1309,7 @@
 		"C:/Qt/6.11.1/mingw_64/include/QtGui",
 		"C:/Qt/6.11.1/mingw_64/include/QtQuick",
 		"C:/Qt/6.11.1/mingw_64/include/QtOpenGL",
+		"C:/Qt/6.11.1/mingw_64/include/QtQuickControls2",
 		"C:/Qt/6.11.1/mingw_64/include/QtSql",
 		"C:/Qt/Tools/mingw1310_64/lib/gcc/x86_64-w64-mingw32/13.1.0/include/c++",
 		"C:/Qt/Tools/mingw1310_64/lib/gcc/x86_64-w64-mingw32/13.1.0/include/c++/x86_64-w64-mingw32",
@@ -1286,7 +1365,48 @@
 	"SETTINGS_FILE" : "D:/c++ project/M3uVideoPlayerPc/build/Desktop_Qt_6_11_1_MinGW_64_bit_Debug/CMakeFiles/M3uVideoPlayerPc_autogen.dir/AutogenUsed.txt",
 	"SOURCES" : 
 	[
-		[ "D:/c++ project/M3uVideoPlayerPc/src/main.cpp", "MU", null ]
+		[
+			"D:/c++ project/M3uVideoPlayerPc/src/data/ChannelRepository.cpp",
+			"MU",
+			null
+		],
+		[
+			"D:/c++ project/M3uVideoPlayerPc/src/data/DatabaseManager.cpp",
+			"MU",
+			null
+		],
+		[ "D:/c++ project/M3uVideoPlayerPc/src/data/M3uParser.cpp", "MU", null ],
+		[
+			"D:/c++ project/M3uVideoPlayerPc/src/data/PlaylistRepository.cpp",
+			"MU",
+			null
+		],
+		[
+			"D:/c++ project/M3uVideoPlayerPc/src/data/XtreamApiClient.cpp",
+			"MU",
+			null
+		],
+		[
+			"D:/c++ project/M3uVideoPlayerPc/src/domain/FuzzySearch.cpp",
+			"MU",
+			null
+		],
+		[
+			"D:/c++ project/M3uVideoPlayerPc/src/infrastructure/TimeZoneManager.cpp",
+			"MU",
+			null
+		],
+		[
+			"D:/c++ project/M3uVideoPlayerPc/src/infrastructure/TrustedTimeSource.cpp",
+			"MU",
+			null
+		],
+		[ "D:/c++ project/M3uVideoPlayerPc/src/main.cpp", "MU", null ],
+		[
+			"D:/c++ project/M3uVideoPlayerPc/src/ui/AppController.cpp",
+			"MU",
+			null
+		]
 	],
 	"UIC_OPTIONS" : [],
 	"UIC_SEARCH_PATHS" : [],

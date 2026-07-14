@@ -96,18 +96,18 @@ clean: CMakeFiles/M3uVideoPlayerPc_autogen.dir/clean
 
 # All Build rule for target.
 CMakeFiles/M3uVideoPlayerPc.dir/all: CMakeFiles/M3uVideoPlayerPc_copy_qml.dir/all
-CMakeFiles/M3uVideoPlayerPc.dir/all: CMakeFiles/M3uVideoPlayerPc_copy_res.dir/all
 CMakeFiles/M3uVideoPlayerPc.dir/all: CMakeFiles/generate_qmlls_build_ini_file.dir/all
+CMakeFiles/M3uVideoPlayerPc.dir/all: CMakeFiles/M3uVideoPlayerPc_copy_res.dir/all
 CMakeFiles/M3uVideoPlayerPc.dir/all: CMakeFiles/M3uVideoPlayerPc_autogen.dir/all
 CMakeFiles/M3uVideoPlayerPc.dir/all: CMakeFiles/M3uVideoPlayerPc_autogen_timestamp_deps.dir/all
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\M3uVideoPlayerPc.dir\build.make CMakeFiles/M3uVideoPlayerPc.dir/depend
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\M3uVideoPlayerPc.dir\build.make CMakeFiles/M3uVideoPlayerPc.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir="D:\c++ project\M3uVideoPlayerPc\build\Desktop_Qt_6_11_1_MinGW_64_bit_Debug\CMakeFiles" --progress-num=1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31 "Built target M3uVideoPlayerPc"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir="D:\c++ project\M3uVideoPlayerPc\build\Desktop_Qt_6_11_1_MinGW_64_bit_Debug\CMakeFiles" --progress-num=1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40 "Built target M3uVideoPlayerPc"
 .PHONY : CMakeFiles/M3uVideoPlayerPc.dir/all
 
 # Build rule for subdir invocation for target.
 CMakeFiles/M3uVideoPlayerPc.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start "D:\c++ project\M3uVideoPlayerPc\build\Desktop_Qt_6_11_1_MinGW_64_bit_Debug\CMakeFiles" 35
+	$(CMAKE_COMMAND) -E cmake_progress_start "D:\c++ project\M3uVideoPlayerPc\build\Desktop_Qt_6_11_1_MinGW_64_bit_Debug\CMakeFiles" 44
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\Makefile2 CMakeFiles/M3uVideoPlayerPc.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start "D:\c++ project\M3uVideoPlayerPc\build\Desktop_Qt_6_11_1_MinGW_64_bit_Debug\CMakeFiles" 0
 .PHONY : CMakeFiles/M3uVideoPlayerPc.dir/rule
@@ -128,7 +128,7 @@ CMakeFiles/M3uVideoPlayerPc.dir/clean:
 CMakeFiles/M3uVideoPlayerPc_qmltyperegistration.dir/all: CMakeFiles/M3uVideoPlayerPc_autogen_timestamp_deps.dir/all
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\M3uVideoPlayerPc_qmltyperegistration.dir\build.make CMakeFiles/M3uVideoPlayerPc_qmltyperegistration.dir/depend
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\M3uVideoPlayerPc_qmltyperegistration.dir\build.make CMakeFiles/M3uVideoPlayerPc_qmltyperegistration.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir="D:\c++ project\M3uVideoPlayerPc\build\Desktop_Qt_6_11_1_MinGW_64_bit_Debug\CMakeFiles" --progress-num=35,36,37,38,39 "Built target M3uVideoPlayerPc_qmltyperegistration"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir="D:\c++ project\M3uVideoPlayerPc\build\Desktop_Qt_6_11_1_MinGW_64_bit_Debug\CMakeFiles" --progress-num=44,45,46,47,48 "Built target M3uVideoPlayerPc_qmltyperegistration"
 .PHONY : CMakeFiles/M3uVideoPlayerPc_qmltyperegistration.dir/all
 
 # Build rule for subdir invocation for target.
@@ -362,7 +362,7 @@ CMakeFiles/all_qmllint_module.dir/clean:
 CMakeFiles/dump_qml_context_properties.dir/all:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\dump_qml_context_properties.dir\build.make CMakeFiles/dump_qml_context_properties.dir/depend
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\dump_qml_context_properties.dir\build.make CMakeFiles/dump_qml_context_properties.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir="D:\c++ project\M3uVideoPlayerPc\build\Desktop_Qt_6_11_1_MinGW_64_bit_Debug\CMakeFiles" --progress-num=42 "Built target dump_qml_context_properties"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir="D:\c++ project\M3uVideoPlayerPc\build\Desktop_Qt_6_11_1_MinGW_64_bit_Debug\CMakeFiles" --progress-num=51 "Built target dump_qml_context_properties"
 .PHONY : CMakeFiles/dump_qml_context_properties.dir/all
 
 # Build rule for subdir invocation for target.
@@ -388,7 +388,7 @@ CMakeFiles/dump_qml_context_properties.dir/clean:
 CMakeFiles/clean_qml_context_properties.dir/all:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\clean_qml_context_properties.dir\build.make CMakeFiles/clean_qml_context_properties.dir/depend
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\clean_qml_context_properties.dir\build.make CMakeFiles/clean_qml_context_properties.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir="D:\c++ project\M3uVideoPlayerPc\build\Desktop_Qt_6_11_1_MinGW_64_bit_Debug\CMakeFiles" --progress-num=41 "Built target clean_qml_context_properties"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir="D:\c++ project\M3uVideoPlayerPc\build\Desktop_Qt_6_11_1_MinGW_64_bit_Debug\CMakeFiles" --progress-num=50 "Built target clean_qml_context_properties"
 .PHONY : CMakeFiles/clean_qml_context_properties.dir/all
 
 # Build rule for subdir invocation for target.
@@ -414,7 +414,7 @@ CMakeFiles/clean_qml_context_properties.dir/clean:
 CMakeFiles/M3uVideoPlayerPc_copy_qml.dir/all:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\M3uVideoPlayerPc_copy_qml.dir\build.make CMakeFiles/M3uVideoPlayerPc_copy_qml.dir/depend
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\M3uVideoPlayerPc_copy_qml.dir\build.make CMakeFiles/M3uVideoPlayerPc_copy_qml.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir="D:\c++ project\M3uVideoPlayerPc\build\Desktop_Qt_6_11_1_MinGW_64_bit_Debug\CMakeFiles" --progress-num=33 "Built target M3uVideoPlayerPc_copy_qml"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir="D:\c++ project\M3uVideoPlayerPc\build\Desktop_Qt_6_11_1_MinGW_64_bit_Debug\CMakeFiles" --progress-num=42 "Built target M3uVideoPlayerPc_copy_qml"
 .PHONY : CMakeFiles/M3uVideoPlayerPc_copy_qml.dir/all
 
 # Build rule for subdir invocation for target.
@@ -440,7 +440,7 @@ CMakeFiles/M3uVideoPlayerPc_copy_qml.dir/clean:
 CMakeFiles/M3uVideoPlayerPc_copy_res.dir/all:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\M3uVideoPlayerPc_copy_res.dir\build.make CMakeFiles/M3uVideoPlayerPc_copy_res.dir/depend
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\M3uVideoPlayerPc_copy_res.dir\build.make CMakeFiles/M3uVideoPlayerPc_copy_res.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir="D:\c++ project\M3uVideoPlayerPc\build\Desktop_Qt_6_11_1_MinGW_64_bit_Debug\CMakeFiles" --progress-num=34 "Built target M3uVideoPlayerPc_copy_res"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir="D:\c++ project\M3uVideoPlayerPc\build\Desktop_Qt_6_11_1_MinGW_64_bit_Debug\CMakeFiles" --progress-num=43 "Built target M3uVideoPlayerPc_copy_res"
 .PHONY : CMakeFiles/M3uVideoPlayerPc_copy_res.dir/all
 
 # Build rule for subdir invocation for target.
@@ -466,7 +466,7 @@ CMakeFiles/M3uVideoPlayerPc_copy_res.dir/clean:
 CMakeFiles/generate_qmlls_build_ini_file.dir/all:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\generate_qmlls_build_ini_file.dir\build.make CMakeFiles/generate_qmlls_build_ini_file.dir/depend
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\generate_qmlls_build_ini_file.dir\build.make CMakeFiles/generate_qmlls_build_ini_file.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir="D:\c++ project\M3uVideoPlayerPc\build\Desktop_Qt_6_11_1_MinGW_64_bit_Debug\CMakeFiles" --progress-num=43 "Built target generate_qmlls_build_ini_file"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir="D:\c++ project\M3uVideoPlayerPc\build\Desktop_Qt_6_11_1_MinGW_64_bit_Debug\CMakeFiles" --progress-num=52 "Built target generate_qmlls_build_ini_file"
 .PHONY : CMakeFiles/generate_qmlls_build_ini_file.dir/all
 
 # Build rule for subdir invocation for target.
@@ -493,7 +493,7 @@ CMakeFiles/module_M3uVideoPlayerPc_aotstats_target.dir/all: CMakeFiles/M3uVideoP
 CMakeFiles/module_M3uVideoPlayerPc_aotstats_target.dir/all: CMakeFiles/M3uVideoPlayerPc_autogen_timestamp_deps.dir/all
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\module_M3uVideoPlayerPc_aotstats_target.dir\build.make CMakeFiles/module_M3uVideoPlayerPc_aotstats_target.dir/depend
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\module_M3uVideoPlayerPc_aotstats_target.dir\build.make CMakeFiles/module_M3uVideoPlayerPc_aotstats_target.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir="D:\c++ project\M3uVideoPlayerPc\build\Desktop_Qt_6_11_1_MinGW_64_bit_Debug\CMakeFiles" --progress-num=44,45,46,47,48,49,50,51,52 "Built target module_M3uVideoPlayerPc_aotstats_target"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir="D:\c++ project\M3uVideoPlayerPc\build\Desktop_Qt_6_11_1_MinGW_64_bit_Debug\CMakeFiles" --progress-num=53,54,55,56,57,58,59,60,61 "Built target module_M3uVideoPlayerPc_aotstats_target"
 .PHONY : CMakeFiles/module_M3uVideoPlayerPc_aotstats_target.dir/all
 
 # Build rule for subdir invocation for target.
@@ -520,7 +520,7 @@ CMakeFiles/all_aotstats.dir/all: CMakeFiles/module_M3uVideoPlayerPc_aotstats_tar
 CMakeFiles/all_aotstats.dir/all: CMakeFiles/M3uVideoPlayerPc_autogen_timestamp_deps.dir/all
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\all_aotstats.dir\build.make CMakeFiles/all_aotstats.dir/depend
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\all_aotstats.dir\build.make CMakeFiles/all_aotstats.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir="D:\c++ project\M3uVideoPlayerPc\build\Desktop_Qt_6_11_1_MinGW_64_bit_Debug\CMakeFiles" --progress-num=40 "Built target all_aotstats"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir="D:\c++ project\M3uVideoPlayerPc\build\Desktop_Qt_6_11_1_MinGW_64_bit_Debug\CMakeFiles" --progress-num=49 "Built target all_aotstats"
 .PHONY : CMakeFiles/all_aotstats.dir/all
 
 # Build rule for subdir invocation for target.
@@ -544,8 +544,8 @@ CMakeFiles/all_aotstats.dir/clean:
 
 # All Build rule for target.
 CMakeFiles/M3uVideoPlayerPc_autogen_timestamp_deps.dir/all: CMakeFiles/M3uVideoPlayerPc_copy_qml.dir/all
-CMakeFiles/M3uVideoPlayerPc_autogen_timestamp_deps.dir/all: CMakeFiles/M3uVideoPlayerPc_copy_res.dir/all
 CMakeFiles/M3uVideoPlayerPc_autogen_timestamp_deps.dir/all: CMakeFiles/generate_qmlls_build_ini_file.dir/all
+CMakeFiles/M3uVideoPlayerPc_autogen_timestamp_deps.dir/all: CMakeFiles/M3uVideoPlayerPc_copy_res.dir/all
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\M3uVideoPlayerPc_autogen_timestamp_deps.dir\build.make CMakeFiles/M3uVideoPlayerPc_autogen_timestamp_deps.dir/depend
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\M3uVideoPlayerPc_autogen_timestamp_deps.dir\build.make CMakeFiles/M3uVideoPlayerPc_autogen_timestamp_deps.dir/build
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir="D:\c++ project\M3uVideoPlayerPc\build\Desktop_Qt_6_11_1_MinGW_64_bit_Debug\CMakeFiles" --progress-num= "Built target M3uVideoPlayerPc_autogen_timestamp_deps"
@@ -574,7 +574,7 @@ CMakeFiles/M3uVideoPlayerPc_autogen_timestamp_deps.dir/clean:
 CMakeFiles/M3uVideoPlayerPc_autogen.dir/all: CMakeFiles/M3uVideoPlayerPc_autogen_timestamp_deps.dir/all
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\M3uVideoPlayerPc_autogen.dir\build.make CMakeFiles/M3uVideoPlayerPc_autogen.dir/depend
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\M3uVideoPlayerPc_autogen.dir\build.make CMakeFiles/M3uVideoPlayerPc_autogen.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir="D:\c++ project\M3uVideoPlayerPc\build\Desktop_Qt_6_11_1_MinGW_64_bit_Debug\CMakeFiles" --progress-num=32 "Built target M3uVideoPlayerPc_autogen"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir="D:\c++ project\M3uVideoPlayerPc\build\Desktop_Qt_6_11_1_MinGW_64_bit_Debug\CMakeFiles" --progress-num=41 "Built target M3uVideoPlayerPc_autogen"
 .PHONY : CMakeFiles/M3uVideoPlayerPc_autogen.dir/all
 
 # Build rule for subdir invocation for target.

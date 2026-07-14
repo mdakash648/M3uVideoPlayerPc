@@ -83,6 +83,7 @@ m3uvideoplayerpc_qmltyperegistrations.cpp: C:/Qt/6.11.1/mingw_64/metatypes/qt6ne
 m3uvideoplayerpc_qmltyperegistrations.cpp: C:/Qt/6.11.1/mingw_64/metatypes/qt6gui_metatypes.json
 m3uvideoplayerpc_qmltyperegistrations.cpp: C:/Qt/6.11.1/mingw_64/metatypes/qt6quick_metatypes.json
 m3uvideoplayerpc_qmltyperegistrations.cpp: C:/Qt/6.11.1/mingw_64/metatypes/qt6opengl_metatypes.json
+m3uvideoplayerpc_qmltyperegistrations.cpp: C:/Qt/6.11.1/mingw_64/metatypes/qt6quickcontrols2_metatypes.json
 m3uvideoplayerpc_qmltyperegistrations.cpp: C:/Qt/6.11.1/mingw_64/metatypes/qt6sql_metatypes.json
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --blue --bold --progress-dir="D:\c++ project\M3uVideoPlayerPc\build\Desktop_Qt_6_11_1_MinGW_64_bit_Debug\CMakeFiles" --progress-num=$(CMAKE_PROGRESS_2) "Automatic QML type registration for target M3uVideoPlayerPc"
 	call .qt\bin\qt_setup_tool_path.bat C:/Qt/6.11.1/mingw_64/bin/qmltyperegistrar.exe "--generate-qmltypes=D:/c++ project/M3uVideoPlayerPc/build/Desktop_Qt_6_11_1_MinGW_64_bit_Debug/M3uVideoPlayer/M3uVideoPlayerPc.qmltypes" --import-name=M3uVideoPlayer --major-version=1 --minor-version=0 "@D:/c++ project/M3uVideoPlayerPc/build/Desktop_Qt_6_11_1_MinGW_64_bit_Debug/qmltypes/M3uVideoPlayerPc_foreign_types.txt" -o "D:/c++ project/M3uVideoPlayerPc/build/Desktop_Qt_6_11_1_MinGW_64_bit_Debug/m3uvideoplayerpc_qmltyperegistrations.cpp" "D:/c++ project/M3uVideoPlayerPc/build/Desktop_Qt_6_11_1_MinGW_64_bit_Debug/meta_types/qt6m3uvideoplayerpc_metatypes.json"
@@ -267,11 +268,146 @@ CMakeFiles/M3uVideoPlayerPc.dir/src/main.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/M3uVideoPlayerPc.dir/src/main.cpp.s"
 	C:\Qt\Tools\mingw1310_64\bin\g++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S "D:\c++ project\M3uVideoPlayerPc\src\main.cpp" -o CMakeFiles\M3uVideoPlayerPc.dir\src\main.cpp.s
 
+CMakeFiles/M3uVideoPlayerPc.dir/src/domain/FuzzySearch.cpp.obj: CMakeFiles/M3uVideoPlayerPc.dir/flags.make
+CMakeFiles/M3uVideoPlayerPc.dir/src/domain/FuzzySearch.cpp.obj: CMakeFiles/M3uVideoPlayerPc.dir/includes_CXX.rsp
+CMakeFiles/M3uVideoPlayerPc.dir/src/domain/FuzzySearch.cpp.obj: D:/c++\ project/M3uVideoPlayerPc/src/domain/FuzzySearch.cpp
+CMakeFiles/M3uVideoPlayerPc.dir/src/domain/FuzzySearch.cpp.obj: CMakeFiles/M3uVideoPlayerPc.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir="D:\c++ project\M3uVideoPlayerPc\build\Desktop_Qt_6_11_1_MinGW_64_bit_Debug\CMakeFiles" --progress-num=$(CMAKE_PROGRESS_19) "Building CXX object CMakeFiles/M3uVideoPlayerPc.dir/src/domain/FuzzySearch.cpp.obj"
+	C:\Qt\Tools\mingw1310_64\bin\g++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/M3uVideoPlayerPc.dir/src/domain/FuzzySearch.cpp.obj -MF CMakeFiles\M3uVideoPlayerPc.dir\src\domain\FuzzySearch.cpp.obj.d -o CMakeFiles\M3uVideoPlayerPc.dir\src\domain\FuzzySearch.cpp.obj -c "D:\c++ project\M3uVideoPlayerPc\src\domain\FuzzySearch.cpp"
+
+CMakeFiles/M3uVideoPlayerPc.dir/src/domain/FuzzySearch.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/M3uVideoPlayerPc.dir/src/domain/FuzzySearch.cpp.i"
+	C:\Qt\Tools\mingw1310_64\bin\g++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E "D:\c++ project\M3uVideoPlayerPc\src\domain\FuzzySearch.cpp" > CMakeFiles\M3uVideoPlayerPc.dir\src\domain\FuzzySearch.cpp.i
+
+CMakeFiles/M3uVideoPlayerPc.dir/src/domain/FuzzySearch.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/M3uVideoPlayerPc.dir/src/domain/FuzzySearch.cpp.s"
+	C:\Qt\Tools\mingw1310_64\bin\g++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S "D:\c++ project\M3uVideoPlayerPc\src\domain\FuzzySearch.cpp" -o CMakeFiles\M3uVideoPlayerPc.dir\src\domain\FuzzySearch.cpp.s
+
+CMakeFiles/M3uVideoPlayerPc.dir/src/data/DatabaseManager.cpp.obj: CMakeFiles/M3uVideoPlayerPc.dir/flags.make
+CMakeFiles/M3uVideoPlayerPc.dir/src/data/DatabaseManager.cpp.obj: CMakeFiles/M3uVideoPlayerPc.dir/includes_CXX.rsp
+CMakeFiles/M3uVideoPlayerPc.dir/src/data/DatabaseManager.cpp.obj: D:/c++\ project/M3uVideoPlayerPc/src/data/DatabaseManager.cpp
+CMakeFiles/M3uVideoPlayerPc.dir/src/data/DatabaseManager.cpp.obj: CMakeFiles/M3uVideoPlayerPc.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir="D:\c++ project\M3uVideoPlayerPc\build\Desktop_Qt_6_11_1_MinGW_64_bit_Debug\CMakeFiles" --progress-num=$(CMAKE_PROGRESS_20) "Building CXX object CMakeFiles/M3uVideoPlayerPc.dir/src/data/DatabaseManager.cpp.obj"
+	C:\Qt\Tools\mingw1310_64\bin\g++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/M3uVideoPlayerPc.dir/src/data/DatabaseManager.cpp.obj -MF CMakeFiles\M3uVideoPlayerPc.dir\src\data\DatabaseManager.cpp.obj.d -o CMakeFiles\M3uVideoPlayerPc.dir\src\data\DatabaseManager.cpp.obj -c "D:\c++ project\M3uVideoPlayerPc\src\data\DatabaseManager.cpp"
+
+CMakeFiles/M3uVideoPlayerPc.dir/src/data/DatabaseManager.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/M3uVideoPlayerPc.dir/src/data/DatabaseManager.cpp.i"
+	C:\Qt\Tools\mingw1310_64\bin\g++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E "D:\c++ project\M3uVideoPlayerPc\src\data\DatabaseManager.cpp" > CMakeFiles\M3uVideoPlayerPc.dir\src\data\DatabaseManager.cpp.i
+
+CMakeFiles/M3uVideoPlayerPc.dir/src/data/DatabaseManager.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/M3uVideoPlayerPc.dir/src/data/DatabaseManager.cpp.s"
+	C:\Qt\Tools\mingw1310_64\bin\g++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S "D:\c++ project\M3uVideoPlayerPc\src\data\DatabaseManager.cpp" -o CMakeFiles\M3uVideoPlayerPc.dir\src\data\DatabaseManager.cpp.s
+
+CMakeFiles/M3uVideoPlayerPc.dir/src/data/PlaylistRepository.cpp.obj: CMakeFiles/M3uVideoPlayerPc.dir/flags.make
+CMakeFiles/M3uVideoPlayerPc.dir/src/data/PlaylistRepository.cpp.obj: CMakeFiles/M3uVideoPlayerPc.dir/includes_CXX.rsp
+CMakeFiles/M3uVideoPlayerPc.dir/src/data/PlaylistRepository.cpp.obj: D:/c++\ project/M3uVideoPlayerPc/src/data/PlaylistRepository.cpp
+CMakeFiles/M3uVideoPlayerPc.dir/src/data/PlaylistRepository.cpp.obj: CMakeFiles/M3uVideoPlayerPc.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir="D:\c++ project\M3uVideoPlayerPc\build\Desktop_Qt_6_11_1_MinGW_64_bit_Debug\CMakeFiles" --progress-num=$(CMAKE_PROGRESS_21) "Building CXX object CMakeFiles/M3uVideoPlayerPc.dir/src/data/PlaylistRepository.cpp.obj"
+	C:\Qt\Tools\mingw1310_64\bin\g++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/M3uVideoPlayerPc.dir/src/data/PlaylistRepository.cpp.obj -MF CMakeFiles\M3uVideoPlayerPc.dir\src\data\PlaylistRepository.cpp.obj.d -o CMakeFiles\M3uVideoPlayerPc.dir\src\data\PlaylistRepository.cpp.obj -c "D:\c++ project\M3uVideoPlayerPc\src\data\PlaylistRepository.cpp"
+
+CMakeFiles/M3uVideoPlayerPc.dir/src/data/PlaylistRepository.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/M3uVideoPlayerPc.dir/src/data/PlaylistRepository.cpp.i"
+	C:\Qt\Tools\mingw1310_64\bin\g++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E "D:\c++ project\M3uVideoPlayerPc\src\data\PlaylistRepository.cpp" > CMakeFiles\M3uVideoPlayerPc.dir\src\data\PlaylistRepository.cpp.i
+
+CMakeFiles/M3uVideoPlayerPc.dir/src/data/PlaylistRepository.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/M3uVideoPlayerPc.dir/src/data/PlaylistRepository.cpp.s"
+	C:\Qt\Tools\mingw1310_64\bin\g++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S "D:\c++ project\M3uVideoPlayerPc\src\data\PlaylistRepository.cpp" -o CMakeFiles\M3uVideoPlayerPc.dir\src\data\PlaylistRepository.cpp.s
+
+CMakeFiles/M3uVideoPlayerPc.dir/src/data/ChannelRepository.cpp.obj: CMakeFiles/M3uVideoPlayerPc.dir/flags.make
+CMakeFiles/M3uVideoPlayerPc.dir/src/data/ChannelRepository.cpp.obj: CMakeFiles/M3uVideoPlayerPc.dir/includes_CXX.rsp
+CMakeFiles/M3uVideoPlayerPc.dir/src/data/ChannelRepository.cpp.obj: D:/c++\ project/M3uVideoPlayerPc/src/data/ChannelRepository.cpp
+CMakeFiles/M3uVideoPlayerPc.dir/src/data/ChannelRepository.cpp.obj: CMakeFiles/M3uVideoPlayerPc.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir="D:\c++ project\M3uVideoPlayerPc\build\Desktop_Qt_6_11_1_MinGW_64_bit_Debug\CMakeFiles" --progress-num=$(CMAKE_PROGRESS_22) "Building CXX object CMakeFiles/M3uVideoPlayerPc.dir/src/data/ChannelRepository.cpp.obj"
+	C:\Qt\Tools\mingw1310_64\bin\g++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/M3uVideoPlayerPc.dir/src/data/ChannelRepository.cpp.obj -MF CMakeFiles\M3uVideoPlayerPc.dir\src\data\ChannelRepository.cpp.obj.d -o CMakeFiles\M3uVideoPlayerPc.dir\src\data\ChannelRepository.cpp.obj -c "D:\c++ project\M3uVideoPlayerPc\src\data\ChannelRepository.cpp"
+
+CMakeFiles/M3uVideoPlayerPc.dir/src/data/ChannelRepository.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/M3uVideoPlayerPc.dir/src/data/ChannelRepository.cpp.i"
+	C:\Qt\Tools\mingw1310_64\bin\g++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E "D:\c++ project\M3uVideoPlayerPc\src\data\ChannelRepository.cpp" > CMakeFiles\M3uVideoPlayerPc.dir\src\data\ChannelRepository.cpp.i
+
+CMakeFiles/M3uVideoPlayerPc.dir/src/data/ChannelRepository.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/M3uVideoPlayerPc.dir/src/data/ChannelRepository.cpp.s"
+	C:\Qt\Tools\mingw1310_64\bin\g++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S "D:\c++ project\M3uVideoPlayerPc\src\data\ChannelRepository.cpp" -o CMakeFiles\M3uVideoPlayerPc.dir\src\data\ChannelRepository.cpp.s
+
+CMakeFiles/M3uVideoPlayerPc.dir/src/data/M3uParser.cpp.obj: CMakeFiles/M3uVideoPlayerPc.dir/flags.make
+CMakeFiles/M3uVideoPlayerPc.dir/src/data/M3uParser.cpp.obj: CMakeFiles/M3uVideoPlayerPc.dir/includes_CXX.rsp
+CMakeFiles/M3uVideoPlayerPc.dir/src/data/M3uParser.cpp.obj: D:/c++\ project/M3uVideoPlayerPc/src/data/M3uParser.cpp
+CMakeFiles/M3uVideoPlayerPc.dir/src/data/M3uParser.cpp.obj: CMakeFiles/M3uVideoPlayerPc.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir="D:\c++ project\M3uVideoPlayerPc\build\Desktop_Qt_6_11_1_MinGW_64_bit_Debug\CMakeFiles" --progress-num=$(CMAKE_PROGRESS_23) "Building CXX object CMakeFiles/M3uVideoPlayerPc.dir/src/data/M3uParser.cpp.obj"
+	C:\Qt\Tools\mingw1310_64\bin\g++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/M3uVideoPlayerPc.dir/src/data/M3uParser.cpp.obj -MF CMakeFiles\M3uVideoPlayerPc.dir\src\data\M3uParser.cpp.obj.d -o CMakeFiles\M3uVideoPlayerPc.dir\src\data\M3uParser.cpp.obj -c "D:\c++ project\M3uVideoPlayerPc\src\data\M3uParser.cpp"
+
+CMakeFiles/M3uVideoPlayerPc.dir/src/data/M3uParser.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/M3uVideoPlayerPc.dir/src/data/M3uParser.cpp.i"
+	C:\Qt\Tools\mingw1310_64\bin\g++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E "D:\c++ project\M3uVideoPlayerPc\src\data\M3uParser.cpp" > CMakeFiles\M3uVideoPlayerPc.dir\src\data\M3uParser.cpp.i
+
+CMakeFiles/M3uVideoPlayerPc.dir/src/data/M3uParser.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/M3uVideoPlayerPc.dir/src/data/M3uParser.cpp.s"
+	C:\Qt\Tools\mingw1310_64\bin\g++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S "D:\c++ project\M3uVideoPlayerPc\src\data\M3uParser.cpp" -o CMakeFiles\M3uVideoPlayerPc.dir\src\data\M3uParser.cpp.s
+
+CMakeFiles/M3uVideoPlayerPc.dir/src/data/XtreamApiClient.cpp.obj: CMakeFiles/M3uVideoPlayerPc.dir/flags.make
+CMakeFiles/M3uVideoPlayerPc.dir/src/data/XtreamApiClient.cpp.obj: CMakeFiles/M3uVideoPlayerPc.dir/includes_CXX.rsp
+CMakeFiles/M3uVideoPlayerPc.dir/src/data/XtreamApiClient.cpp.obj: D:/c++\ project/M3uVideoPlayerPc/src/data/XtreamApiClient.cpp
+CMakeFiles/M3uVideoPlayerPc.dir/src/data/XtreamApiClient.cpp.obj: CMakeFiles/M3uVideoPlayerPc.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir="D:\c++ project\M3uVideoPlayerPc\build\Desktop_Qt_6_11_1_MinGW_64_bit_Debug\CMakeFiles" --progress-num=$(CMAKE_PROGRESS_24) "Building CXX object CMakeFiles/M3uVideoPlayerPc.dir/src/data/XtreamApiClient.cpp.obj"
+	C:\Qt\Tools\mingw1310_64\bin\g++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/M3uVideoPlayerPc.dir/src/data/XtreamApiClient.cpp.obj -MF CMakeFiles\M3uVideoPlayerPc.dir\src\data\XtreamApiClient.cpp.obj.d -o CMakeFiles\M3uVideoPlayerPc.dir\src\data\XtreamApiClient.cpp.obj -c "D:\c++ project\M3uVideoPlayerPc\src\data\XtreamApiClient.cpp"
+
+CMakeFiles/M3uVideoPlayerPc.dir/src/data/XtreamApiClient.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/M3uVideoPlayerPc.dir/src/data/XtreamApiClient.cpp.i"
+	C:\Qt\Tools\mingw1310_64\bin\g++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E "D:\c++ project\M3uVideoPlayerPc\src\data\XtreamApiClient.cpp" > CMakeFiles\M3uVideoPlayerPc.dir\src\data\XtreamApiClient.cpp.i
+
+CMakeFiles/M3uVideoPlayerPc.dir/src/data/XtreamApiClient.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/M3uVideoPlayerPc.dir/src/data/XtreamApiClient.cpp.s"
+	C:\Qt\Tools\mingw1310_64\bin\g++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S "D:\c++ project\M3uVideoPlayerPc\src\data\XtreamApiClient.cpp" -o CMakeFiles\M3uVideoPlayerPc.dir\src\data\XtreamApiClient.cpp.s
+
+CMakeFiles/M3uVideoPlayerPc.dir/src/infrastructure/TrustedTimeSource.cpp.obj: CMakeFiles/M3uVideoPlayerPc.dir/flags.make
+CMakeFiles/M3uVideoPlayerPc.dir/src/infrastructure/TrustedTimeSource.cpp.obj: CMakeFiles/M3uVideoPlayerPc.dir/includes_CXX.rsp
+CMakeFiles/M3uVideoPlayerPc.dir/src/infrastructure/TrustedTimeSource.cpp.obj: D:/c++\ project/M3uVideoPlayerPc/src/infrastructure/TrustedTimeSource.cpp
+CMakeFiles/M3uVideoPlayerPc.dir/src/infrastructure/TrustedTimeSource.cpp.obj: CMakeFiles/M3uVideoPlayerPc.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir="D:\c++ project\M3uVideoPlayerPc\build\Desktop_Qt_6_11_1_MinGW_64_bit_Debug\CMakeFiles" --progress-num=$(CMAKE_PROGRESS_25) "Building CXX object CMakeFiles/M3uVideoPlayerPc.dir/src/infrastructure/TrustedTimeSource.cpp.obj"
+	C:\Qt\Tools\mingw1310_64\bin\g++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/M3uVideoPlayerPc.dir/src/infrastructure/TrustedTimeSource.cpp.obj -MF CMakeFiles\M3uVideoPlayerPc.dir\src\infrastructure\TrustedTimeSource.cpp.obj.d -o CMakeFiles\M3uVideoPlayerPc.dir\src\infrastructure\TrustedTimeSource.cpp.obj -c "D:\c++ project\M3uVideoPlayerPc\src\infrastructure\TrustedTimeSource.cpp"
+
+CMakeFiles/M3uVideoPlayerPc.dir/src/infrastructure/TrustedTimeSource.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/M3uVideoPlayerPc.dir/src/infrastructure/TrustedTimeSource.cpp.i"
+	C:\Qt\Tools\mingw1310_64\bin\g++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E "D:\c++ project\M3uVideoPlayerPc\src\infrastructure\TrustedTimeSource.cpp" > CMakeFiles\M3uVideoPlayerPc.dir\src\infrastructure\TrustedTimeSource.cpp.i
+
+CMakeFiles/M3uVideoPlayerPc.dir/src/infrastructure/TrustedTimeSource.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/M3uVideoPlayerPc.dir/src/infrastructure/TrustedTimeSource.cpp.s"
+	C:\Qt\Tools\mingw1310_64\bin\g++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S "D:\c++ project\M3uVideoPlayerPc\src\infrastructure\TrustedTimeSource.cpp" -o CMakeFiles\M3uVideoPlayerPc.dir\src\infrastructure\TrustedTimeSource.cpp.s
+
+CMakeFiles/M3uVideoPlayerPc.dir/src/infrastructure/TimeZoneManager.cpp.obj: CMakeFiles/M3uVideoPlayerPc.dir/flags.make
+CMakeFiles/M3uVideoPlayerPc.dir/src/infrastructure/TimeZoneManager.cpp.obj: CMakeFiles/M3uVideoPlayerPc.dir/includes_CXX.rsp
+CMakeFiles/M3uVideoPlayerPc.dir/src/infrastructure/TimeZoneManager.cpp.obj: D:/c++\ project/M3uVideoPlayerPc/src/infrastructure/TimeZoneManager.cpp
+CMakeFiles/M3uVideoPlayerPc.dir/src/infrastructure/TimeZoneManager.cpp.obj: CMakeFiles/M3uVideoPlayerPc.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir="D:\c++ project\M3uVideoPlayerPc\build\Desktop_Qt_6_11_1_MinGW_64_bit_Debug\CMakeFiles" --progress-num=$(CMAKE_PROGRESS_26) "Building CXX object CMakeFiles/M3uVideoPlayerPc.dir/src/infrastructure/TimeZoneManager.cpp.obj"
+	C:\Qt\Tools\mingw1310_64\bin\g++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/M3uVideoPlayerPc.dir/src/infrastructure/TimeZoneManager.cpp.obj -MF CMakeFiles\M3uVideoPlayerPc.dir\src\infrastructure\TimeZoneManager.cpp.obj.d -o CMakeFiles\M3uVideoPlayerPc.dir\src\infrastructure\TimeZoneManager.cpp.obj -c "D:\c++ project\M3uVideoPlayerPc\src\infrastructure\TimeZoneManager.cpp"
+
+CMakeFiles/M3uVideoPlayerPc.dir/src/infrastructure/TimeZoneManager.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/M3uVideoPlayerPc.dir/src/infrastructure/TimeZoneManager.cpp.i"
+	C:\Qt\Tools\mingw1310_64\bin\g++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E "D:\c++ project\M3uVideoPlayerPc\src\infrastructure\TimeZoneManager.cpp" > CMakeFiles\M3uVideoPlayerPc.dir\src\infrastructure\TimeZoneManager.cpp.i
+
+CMakeFiles/M3uVideoPlayerPc.dir/src/infrastructure/TimeZoneManager.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/M3uVideoPlayerPc.dir/src/infrastructure/TimeZoneManager.cpp.s"
+	C:\Qt\Tools\mingw1310_64\bin\g++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S "D:\c++ project\M3uVideoPlayerPc\src\infrastructure\TimeZoneManager.cpp" -o CMakeFiles\M3uVideoPlayerPc.dir\src\infrastructure\TimeZoneManager.cpp.s
+
+CMakeFiles/M3uVideoPlayerPc.dir/src/ui/AppController.cpp.obj: CMakeFiles/M3uVideoPlayerPc.dir/flags.make
+CMakeFiles/M3uVideoPlayerPc.dir/src/ui/AppController.cpp.obj: CMakeFiles/M3uVideoPlayerPc.dir/includes_CXX.rsp
+CMakeFiles/M3uVideoPlayerPc.dir/src/ui/AppController.cpp.obj: D:/c++\ project/M3uVideoPlayerPc/src/ui/AppController.cpp
+CMakeFiles/M3uVideoPlayerPc.dir/src/ui/AppController.cpp.obj: CMakeFiles/M3uVideoPlayerPc.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir="D:\c++ project\M3uVideoPlayerPc\build\Desktop_Qt_6_11_1_MinGW_64_bit_Debug\CMakeFiles" --progress-num=$(CMAKE_PROGRESS_27) "Building CXX object CMakeFiles/M3uVideoPlayerPc.dir/src/ui/AppController.cpp.obj"
+	C:\Qt\Tools\mingw1310_64\bin\g++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/M3uVideoPlayerPc.dir/src/ui/AppController.cpp.obj -MF CMakeFiles\M3uVideoPlayerPc.dir\src\ui\AppController.cpp.obj.d -o CMakeFiles\M3uVideoPlayerPc.dir\src\ui\AppController.cpp.obj -c "D:\c++ project\M3uVideoPlayerPc\src\ui\AppController.cpp"
+
+CMakeFiles/M3uVideoPlayerPc.dir/src/ui/AppController.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/M3uVideoPlayerPc.dir/src/ui/AppController.cpp.i"
+	C:\Qt\Tools\mingw1310_64\bin\g++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E "D:\c++ project\M3uVideoPlayerPc\src\ui\AppController.cpp" > CMakeFiles\M3uVideoPlayerPc.dir\src\ui\AppController.cpp.i
+
+CMakeFiles/M3uVideoPlayerPc.dir/src/ui/AppController.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/M3uVideoPlayerPc.dir/src/ui/AppController.cpp.s"
+	C:\Qt\Tools\mingw1310_64\bin\g++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S "D:\c++ project\M3uVideoPlayerPc\src\ui\AppController.cpp" -o CMakeFiles\M3uVideoPlayerPc.dir\src\ui\AppController.cpp.s
+
 CMakeFiles/M3uVideoPlayerPc.dir/m3uvideoplayerpc_qmltyperegistrations.cpp.obj: CMakeFiles/M3uVideoPlayerPc.dir/flags.make
 CMakeFiles/M3uVideoPlayerPc.dir/m3uvideoplayerpc_qmltyperegistrations.cpp.obj: CMakeFiles/M3uVideoPlayerPc.dir/includes_CXX.rsp
 CMakeFiles/M3uVideoPlayerPc.dir/m3uvideoplayerpc_qmltyperegistrations.cpp.obj: m3uvideoplayerpc_qmltyperegistrations.cpp
 CMakeFiles/M3uVideoPlayerPc.dir/m3uvideoplayerpc_qmltyperegistrations.cpp.obj: CMakeFiles/M3uVideoPlayerPc.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir="D:\c++ project\M3uVideoPlayerPc\build\Desktop_Qt_6_11_1_MinGW_64_bit_Debug\CMakeFiles" --progress-num=$(CMAKE_PROGRESS_19) "Building CXX object CMakeFiles/M3uVideoPlayerPc.dir/m3uvideoplayerpc_qmltyperegistrations.cpp.obj"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir="D:\c++ project\M3uVideoPlayerPc\build\Desktop_Qt_6_11_1_MinGW_64_bit_Debug\CMakeFiles" --progress-num=$(CMAKE_PROGRESS_28) "Building CXX object CMakeFiles/M3uVideoPlayerPc.dir/m3uvideoplayerpc_qmltyperegistrations.cpp.obj"
 	C:\Qt\Tools\mingw1310_64\bin\g++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -Wa,-mbig-obj -MD -MT CMakeFiles/M3uVideoPlayerPc.dir/m3uvideoplayerpc_qmltyperegistrations.cpp.obj -MF CMakeFiles\M3uVideoPlayerPc.dir\m3uvideoplayerpc_qmltyperegistrations.cpp.obj.d -o CMakeFiles\M3uVideoPlayerPc.dir\m3uvideoplayerpc_qmltyperegistrations.cpp.obj -c "D:\c++ project\M3uVideoPlayerPc\build\Desktop_Qt_6_11_1_MinGW_64_bit_Debug\m3uvideoplayerpc_qmltyperegistrations.cpp"
 
 CMakeFiles/M3uVideoPlayerPc.dir/m3uvideoplayerpc_qmltyperegistrations.cpp.i: cmake_force
@@ -286,7 +422,7 @@ CMakeFiles/M3uVideoPlayerPc.dir/build/Desktop_Qt_6_11_1_MinGW_64_bit_Debug/.qt/r
 CMakeFiles/M3uVideoPlayerPc.dir/build/Desktop_Qt_6_11_1_MinGW_64_bit_Debug/.qt/rcc/qrc_qmake_M3uVideoPlayer.cpp.obj: CMakeFiles/M3uVideoPlayerPc.dir/includes_CXX.rsp
 CMakeFiles/M3uVideoPlayerPc.dir/build/Desktop_Qt_6_11_1_MinGW_64_bit_Debug/.qt/rcc/qrc_qmake_M3uVideoPlayer.cpp.obj: .qt/rcc/qrc_qmake_M3uVideoPlayer.cpp
 CMakeFiles/M3uVideoPlayerPc.dir/build/Desktop_Qt_6_11_1_MinGW_64_bit_Debug/.qt/rcc/qrc_qmake_M3uVideoPlayer.cpp.obj: CMakeFiles/M3uVideoPlayerPc.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir="D:\c++ project\M3uVideoPlayerPc\build\Desktop_Qt_6_11_1_MinGW_64_bit_Debug\CMakeFiles" --progress-num=$(CMAKE_PROGRESS_20) "Building CXX object CMakeFiles/M3uVideoPlayerPc.dir/build/Desktop_Qt_6_11_1_MinGW_64_bit_Debug/.qt/rcc/qrc_qmake_M3uVideoPlayer.cpp.obj"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir="D:\c++ project\M3uVideoPlayerPc\build\Desktop_Qt_6_11_1_MinGW_64_bit_Debug\CMakeFiles" --progress-num=$(CMAKE_PROGRESS_29) "Building CXX object CMakeFiles/M3uVideoPlayerPc.dir/build/Desktop_Qt_6_11_1_MinGW_64_bit_Debug/.qt/rcc/qrc_qmake_M3uVideoPlayer.cpp.obj"
 	C:\Qt\Tools\mingw1310_64\bin\g++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/M3uVideoPlayerPc.dir/build/Desktop_Qt_6_11_1_MinGW_64_bit_Debug/.qt/rcc/qrc_qmake_M3uVideoPlayer.cpp.obj -MF CMakeFiles\M3uVideoPlayerPc.dir\build\Desktop_Qt_6_11_1_MinGW_64_bit_Debug\.qt\rcc\qrc_qmake_M3uVideoPlayer.cpp.obj.d -o CMakeFiles\M3uVideoPlayerPc.dir\build\Desktop_Qt_6_11_1_MinGW_64_bit_Debug\.qt\rcc\qrc_qmake_M3uVideoPlayer.cpp.obj -c "D:\c++ project\M3uVideoPlayerPc\build\Desktop_Qt_6_11_1_MinGW_64_bit_Debug\.qt\rcc\qrc_qmake_M3uVideoPlayer.cpp"
 
 CMakeFiles/M3uVideoPlayerPc.dir/build/Desktop_Qt_6_11_1_MinGW_64_bit_Debug/.qt/rcc/qrc_qmake_M3uVideoPlayer.cpp.i: cmake_force
@@ -301,7 +437,7 @@ CMakeFiles/M3uVideoPlayerPc.dir/build/Desktop_Qt_6_11_1_MinGW_64_bit_Debug/.rcc/
 CMakeFiles/M3uVideoPlayerPc.dir/build/Desktop_Qt_6_11_1_MinGW_64_bit_Debug/.rcc/qmlcache/M3uVideoPlayerPc_qmlcache_loader.cpp.obj: CMakeFiles/M3uVideoPlayerPc.dir/includes_CXX.rsp
 CMakeFiles/M3uVideoPlayerPc.dir/build/Desktop_Qt_6_11_1_MinGW_64_bit_Debug/.rcc/qmlcache/M3uVideoPlayerPc_qmlcache_loader.cpp.obj: .rcc/qmlcache/M3uVideoPlayerPc_qmlcache_loader.cpp
 CMakeFiles/M3uVideoPlayerPc.dir/build/Desktop_Qt_6_11_1_MinGW_64_bit_Debug/.rcc/qmlcache/M3uVideoPlayerPc_qmlcache_loader.cpp.obj: CMakeFiles/M3uVideoPlayerPc.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir="D:\c++ project\M3uVideoPlayerPc\build\Desktop_Qt_6_11_1_MinGW_64_bit_Debug\CMakeFiles" --progress-num=$(CMAKE_PROGRESS_21) "Building CXX object CMakeFiles/M3uVideoPlayerPc.dir/build/Desktop_Qt_6_11_1_MinGW_64_bit_Debug/.rcc/qmlcache/M3uVideoPlayerPc_qmlcache_loader.cpp.obj"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir="D:\c++ project\M3uVideoPlayerPc\build\Desktop_Qt_6_11_1_MinGW_64_bit_Debug\CMakeFiles" --progress-num=$(CMAKE_PROGRESS_30) "Building CXX object CMakeFiles/M3uVideoPlayerPc.dir/build/Desktop_Qt_6_11_1_MinGW_64_bit_Debug/.rcc/qmlcache/M3uVideoPlayerPc_qmlcache_loader.cpp.obj"
 	C:\Qt\Tools\mingw1310_64\bin\g++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/M3uVideoPlayerPc.dir/build/Desktop_Qt_6_11_1_MinGW_64_bit_Debug/.rcc/qmlcache/M3uVideoPlayerPc_qmlcache_loader.cpp.obj -MF CMakeFiles\M3uVideoPlayerPc.dir\build\Desktop_Qt_6_11_1_MinGW_64_bit_Debug\.rcc\qmlcache\M3uVideoPlayerPc_qmlcache_loader.cpp.obj.d -o CMakeFiles\M3uVideoPlayerPc.dir\build\Desktop_Qt_6_11_1_MinGW_64_bit_Debug\.rcc\qmlcache\M3uVideoPlayerPc_qmlcache_loader.cpp.obj -c "D:\c++ project\M3uVideoPlayerPc\build\Desktop_Qt_6_11_1_MinGW_64_bit_Debug\.rcc\qmlcache\M3uVideoPlayerPc_qmlcache_loader.cpp"
 
 CMakeFiles/M3uVideoPlayerPc.dir/build/Desktop_Qt_6_11_1_MinGW_64_bit_Debug/.rcc/qmlcache/M3uVideoPlayerPc_qmlcache_loader.cpp.i: cmake_force
@@ -316,7 +452,7 @@ CMakeFiles/M3uVideoPlayerPc.dir/build/Desktop_Qt_6_11_1_MinGW_64_bit_Debug/.rcc/
 CMakeFiles/M3uVideoPlayerPc.dir/build/Desktop_Qt_6_11_1_MinGW_64_bit_Debug/.rcc/qmlcache/M3uVideoPlayerPc_src/ui/main_qml.cpp.obj: CMakeFiles/M3uVideoPlayerPc.dir/includes_CXX.rsp
 CMakeFiles/M3uVideoPlayerPc.dir/build/Desktop_Qt_6_11_1_MinGW_64_bit_Debug/.rcc/qmlcache/M3uVideoPlayerPc_src/ui/main_qml.cpp.obj: .rcc/qmlcache/M3uVideoPlayerPc_src/ui/main_qml.cpp
 CMakeFiles/M3uVideoPlayerPc.dir/build/Desktop_Qt_6_11_1_MinGW_64_bit_Debug/.rcc/qmlcache/M3uVideoPlayerPc_src/ui/main_qml.cpp.obj: CMakeFiles/M3uVideoPlayerPc.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir="D:\c++ project\M3uVideoPlayerPc\build\Desktop_Qt_6_11_1_MinGW_64_bit_Debug\CMakeFiles" --progress-num=$(CMAKE_PROGRESS_22) "Building CXX object CMakeFiles/M3uVideoPlayerPc.dir/build/Desktop_Qt_6_11_1_MinGW_64_bit_Debug/.rcc/qmlcache/M3uVideoPlayerPc_src/ui/main_qml.cpp.obj"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir="D:\c++ project\M3uVideoPlayerPc\build\Desktop_Qt_6_11_1_MinGW_64_bit_Debug\CMakeFiles" --progress-num=$(CMAKE_PROGRESS_31) "Building CXX object CMakeFiles/M3uVideoPlayerPc.dir/build/Desktop_Qt_6_11_1_MinGW_64_bit_Debug/.rcc/qmlcache/M3uVideoPlayerPc_src/ui/main_qml.cpp.obj"
 	C:\Qt\Tools\mingw1310_64\bin\g++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/M3uVideoPlayerPc.dir/build/Desktop_Qt_6_11_1_MinGW_64_bit_Debug/.rcc/qmlcache/M3uVideoPlayerPc_src/ui/main_qml.cpp.obj -MF CMakeFiles\M3uVideoPlayerPc.dir\build\Desktop_Qt_6_11_1_MinGW_64_bit_Debug\.rcc\qmlcache\M3uVideoPlayerPc_src\ui\main_qml.cpp.obj.d -o CMakeFiles\M3uVideoPlayerPc.dir\build\Desktop_Qt_6_11_1_MinGW_64_bit_Debug\.rcc\qmlcache\M3uVideoPlayerPc_src\ui\main_qml.cpp.obj -c "D:\c++ project\M3uVideoPlayerPc\build\Desktop_Qt_6_11_1_MinGW_64_bit_Debug\.rcc\qmlcache\M3uVideoPlayerPc_src\ui\main_qml.cpp"
 
 CMakeFiles/M3uVideoPlayerPc.dir/build/Desktop_Qt_6_11_1_MinGW_64_bit_Debug/.rcc/qmlcache/M3uVideoPlayerPc_src/ui/main_qml.cpp.i: cmake_force
@@ -331,7 +467,7 @@ CMakeFiles/M3uVideoPlayerPc.dir/build/Desktop_Qt_6_11_1_MinGW_64_bit_Debug/.rcc/
 CMakeFiles/M3uVideoPlayerPc.dir/build/Desktop_Qt_6_11_1_MinGW_64_bit_Debug/.rcc/qmlcache/M3uVideoPlayerPc_src/ui/components/Sidebar_qml.cpp.obj: CMakeFiles/M3uVideoPlayerPc.dir/includes_CXX.rsp
 CMakeFiles/M3uVideoPlayerPc.dir/build/Desktop_Qt_6_11_1_MinGW_64_bit_Debug/.rcc/qmlcache/M3uVideoPlayerPc_src/ui/components/Sidebar_qml.cpp.obj: .rcc/qmlcache/M3uVideoPlayerPc_src/ui/components/Sidebar_qml.cpp
 CMakeFiles/M3uVideoPlayerPc.dir/build/Desktop_Qt_6_11_1_MinGW_64_bit_Debug/.rcc/qmlcache/M3uVideoPlayerPc_src/ui/components/Sidebar_qml.cpp.obj: CMakeFiles/M3uVideoPlayerPc.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir="D:\c++ project\M3uVideoPlayerPc\build\Desktop_Qt_6_11_1_MinGW_64_bit_Debug\CMakeFiles" --progress-num=$(CMAKE_PROGRESS_23) "Building CXX object CMakeFiles/M3uVideoPlayerPc.dir/build/Desktop_Qt_6_11_1_MinGW_64_bit_Debug/.rcc/qmlcache/M3uVideoPlayerPc_src/ui/components/Sidebar_qml.cpp.obj"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir="D:\c++ project\M3uVideoPlayerPc\build\Desktop_Qt_6_11_1_MinGW_64_bit_Debug\CMakeFiles" --progress-num=$(CMAKE_PROGRESS_32) "Building CXX object CMakeFiles/M3uVideoPlayerPc.dir/build/Desktop_Qt_6_11_1_MinGW_64_bit_Debug/.rcc/qmlcache/M3uVideoPlayerPc_src/ui/components/Sidebar_qml.cpp.obj"
 	C:\Qt\Tools\mingw1310_64\bin\g++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/M3uVideoPlayerPc.dir/build/Desktop_Qt_6_11_1_MinGW_64_bit_Debug/.rcc/qmlcache/M3uVideoPlayerPc_src/ui/components/Sidebar_qml.cpp.obj -MF CMakeFiles\M3uVideoPlayerPc.dir\build\Desktop_Qt_6_11_1_MinGW_64_bit_Debug\.rcc\qmlcache\M3uVideoPlayerPc_src\ui\components\Sidebar_qml.cpp.obj.d -o CMakeFiles\M3uVideoPlayerPc.dir\build\Desktop_Qt_6_11_1_MinGW_64_bit_Debug\.rcc\qmlcache\M3uVideoPlayerPc_src\ui\components\Sidebar_qml.cpp.obj -c "D:\c++ project\M3uVideoPlayerPc\build\Desktop_Qt_6_11_1_MinGW_64_bit_Debug\.rcc\qmlcache\M3uVideoPlayerPc_src\ui\components\Sidebar_qml.cpp"
 
 CMakeFiles/M3uVideoPlayerPc.dir/build/Desktop_Qt_6_11_1_MinGW_64_bit_Debug/.rcc/qmlcache/M3uVideoPlayerPc_src/ui/components/Sidebar_qml.cpp.i: cmake_force
@@ -346,7 +482,7 @@ CMakeFiles/M3uVideoPlayerPc.dir/build/Desktop_Qt_6_11_1_MinGW_64_bit_Debug/.rcc/
 CMakeFiles/M3uVideoPlayerPc.dir/build/Desktop_Qt_6_11_1_MinGW_64_bit_Debug/.rcc/qmlcache/M3uVideoPlayerPc_src/ui/components/SidebarButton_qml.cpp.obj: CMakeFiles/M3uVideoPlayerPc.dir/includes_CXX.rsp
 CMakeFiles/M3uVideoPlayerPc.dir/build/Desktop_Qt_6_11_1_MinGW_64_bit_Debug/.rcc/qmlcache/M3uVideoPlayerPc_src/ui/components/SidebarButton_qml.cpp.obj: .rcc/qmlcache/M3uVideoPlayerPc_src/ui/components/SidebarButton_qml.cpp
 CMakeFiles/M3uVideoPlayerPc.dir/build/Desktop_Qt_6_11_1_MinGW_64_bit_Debug/.rcc/qmlcache/M3uVideoPlayerPc_src/ui/components/SidebarButton_qml.cpp.obj: CMakeFiles/M3uVideoPlayerPc.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir="D:\c++ project\M3uVideoPlayerPc\build\Desktop_Qt_6_11_1_MinGW_64_bit_Debug\CMakeFiles" --progress-num=$(CMAKE_PROGRESS_24) "Building CXX object CMakeFiles/M3uVideoPlayerPc.dir/build/Desktop_Qt_6_11_1_MinGW_64_bit_Debug/.rcc/qmlcache/M3uVideoPlayerPc_src/ui/components/SidebarButton_qml.cpp.obj"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir="D:\c++ project\M3uVideoPlayerPc\build\Desktop_Qt_6_11_1_MinGW_64_bit_Debug\CMakeFiles" --progress-num=$(CMAKE_PROGRESS_33) "Building CXX object CMakeFiles/M3uVideoPlayerPc.dir/build/Desktop_Qt_6_11_1_MinGW_64_bit_Debug/.rcc/qmlcache/M3uVideoPlayerPc_src/ui/components/SidebarButton_qml.cpp.obj"
 	C:\Qt\Tools\mingw1310_64\bin\g++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/M3uVideoPlayerPc.dir/build/Desktop_Qt_6_11_1_MinGW_64_bit_Debug/.rcc/qmlcache/M3uVideoPlayerPc_src/ui/components/SidebarButton_qml.cpp.obj -MF CMakeFiles\M3uVideoPlayerPc.dir\build\Desktop_Qt_6_11_1_MinGW_64_bit_Debug\.rcc\qmlcache\M3uVideoPlayerPc_src\ui\components\SidebarButton_qml.cpp.obj.d -o CMakeFiles\M3uVideoPlayerPc.dir\build\Desktop_Qt_6_11_1_MinGW_64_bit_Debug\.rcc\qmlcache\M3uVideoPlayerPc_src\ui\components\SidebarButton_qml.cpp.obj -c "D:\c++ project\M3uVideoPlayerPc\build\Desktop_Qt_6_11_1_MinGW_64_bit_Debug\.rcc\qmlcache\M3uVideoPlayerPc_src\ui\components\SidebarButton_qml.cpp"
 
 CMakeFiles/M3uVideoPlayerPc.dir/build/Desktop_Qt_6_11_1_MinGW_64_bit_Debug/.rcc/qmlcache/M3uVideoPlayerPc_src/ui/components/SidebarButton_qml.cpp.i: cmake_force
@@ -361,7 +497,7 @@ CMakeFiles/M3uVideoPlayerPc.dir/build/Desktop_Qt_6_11_1_MinGW_64_bit_Debug/.rcc/
 CMakeFiles/M3uVideoPlayerPc.dir/build/Desktop_Qt_6_11_1_MinGW_64_bit_Debug/.rcc/qmlcache/M3uVideoPlayerPc_src/ui/components/AddPlaylistDialog_qml.cpp.obj: CMakeFiles/M3uVideoPlayerPc.dir/includes_CXX.rsp
 CMakeFiles/M3uVideoPlayerPc.dir/build/Desktop_Qt_6_11_1_MinGW_64_bit_Debug/.rcc/qmlcache/M3uVideoPlayerPc_src/ui/components/AddPlaylistDialog_qml.cpp.obj: .rcc/qmlcache/M3uVideoPlayerPc_src/ui/components/AddPlaylistDialog_qml.cpp
 CMakeFiles/M3uVideoPlayerPc.dir/build/Desktop_Qt_6_11_1_MinGW_64_bit_Debug/.rcc/qmlcache/M3uVideoPlayerPc_src/ui/components/AddPlaylistDialog_qml.cpp.obj: CMakeFiles/M3uVideoPlayerPc.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir="D:\c++ project\M3uVideoPlayerPc\build\Desktop_Qt_6_11_1_MinGW_64_bit_Debug\CMakeFiles" --progress-num=$(CMAKE_PROGRESS_25) "Building CXX object CMakeFiles/M3uVideoPlayerPc.dir/build/Desktop_Qt_6_11_1_MinGW_64_bit_Debug/.rcc/qmlcache/M3uVideoPlayerPc_src/ui/components/AddPlaylistDialog_qml.cpp.obj"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir="D:\c++ project\M3uVideoPlayerPc\build\Desktop_Qt_6_11_1_MinGW_64_bit_Debug\CMakeFiles" --progress-num=$(CMAKE_PROGRESS_34) "Building CXX object CMakeFiles/M3uVideoPlayerPc.dir/build/Desktop_Qt_6_11_1_MinGW_64_bit_Debug/.rcc/qmlcache/M3uVideoPlayerPc_src/ui/components/AddPlaylistDialog_qml.cpp.obj"
 	C:\Qt\Tools\mingw1310_64\bin\g++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/M3uVideoPlayerPc.dir/build/Desktop_Qt_6_11_1_MinGW_64_bit_Debug/.rcc/qmlcache/M3uVideoPlayerPc_src/ui/components/AddPlaylistDialog_qml.cpp.obj -MF CMakeFiles\M3uVideoPlayerPc.dir\build\Desktop_Qt_6_11_1_MinGW_64_bit_Debug\.rcc\qmlcache\M3uVideoPlayerPc_src\ui\components\AddPlaylistDialog_qml.cpp.obj.d -o CMakeFiles\M3uVideoPlayerPc.dir\build\Desktop_Qt_6_11_1_MinGW_64_bit_Debug\.rcc\qmlcache\M3uVideoPlayerPc_src\ui\components\AddPlaylistDialog_qml.cpp.obj -c "D:\c++ project\M3uVideoPlayerPc\build\Desktop_Qt_6_11_1_MinGW_64_bit_Debug\.rcc\qmlcache\M3uVideoPlayerPc_src\ui\components\AddPlaylistDialog_qml.cpp"
 
 CMakeFiles/M3uVideoPlayerPc.dir/build/Desktop_Qt_6_11_1_MinGW_64_bit_Debug/.rcc/qmlcache/M3uVideoPlayerPc_src/ui/components/AddPlaylistDialog_qml.cpp.i: cmake_force
@@ -376,7 +512,7 @@ CMakeFiles/M3uVideoPlayerPc.dir/build/Desktop_Qt_6_11_1_MinGW_64_bit_Debug/.rcc/
 CMakeFiles/M3uVideoPlayerPc.dir/build/Desktop_Qt_6_11_1_MinGW_64_bit_Debug/.rcc/qmlcache/M3uVideoPlayerPc_src/ui/screens/PlaylistListView_qml.cpp.obj: CMakeFiles/M3uVideoPlayerPc.dir/includes_CXX.rsp
 CMakeFiles/M3uVideoPlayerPc.dir/build/Desktop_Qt_6_11_1_MinGW_64_bit_Debug/.rcc/qmlcache/M3uVideoPlayerPc_src/ui/screens/PlaylistListView_qml.cpp.obj: .rcc/qmlcache/M3uVideoPlayerPc_src/ui/screens/PlaylistListView_qml.cpp
 CMakeFiles/M3uVideoPlayerPc.dir/build/Desktop_Qt_6_11_1_MinGW_64_bit_Debug/.rcc/qmlcache/M3uVideoPlayerPc_src/ui/screens/PlaylistListView_qml.cpp.obj: CMakeFiles/M3uVideoPlayerPc.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir="D:\c++ project\M3uVideoPlayerPc\build\Desktop_Qt_6_11_1_MinGW_64_bit_Debug\CMakeFiles" --progress-num=$(CMAKE_PROGRESS_26) "Building CXX object CMakeFiles/M3uVideoPlayerPc.dir/build/Desktop_Qt_6_11_1_MinGW_64_bit_Debug/.rcc/qmlcache/M3uVideoPlayerPc_src/ui/screens/PlaylistListView_qml.cpp.obj"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir="D:\c++ project\M3uVideoPlayerPc\build\Desktop_Qt_6_11_1_MinGW_64_bit_Debug\CMakeFiles" --progress-num=$(CMAKE_PROGRESS_35) "Building CXX object CMakeFiles/M3uVideoPlayerPc.dir/build/Desktop_Qt_6_11_1_MinGW_64_bit_Debug/.rcc/qmlcache/M3uVideoPlayerPc_src/ui/screens/PlaylistListView_qml.cpp.obj"
 	C:\Qt\Tools\mingw1310_64\bin\g++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/M3uVideoPlayerPc.dir/build/Desktop_Qt_6_11_1_MinGW_64_bit_Debug/.rcc/qmlcache/M3uVideoPlayerPc_src/ui/screens/PlaylistListView_qml.cpp.obj -MF CMakeFiles\M3uVideoPlayerPc.dir\build\Desktop_Qt_6_11_1_MinGW_64_bit_Debug\.rcc\qmlcache\M3uVideoPlayerPc_src\ui\screens\PlaylistListView_qml.cpp.obj.d -o CMakeFiles\M3uVideoPlayerPc.dir\build\Desktop_Qt_6_11_1_MinGW_64_bit_Debug\.rcc\qmlcache\M3uVideoPlayerPc_src\ui\screens\PlaylistListView_qml.cpp.obj -c "D:\c++ project\M3uVideoPlayerPc\build\Desktop_Qt_6_11_1_MinGW_64_bit_Debug\.rcc\qmlcache\M3uVideoPlayerPc_src\ui\screens\PlaylistListView_qml.cpp"
 
 CMakeFiles/M3uVideoPlayerPc.dir/build/Desktop_Qt_6_11_1_MinGW_64_bit_Debug/.rcc/qmlcache/M3uVideoPlayerPc_src/ui/screens/PlaylistListView_qml.cpp.i: cmake_force
@@ -391,7 +527,7 @@ CMakeFiles/M3uVideoPlayerPc.dir/build/Desktop_Qt_6_11_1_MinGW_64_bit_Debug/.rcc/
 CMakeFiles/M3uVideoPlayerPc.dir/build/Desktop_Qt_6_11_1_MinGW_64_bit_Debug/.rcc/qmlcache/M3uVideoPlayerPc_src/ui/screens/DirectLinkView_qml.cpp.obj: CMakeFiles/M3uVideoPlayerPc.dir/includes_CXX.rsp
 CMakeFiles/M3uVideoPlayerPc.dir/build/Desktop_Qt_6_11_1_MinGW_64_bit_Debug/.rcc/qmlcache/M3uVideoPlayerPc_src/ui/screens/DirectLinkView_qml.cpp.obj: .rcc/qmlcache/M3uVideoPlayerPc_src/ui/screens/DirectLinkView_qml.cpp
 CMakeFiles/M3uVideoPlayerPc.dir/build/Desktop_Qt_6_11_1_MinGW_64_bit_Debug/.rcc/qmlcache/M3uVideoPlayerPc_src/ui/screens/DirectLinkView_qml.cpp.obj: CMakeFiles/M3uVideoPlayerPc.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir="D:\c++ project\M3uVideoPlayerPc\build\Desktop_Qt_6_11_1_MinGW_64_bit_Debug\CMakeFiles" --progress-num=$(CMAKE_PROGRESS_27) "Building CXX object CMakeFiles/M3uVideoPlayerPc.dir/build/Desktop_Qt_6_11_1_MinGW_64_bit_Debug/.rcc/qmlcache/M3uVideoPlayerPc_src/ui/screens/DirectLinkView_qml.cpp.obj"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir="D:\c++ project\M3uVideoPlayerPc\build\Desktop_Qt_6_11_1_MinGW_64_bit_Debug\CMakeFiles" --progress-num=$(CMAKE_PROGRESS_36) "Building CXX object CMakeFiles/M3uVideoPlayerPc.dir/build/Desktop_Qt_6_11_1_MinGW_64_bit_Debug/.rcc/qmlcache/M3uVideoPlayerPc_src/ui/screens/DirectLinkView_qml.cpp.obj"
 	C:\Qt\Tools\mingw1310_64\bin\g++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/M3uVideoPlayerPc.dir/build/Desktop_Qt_6_11_1_MinGW_64_bit_Debug/.rcc/qmlcache/M3uVideoPlayerPc_src/ui/screens/DirectLinkView_qml.cpp.obj -MF CMakeFiles\M3uVideoPlayerPc.dir\build\Desktop_Qt_6_11_1_MinGW_64_bit_Debug\.rcc\qmlcache\M3uVideoPlayerPc_src\ui\screens\DirectLinkView_qml.cpp.obj.d -o CMakeFiles\M3uVideoPlayerPc.dir\build\Desktop_Qt_6_11_1_MinGW_64_bit_Debug\.rcc\qmlcache\M3uVideoPlayerPc_src\ui\screens\DirectLinkView_qml.cpp.obj -c "D:\c++ project\M3uVideoPlayerPc\build\Desktop_Qt_6_11_1_MinGW_64_bit_Debug\.rcc\qmlcache\M3uVideoPlayerPc_src\ui\screens\DirectLinkView_qml.cpp"
 
 CMakeFiles/M3uVideoPlayerPc.dir/build/Desktop_Qt_6_11_1_MinGW_64_bit_Debug/.rcc/qmlcache/M3uVideoPlayerPc_src/ui/screens/DirectLinkView_qml.cpp.i: cmake_force
@@ -406,7 +542,7 @@ CMakeFiles/M3uVideoPlayerPc.dir/build/Desktop_Qt_6_11_1_MinGW_64_bit_Debug/.rcc/
 CMakeFiles/M3uVideoPlayerPc.dir/build/Desktop_Qt_6_11_1_MinGW_64_bit_Debug/.rcc/qmlcache/M3uVideoPlayerPc_src/ui/screens/GroupListView_qml.cpp.obj: CMakeFiles/M3uVideoPlayerPc.dir/includes_CXX.rsp
 CMakeFiles/M3uVideoPlayerPc.dir/build/Desktop_Qt_6_11_1_MinGW_64_bit_Debug/.rcc/qmlcache/M3uVideoPlayerPc_src/ui/screens/GroupListView_qml.cpp.obj: .rcc/qmlcache/M3uVideoPlayerPc_src/ui/screens/GroupListView_qml.cpp
 CMakeFiles/M3uVideoPlayerPc.dir/build/Desktop_Qt_6_11_1_MinGW_64_bit_Debug/.rcc/qmlcache/M3uVideoPlayerPc_src/ui/screens/GroupListView_qml.cpp.obj: CMakeFiles/M3uVideoPlayerPc.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir="D:\c++ project\M3uVideoPlayerPc\build\Desktop_Qt_6_11_1_MinGW_64_bit_Debug\CMakeFiles" --progress-num=$(CMAKE_PROGRESS_28) "Building CXX object CMakeFiles/M3uVideoPlayerPc.dir/build/Desktop_Qt_6_11_1_MinGW_64_bit_Debug/.rcc/qmlcache/M3uVideoPlayerPc_src/ui/screens/GroupListView_qml.cpp.obj"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir="D:\c++ project\M3uVideoPlayerPc\build\Desktop_Qt_6_11_1_MinGW_64_bit_Debug\CMakeFiles" --progress-num=$(CMAKE_PROGRESS_37) "Building CXX object CMakeFiles/M3uVideoPlayerPc.dir/build/Desktop_Qt_6_11_1_MinGW_64_bit_Debug/.rcc/qmlcache/M3uVideoPlayerPc_src/ui/screens/GroupListView_qml.cpp.obj"
 	C:\Qt\Tools\mingw1310_64\bin\g++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/M3uVideoPlayerPc.dir/build/Desktop_Qt_6_11_1_MinGW_64_bit_Debug/.rcc/qmlcache/M3uVideoPlayerPc_src/ui/screens/GroupListView_qml.cpp.obj -MF CMakeFiles\M3uVideoPlayerPc.dir\build\Desktop_Qt_6_11_1_MinGW_64_bit_Debug\.rcc\qmlcache\M3uVideoPlayerPc_src\ui\screens\GroupListView_qml.cpp.obj.d -o CMakeFiles\M3uVideoPlayerPc.dir\build\Desktop_Qt_6_11_1_MinGW_64_bit_Debug\.rcc\qmlcache\M3uVideoPlayerPc_src\ui\screens\GroupListView_qml.cpp.obj -c "D:\c++ project\M3uVideoPlayerPc\build\Desktop_Qt_6_11_1_MinGW_64_bit_Debug\.rcc\qmlcache\M3uVideoPlayerPc_src\ui\screens\GroupListView_qml.cpp"
 
 CMakeFiles/M3uVideoPlayerPc.dir/build/Desktop_Qt_6_11_1_MinGW_64_bit_Debug/.rcc/qmlcache/M3uVideoPlayerPc_src/ui/screens/GroupListView_qml.cpp.i: cmake_force
@@ -421,7 +557,7 @@ CMakeFiles/M3uVideoPlayerPc.dir/build/Desktop_Qt_6_11_1_MinGW_64_bit_Debug/.rcc/
 CMakeFiles/M3uVideoPlayerPc.dir/build/Desktop_Qt_6_11_1_MinGW_64_bit_Debug/.rcc/qmlcache/M3uVideoPlayerPc_src/ui/screens/ChannelListView_qml.cpp.obj: CMakeFiles/M3uVideoPlayerPc.dir/includes_CXX.rsp
 CMakeFiles/M3uVideoPlayerPc.dir/build/Desktop_Qt_6_11_1_MinGW_64_bit_Debug/.rcc/qmlcache/M3uVideoPlayerPc_src/ui/screens/ChannelListView_qml.cpp.obj: .rcc/qmlcache/M3uVideoPlayerPc_src/ui/screens/ChannelListView_qml.cpp
 CMakeFiles/M3uVideoPlayerPc.dir/build/Desktop_Qt_6_11_1_MinGW_64_bit_Debug/.rcc/qmlcache/M3uVideoPlayerPc_src/ui/screens/ChannelListView_qml.cpp.obj: CMakeFiles/M3uVideoPlayerPc.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir="D:\c++ project\M3uVideoPlayerPc\build\Desktop_Qt_6_11_1_MinGW_64_bit_Debug\CMakeFiles" --progress-num=$(CMAKE_PROGRESS_29) "Building CXX object CMakeFiles/M3uVideoPlayerPc.dir/build/Desktop_Qt_6_11_1_MinGW_64_bit_Debug/.rcc/qmlcache/M3uVideoPlayerPc_src/ui/screens/ChannelListView_qml.cpp.obj"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir="D:\c++ project\M3uVideoPlayerPc\build\Desktop_Qt_6_11_1_MinGW_64_bit_Debug\CMakeFiles" --progress-num=$(CMAKE_PROGRESS_38) "Building CXX object CMakeFiles/M3uVideoPlayerPc.dir/build/Desktop_Qt_6_11_1_MinGW_64_bit_Debug/.rcc/qmlcache/M3uVideoPlayerPc_src/ui/screens/ChannelListView_qml.cpp.obj"
 	C:\Qt\Tools\mingw1310_64\bin\g++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/M3uVideoPlayerPc.dir/build/Desktop_Qt_6_11_1_MinGW_64_bit_Debug/.rcc/qmlcache/M3uVideoPlayerPc_src/ui/screens/ChannelListView_qml.cpp.obj -MF CMakeFiles\M3uVideoPlayerPc.dir\build\Desktop_Qt_6_11_1_MinGW_64_bit_Debug\.rcc\qmlcache\M3uVideoPlayerPc_src\ui\screens\ChannelListView_qml.cpp.obj.d -o CMakeFiles\M3uVideoPlayerPc.dir\build\Desktop_Qt_6_11_1_MinGW_64_bit_Debug\.rcc\qmlcache\M3uVideoPlayerPc_src\ui\screens\ChannelListView_qml.cpp.obj -c "D:\c++ project\M3uVideoPlayerPc\build\Desktop_Qt_6_11_1_MinGW_64_bit_Debug\.rcc\qmlcache\M3uVideoPlayerPc_src\ui\screens\ChannelListView_qml.cpp"
 
 CMakeFiles/M3uVideoPlayerPc.dir/build/Desktop_Qt_6_11_1_MinGW_64_bit_Debug/.rcc/qmlcache/M3uVideoPlayerPc_src/ui/screens/ChannelListView_qml.cpp.i: cmake_force
@@ -436,7 +572,7 @@ CMakeFiles/M3uVideoPlayerPc.dir/build/Desktop_Qt_6_11_1_MinGW_64_bit_Debug/.qt/r
 CMakeFiles/M3uVideoPlayerPc.dir/build/Desktop_Qt_6_11_1_MinGW_64_bit_Debug/.qt/rcc/qrc_M3uVideoPlayerPc_raw_qml_0.cpp.obj: CMakeFiles/M3uVideoPlayerPc.dir/includes_CXX.rsp
 CMakeFiles/M3uVideoPlayerPc.dir/build/Desktop_Qt_6_11_1_MinGW_64_bit_Debug/.qt/rcc/qrc_M3uVideoPlayerPc_raw_qml_0.cpp.obj: .qt/rcc/qrc_M3uVideoPlayerPc_raw_qml_0.cpp
 CMakeFiles/M3uVideoPlayerPc.dir/build/Desktop_Qt_6_11_1_MinGW_64_bit_Debug/.qt/rcc/qrc_M3uVideoPlayerPc_raw_qml_0.cpp.obj: CMakeFiles/M3uVideoPlayerPc.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir="D:\c++ project\M3uVideoPlayerPc\build\Desktop_Qt_6_11_1_MinGW_64_bit_Debug\CMakeFiles" --progress-num=$(CMAKE_PROGRESS_30) "Building CXX object CMakeFiles/M3uVideoPlayerPc.dir/build/Desktop_Qt_6_11_1_MinGW_64_bit_Debug/.qt/rcc/qrc_M3uVideoPlayerPc_raw_qml_0.cpp.obj"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir="D:\c++ project\M3uVideoPlayerPc\build\Desktop_Qt_6_11_1_MinGW_64_bit_Debug\CMakeFiles" --progress-num=$(CMAKE_PROGRESS_39) "Building CXX object CMakeFiles/M3uVideoPlayerPc.dir/build/Desktop_Qt_6_11_1_MinGW_64_bit_Debug/.qt/rcc/qrc_M3uVideoPlayerPc_raw_qml_0.cpp.obj"
 	C:\Qt\Tools\mingw1310_64\bin\g++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/M3uVideoPlayerPc.dir/build/Desktop_Qt_6_11_1_MinGW_64_bit_Debug/.qt/rcc/qrc_M3uVideoPlayerPc_raw_qml_0.cpp.obj -MF CMakeFiles\M3uVideoPlayerPc.dir\build\Desktop_Qt_6_11_1_MinGW_64_bit_Debug\.qt\rcc\qrc_M3uVideoPlayerPc_raw_qml_0.cpp.obj.d -o CMakeFiles\M3uVideoPlayerPc.dir\build\Desktop_Qt_6_11_1_MinGW_64_bit_Debug\.qt\rcc\qrc_M3uVideoPlayerPc_raw_qml_0.cpp.obj -c "D:\c++ project\M3uVideoPlayerPc\build\Desktop_Qt_6_11_1_MinGW_64_bit_Debug\.qt\rcc\qrc_M3uVideoPlayerPc_raw_qml_0.cpp"
 
 CMakeFiles/M3uVideoPlayerPc.dir/build/Desktop_Qt_6_11_1_MinGW_64_bit_Debug/.qt/rcc/qrc_M3uVideoPlayerPc_raw_qml_0.cpp.i: cmake_force
@@ -451,6 +587,15 @@ CMakeFiles/M3uVideoPlayerPc.dir/build/Desktop_Qt_6_11_1_MinGW_64_bit_Debug/.qt/r
 M3uVideoPlayerPc_OBJECTS = \
 "CMakeFiles/M3uVideoPlayerPc.dir/M3uVideoPlayerPc_autogen/mocs_compilation.cpp.obj" \
 "CMakeFiles/M3uVideoPlayerPc.dir/src/main.cpp.obj" \
+"CMakeFiles/M3uVideoPlayerPc.dir/src/domain/FuzzySearch.cpp.obj" \
+"CMakeFiles/M3uVideoPlayerPc.dir/src/data/DatabaseManager.cpp.obj" \
+"CMakeFiles/M3uVideoPlayerPc.dir/src/data/PlaylistRepository.cpp.obj" \
+"CMakeFiles/M3uVideoPlayerPc.dir/src/data/ChannelRepository.cpp.obj" \
+"CMakeFiles/M3uVideoPlayerPc.dir/src/data/M3uParser.cpp.obj" \
+"CMakeFiles/M3uVideoPlayerPc.dir/src/data/XtreamApiClient.cpp.obj" \
+"CMakeFiles/M3uVideoPlayerPc.dir/src/infrastructure/TrustedTimeSource.cpp.obj" \
+"CMakeFiles/M3uVideoPlayerPc.dir/src/infrastructure/TimeZoneManager.cpp.obj" \
+"CMakeFiles/M3uVideoPlayerPc.dir/src/ui/AppController.cpp.obj" \
 "CMakeFiles/M3uVideoPlayerPc.dir/m3uvideoplayerpc_qmltyperegistrations.cpp.obj" \
 "CMakeFiles/M3uVideoPlayerPc.dir/build/Desktop_Qt_6_11_1_MinGW_64_bit_Debug/.qt/rcc/qrc_qmake_M3uVideoPlayer.cpp.obj" \
 "CMakeFiles/M3uVideoPlayerPc.dir/build/Desktop_Qt_6_11_1_MinGW_64_bit_Debug/.rcc/qmlcache/M3uVideoPlayerPc_qmlcache_loader.cpp.obj" \
@@ -469,6 +614,15 @@ M3uVideoPlayerPc_EXTERNAL_OBJECTS =
 
 M3uVideoPlayerPc.exe: CMakeFiles/M3uVideoPlayerPc.dir/M3uVideoPlayerPc_autogen/mocs_compilation.cpp.obj
 M3uVideoPlayerPc.exe: CMakeFiles/M3uVideoPlayerPc.dir/src/main.cpp.obj
+M3uVideoPlayerPc.exe: CMakeFiles/M3uVideoPlayerPc.dir/src/domain/FuzzySearch.cpp.obj
+M3uVideoPlayerPc.exe: CMakeFiles/M3uVideoPlayerPc.dir/src/data/DatabaseManager.cpp.obj
+M3uVideoPlayerPc.exe: CMakeFiles/M3uVideoPlayerPc.dir/src/data/PlaylistRepository.cpp.obj
+M3uVideoPlayerPc.exe: CMakeFiles/M3uVideoPlayerPc.dir/src/data/ChannelRepository.cpp.obj
+M3uVideoPlayerPc.exe: CMakeFiles/M3uVideoPlayerPc.dir/src/data/M3uParser.cpp.obj
+M3uVideoPlayerPc.exe: CMakeFiles/M3uVideoPlayerPc.dir/src/data/XtreamApiClient.cpp.obj
+M3uVideoPlayerPc.exe: CMakeFiles/M3uVideoPlayerPc.dir/src/infrastructure/TrustedTimeSource.cpp.obj
+M3uVideoPlayerPc.exe: CMakeFiles/M3uVideoPlayerPc.dir/src/infrastructure/TimeZoneManager.cpp.obj
+M3uVideoPlayerPc.exe: CMakeFiles/M3uVideoPlayerPc.dir/src/ui/AppController.cpp.obj
 M3uVideoPlayerPc.exe: CMakeFiles/M3uVideoPlayerPc.dir/m3uvideoplayerpc_qmltyperegistrations.cpp.obj
 M3uVideoPlayerPc.exe: CMakeFiles/M3uVideoPlayerPc.dir/build/Desktop_Qt_6_11_1_MinGW_64_bit_Debug/.qt/rcc/qrc_qmake_M3uVideoPlayer.cpp.obj
 M3uVideoPlayerPc.exe: CMakeFiles/M3uVideoPlayerPc.dir/build/Desktop_Qt_6_11_1_MinGW_64_bit_Debug/.rcc/qmlcache/M3uVideoPlayerPc_qmlcache_loader.cpp.obj
@@ -482,8 +636,9 @@ M3uVideoPlayerPc.exe: CMakeFiles/M3uVideoPlayerPc.dir/build/Desktop_Qt_6_11_1_Mi
 M3uVideoPlayerPc.exe: CMakeFiles/M3uVideoPlayerPc.dir/build/Desktop_Qt_6_11_1_MinGW_64_bit_Debug/.rcc/qmlcache/M3uVideoPlayerPc_src/ui/screens/ChannelListView_qml.cpp.obj
 M3uVideoPlayerPc.exe: CMakeFiles/M3uVideoPlayerPc.dir/build/Desktop_Qt_6_11_1_MinGW_64_bit_Debug/.qt/rcc/qrc_M3uVideoPlayerPc_raw_qml_0.cpp.obj
 M3uVideoPlayerPc.exe: CMakeFiles/M3uVideoPlayerPc.dir/build.make
-M3uVideoPlayerPc.exe: C:/Qt/6.11.1/mingw_64/lib/libQt6Quick.a
+M3uVideoPlayerPc.exe: C:/Qt/6.11.1/mingw_64/lib/libQt6QuickControls2.a
 M3uVideoPlayerPc.exe: C:/Qt/6.11.1/mingw_64/lib/libQt6Sql.a
+M3uVideoPlayerPc.exe: C:/Qt/6.11.1/mingw_64/lib/libQt6Quick.a
 M3uVideoPlayerPc.exe: C:/Qt/6.11.1/mingw_64/lib/libQt6OpenGL.a
 M3uVideoPlayerPc.exe: C:/Qt/6.11.1/mingw_64/lib/libQt6Gui.a
 M3uVideoPlayerPc.exe: C:/Qt/6.11.1/mingw_64/lib/libQt6Qml.a
@@ -492,7 +647,7 @@ M3uVideoPlayerPc.exe: C:/Qt/6.11.1/mingw_64/lib/libQt6Core.a
 M3uVideoPlayerPc.exe: CMakeFiles/M3uVideoPlayerPc.dir/linkLibs.rsp
 M3uVideoPlayerPc.exe: CMakeFiles/M3uVideoPlayerPc.dir/objects1.rsp
 M3uVideoPlayerPc.exe: CMakeFiles/M3uVideoPlayerPc.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir="D:\c++ project\M3uVideoPlayerPc\build\Desktop_Qt_6_11_1_MinGW_64_bit_Debug\CMakeFiles" --progress-num=$(CMAKE_PROGRESS_31) "Linking CXX executable M3uVideoPlayerPc.exe"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir="D:\c++ project\M3uVideoPlayerPc\build\Desktop_Qt_6_11_1_MinGW_64_bit_Debug\CMakeFiles" --progress-num=$(CMAKE_PROGRESS_40) "Linking CXX executable M3uVideoPlayerPc.exe"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles\M3uVideoPlayerPc.dir\link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.

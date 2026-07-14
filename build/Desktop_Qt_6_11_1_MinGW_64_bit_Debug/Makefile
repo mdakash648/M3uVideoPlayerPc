@@ -674,6 +674,198 @@ m3uvideoplayerpc_qmltyperegistrations.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\M3uVideoPlayerPc.dir\build.make CMakeFiles/M3uVideoPlayerPc.dir/m3uvideoplayerpc_qmltyperegistrations.cpp.s
 .PHONY : m3uvideoplayerpc_qmltyperegistrations.cpp.s
 
+src/data/ChannelRepository.obj: src/data/ChannelRepository.cpp.obj
+.PHONY : src/data/ChannelRepository.obj
+
+# target to build an object file
+src/data/ChannelRepository.cpp.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\M3uVideoPlayerPc.dir\build.make CMakeFiles/M3uVideoPlayerPc.dir/src/data/ChannelRepository.cpp.obj
+.PHONY : src/data/ChannelRepository.cpp.obj
+
+src/data/ChannelRepository.i: src/data/ChannelRepository.cpp.i
+.PHONY : src/data/ChannelRepository.i
+
+# target to preprocess a source file
+src/data/ChannelRepository.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\M3uVideoPlayerPc.dir\build.make CMakeFiles/M3uVideoPlayerPc.dir/src/data/ChannelRepository.cpp.i
+.PHONY : src/data/ChannelRepository.cpp.i
+
+src/data/ChannelRepository.s: src/data/ChannelRepository.cpp.s
+.PHONY : src/data/ChannelRepository.s
+
+# target to generate assembly for a file
+src/data/ChannelRepository.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\M3uVideoPlayerPc.dir\build.make CMakeFiles/M3uVideoPlayerPc.dir/src/data/ChannelRepository.cpp.s
+.PHONY : src/data/ChannelRepository.cpp.s
+
+src/data/DatabaseManager.obj: src/data/DatabaseManager.cpp.obj
+.PHONY : src/data/DatabaseManager.obj
+
+# target to build an object file
+src/data/DatabaseManager.cpp.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\M3uVideoPlayerPc.dir\build.make CMakeFiles/M3uVideoPlayerPc.dir/src/data/DatabaseManager.cpp.obj
+.PHONY : src/data/DatabaseManager.cpp.obj
+
+src/data/DatabaseManager.i: src/data/DatabaseManager.cpp.i
+.PHONY : src/data/DatabaseManager.i
+
+# target to preprocess a source file
+src/data/DatabaseManager.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\M3uVideoPlayerPc.dir\build.make CMakeFiles/M3uVideoPlayerPc.dir/src/data/DatabaseManager.cpp.i
+.PHONY : src/data/DatabaseManager.cpp.i
+
+src/data/DatabaseManager.s: src/data/DatabaseManager.cpp.s
+.PHONY : src/data/DatabaseManager.s
+
+# target to generate assembly for a file
+src/data/DatabaseManager.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\M3uVideoPlayerPc.dir\build.make CMakeFiles/M3uVideoPlayerPc.dir/src/data/DatabaseManager.cpp.s
+.PHONY : src/data/DatabaseManager.cpp.s
+
+src/data/M3uParser.obj: src/data/M3uParser.cpp.obj
+.PHONY : src/data/M3uParser.obj
+
+# target to build an object file
+src/data/M3uParser.cpp.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\M3uVideoPlayerPc.dir\build.make CMakeFiles/M3uVideoPlayerPc.dir/src/data/M3uParser.cpp.obj
+.PHONY : src/data/M3uParser.cpp.obj
+
+src/data/M3uParser.i: src/data/M3uParser.cpp.i
+.PHONY : src/data/M3uParser.i
+
+# target to preprocess a source file
+src/data/M3uParser.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\M3uVideoPlayerPc.dir\build.make CMakeFiles/M3uVideoPlayerPc.dir/src/data/M3uParser.cpp.i
+.PHONY : src/data/M3uParser.cpp.i
+
+src/data/M3uParser.s: src/data/M3uParser.cpp.s
+.PHONY : src/data/M3uParser.s
+
+# target to generate assembly for a file
+src/data/M3uParser.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\M3uVideoPlayerPc.dir\build.make CMakeFiles/M3uVideoPlayerPc.dir/src/data/M3uParser.cpp.s
+.PHONY : src/data/M3uParser.cpp.s
+
+src/data/PlaylistRepository.obj: src/data/PlaylistRepository.cpp.obj
+.PHONY : src/data/PlaylistRepository.obj
+
+# target to build an object file
+src/data/PlaylistRepository.cpp.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\M3uVideoPlayerPc.dir\build.make CMakeFiles/M3uVideoPlayerPc.dir/src/data/PlaylistRepository.cpp.obj
+.PHONY : src/data/PlaylistRepository.cpp.obj
+
+src/data/PlaylistRepository.i: src/data/PlaylistRepository.cpp.i
+.PHONY : src/data/PlaylistRepository.i
+
+# target to preprocess a source file
+src/data/PlaylistRepository.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\M3uVideoPlayerPc.dir\build.make CMakeFiles/M3uVideoPlayerPc.dir/src/data/PlaylistRepository.cpp.i
+.PHONY : src/data/PlaylistRepository.cpp.i
+
+src/data/PlaylistRepository.s: src/data/PlaylistRepository.cpp.s
+.PHONY : src/data/PlaylistRepository.s
+
+# target to generate assembly for a file
+src/data/PlaylistRepository.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\M3uVideoPlayerPc.dir\build.make CMakeFiles/M3uVideoPlayerPc.dir/src/data/PlaylistRepository.cpp.s
+.PHONY : src/data/PlaylistRepository.cpp.s
+
+src/data/XtreamApiClient.obj: src/data/XtreamApiClient.cpp.obj
+.PHONY : src/data/XtreamApiClient.obj
+
+# target to build an object file
+src/data/XtreamApiClient.cpp.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\M3uVideoPlayerPc.dir\build.make CMakeFiles/M3uVideoPlayerPc.dir/src/data/XtreamApiClient.cpp.obj
+.PHONY : src/data/XtreamApiClient.cpp.obj
+
+src/data/XtreamApiClient.i: src/data/XtreamApiClient.cpp.i
+.PHONY : src/data/XtreamApiClient.i
+
+# target to preprocess a source file
+src/data/XtreamApiClient.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\M3uVideoPlayerPc.dir\build.make CMakeFiles/M3uVideoPlayerPc.dir/src/data/XtreamApiClient.cpp.i
+.PHONY : src/data/XtreamApiClient.cpp.i
+
+src/data/XtreamApiClient.s: src/data/XtreamApiClient.cpp.s
+.PHONY : src/data/XtreamApiClient.s
+
+# target to generate assembly for a file
+src/data/XtreamApiClient.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\M3uVideoPlayerPc.dir\build.make CMakeFiles/M3uVideoPlayerPc.dir/src/data/XtreamApiClient.cpp.s
+.PHONY : src/data/XtreamApiClient.cpp.s
+
+src/domain/FuzzySearch.obj: src/domain/FuzzySearch.cpp.obj
+.PHONY : src/domain/FuzzySearch.obj
+
+# target to build an object file
+src/domain/FuzzySearch.cpp.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\M3uVideoPlayerPc.dir\build.make CMakeFiles/M3uVideoPlayerPc.dir/src/domain/FuzzySearch.cpp.obj
+.PHONY : src/domain/FuzzySearch.cpp.obj
+
+src/domain/FuzzySearch.i: src/domain/FuzzySearch.cpp.i
+.PHONY : src/domain/FuzzySearch.i
+
+# target to preprocess a source file
+src/domain/FuzzySearch.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\M3uVideoPlayerPc.dir\build.make CMakeFiles/M3uVideoPlayerPc.dir/src/domain/FuzzySearch.cpp.i
+.PHONY : src/domain/FuzzySearch.cpp.i
+
+src/domain/FuzzySearch.s: src/domain/FuzzySearch.cpp.s
+.PHONY : src/domain/FuzzySearch.s
+
+# target to generate assembly for a file
+src/domain/FuzzySearch.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\M3uVideoPlayerPc.dir\build.make CMakeFiles/M3uVideoPlayerPc.dir/src/domain/FuzzySearch.cpp.s
+.PHONY : src/domain/FuzzySearch.cpp.s
+
+src/infrastructure/TimeZoneManager.obj: src/infrastructure/TimeZoneManager.cpp.obj
+.PHONY : src/infrastructure/TimeZoneManager.obj
+
+# target to build an object file
+src/infrastructure/TimeZoneManager.cpp.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\M3uVideoPlayerPc.dir\build.make CMakeFiles/M3uVideoPlayerPc.dir/src/infrastructure/TimeZoneManager.cpp.obj
+.PHONY : src/infrastructure/TimeZoneManager.cpp.obj
+
+src/infrastructure/TimeZoneManager.i: src/infrastructure/TimeZoneManager.cpp.i
+.PHONY : src/infrastructure/TimeZoneManager.i
+
+# target to preprocess a source file
+src/infrastructure/TimeZoneManager.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\M3uVideoPlayerPc.dir\build.make CMakeFiles/M3uVideoPlayerPc.dir/src/infrastructure/TimeZoneManager.cpp.i
+.PHONY : src/infrastructure/TimeZoneManager.cpp.i
+
+src/infrastructure/TimeZoneManager.s: src/infrastructure/TimeZoneManager.cpp.s
+.PHONY : src/infrastructure/TimeZoneManager.s
+
+# target to generate assembly for a file
+src/infrastructure/TimeZoneManager.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\M3uVideoPlayerPc.dir\build.make CMakeFiles/M3uVideoPlayerPc.dir/src/infrastructure/TimeZoneManager.cpp.s
+.PHONY : src/infrastructure/TimeZoneManager.cpp.s
+
+src/infrastructure/TrustedTimeSource.obj: src/infrastructure/TrustedTimeSource.cpp.obj
+.PHONY : src/infrastructure/TrustedTimeSource.obj
+
+# target to build an object file
+src/infrastructure/TrustedTimeSource.cpp.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\M3uVideoPlayerPc.dir\build.make CMakeFiles/M3uVideoPlayerPc.dir/src/infrastructure/TrustedTimeSource.cpp.obj
+.PHONY : src/infrastructure/TrustedTimeSource.cpp.obj
+
+src/infrastructure/TrustedTimeSource.i: src/infrastructure/TrustedTimeSource.cpp.i
+.PHONY : src/infrastructure/TrustedTimeSource.i
+
+# target to preprocess a source file
+src/infrastructure/TrustedTimeSource.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\M3uVideoPlayerPc.dir\build.make CMakeFiles/M3uVideoPlayerPc.dir/src/infrastructure/TrustedTimeSource.cpp.i
+.PHONY : src/infrastructure/TrustedTimeSource.cpp.i
+
+src/infrastructure/TrustedTimeSource.s: src/infrastructure/TrustedTimeSource.cpp.s
+.PHONY : src/infrastructure/TrustedTimeSource.s
+
+# target to generate assembly for a file
+src/infrastructure/TrustedTimeSource.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\M3uVideoPlayerPc.dir\build.make CMakeFiles/M3uVideoPlayerPc.dir/src/infrastructure/TrustedTimeSource.cpp.s
+.PHONY : src/infrastructure/TrustedTimeSource.cpp.s
+
 src/main.obj: src/main.cpp.obj
 .PHONY : src/main.obj
 
@@ -697,6 +889,30 @@ src/main.s: src/main.cpp.s
 src/main.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\M3uVideoPlayerPc.dir\build.make CMakeFiles/M3uVideoPlayerPc.dir/src/main.cpp.s
 .PHONY : src/main.cpp.s
+
+src/ui/AppController.obj: src/ui/AppController.cpp.obj
+.PHONY : src/ui/AppController.obj
+
+# target to build an object file
+src/ui/AppController.cpp.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\M3uVideoPlayerPc.dir\build.make CMakeFiles/M3uVideoPlayerPc.dir/src/ui/AppController.cpp.obj
+.PHONY : src/ui/AppController.cpp.obj
+
+src/ui/AppController.i: src/ui/AppController.cpp.i
+.PHONY : src/ui/AppController.i
+
+# target to preprocess a source file
+src/ui/AppController.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\M3uVideoPlayerPc.dir\build.make CMakeFiles/M3uVideoPlayerPc.dir/src/ui/AppController.cpp.i
+.PHONY : src/ui/AppController.cpp.i
+
+src/ui/AppController.s: src/ui/AppController.cpp.s
+.PHONY : src/ui/AppController.s
+
+# target to generate assembly for a file
+src/ui/AppController.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\M3uVideoPlayerPc.dir\build.make CMakeFiles/M3uVideoPlayerPc.dir/src/ui/AppController.cpp.s
+.PHONY : src/ui/AppController.cpp.s
 
 # Help Target
 help:
@@ -764,9 +980,36 @@ help:
 	@echo ... m3uvideoplayerpc_qmltyperegistrations.obj
 	@echo ... m3uvideoplayerpc_qmltyperegistrations.i
 	@echo ... m3uvideoplayerpc_qmltyperegistrations.s
+	@echo ... src/data/ChannelRepository.obj
+	@echo ... src/data/ChannelRepository.i
+	@echo ... src/data/ChannelRepository.s
+	@echo ... src/data/DatabaseManager.obj
+	@echo ... src/data/DatabaseManager.i
+	@echo ... src/data/DatabaseManager.s
+	@echo ... src/data/M3uParser.obj
+	@echo ... src/data/M3uParser.i
+	@echo ... src/data/M3uParser.s
+	@echo ... src/data/PlaylistRepository.obj
+	@echo ... src/data/PlaylistRepository.i
+	@echo ... src/data/PlaylistRepository.s
+	@echo ... src/data/XtreamApiClient.obj
+	@echo ... src/data/XtreamApiClient.i
+	@echo ... src/data/XtreamApiClient.s
+	@echo ... src/domain/FuzzySearch.obj
+	@echo ... src/domain/FuzzySearch.i
+	@echo ... src/domain/FuzzySearch.s
+	@echo ... src/infrastructure/TimeZoneManager.obj
+	@echo ... src/infrastructure/TimeZoneManager.i
+	@echo ... src/infrastructure/TimeZoneManager.s
+	@echo ... src/infrastructure/TrustedTimeSource.obj
+	@echo ... src/infrastructure/TrustedTimeSource.i
+	@echo ... src/infrastructure/TrustedTimeSource.s
 	@echo ... src/main.obj
 	@echo ... src/main.i
 	@echo ... src/main.s
+	@echo ... src/ui/AppController.obj
+	@echo ... src/ui/AppController.i
+	@echo ... src/ui/AppController.s
 .PHONY : help
 
 

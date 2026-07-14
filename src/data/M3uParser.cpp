@@ -31,11 +31,11 @@ ParseResult M3uParser::parse(const QString& m3uContent, int playlistId) {
     bool inChannelInfo = false;
     
     // Regular expressions for attributes
-    QRegularExpression tvgIdRegex(R"(tvg-id="([^"]*)")");
-    QRegularExpression tvgNameRegex(R"(tvg-name="([^"]*)")");
-    QRegularExpression tvgLogoRegex(R"(tvg-logo="([^"]*)")");
-    QRegularExpression tvgShiftRegex(R"(tvg-shift="([^"]*)")");
-    QRegularExpression groupTitleRegex(R"(group-title="([^"]*)")");
+    QRegularExpression tvgIdRegex(R"re(tvg-id="([^"]*)")re");
+    QRegularExpression tvgNameRegex(R"re(tvg-name="([^"]*)")re");
+    QRegularExpression tvgLogoRegex(R"re(tvg-logo="([^"]*)")re");
+    QRegularExpression tvgShiftRegex(R"re(tvg-shift="([^"]*)")re");
+    QRegularExpression groupTitleRegex(R"re(group-title="([^"]*)")re");
     
     for (const QString& line : lines) {
         QString tline = line.trimmed();

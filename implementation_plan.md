@@ -58,11 +58,11 @@
 - [x] Set up folder structure: `src/ui`, `src/domain`, `src/data`, `src/infrastructure`.
 - [x] Configure `libmpv` linking in CMake.
 
-### Step 0.2: Dependency Injection & App Init 🔄 In Progress
+### Step 0.2: Dependency Injection & App Init ✅ Complete
 - [x] Set up a basic IoC container or manual DI in `main.cpp`.
-- [ ] Expose C++ ViewModels to QML via `qmlRegisterType` or `QML_ELEMENT`.
+- [x] Expose C++ ViewModels to QML via `qmlRegisterType` or `QML_ELEMENT`.
 
-### Step 0.3: Global Theme & Design System (QML) 🔄 In Progress
+### Step 0.3: Global Theme & Design System (QML) ✅ Complete
 - [x] Define the dark color palette (`#121212` background, `#1E1E1E` surface, `#FFD54F` primary accent).
 - [x] Create reusable QML components (CustomButtons, TextStyles, ListDelegates).
 
@@ -100,9 +100,9 @@
 
 ## PHASE 2 — Core UI Screens (QML)
 
-### Step 2.1: Main Window & Navigation Shell 🔄 In Progress
+### Step 2.1: Main Window & Navigation Shell ✅ Complete
 - [x] Design `main.qml` with a sidebar and `StackView` for navigation.
-- [ ] Handle on-start background sync.
+- [x] Handle on-start background sync.
 
 ### Step 2.2: Playlist & Direct Link Management ✅ Complete
 - [x] `PlaylistListView.qml`: Show user playlists with floating resume buttons.
@@ -111,10 +111,10 @@
 ### Step 2.3: Add/Edit Playlist Dialog ✅ Complete
 - [x] `AddPlaylistDialog.qml`: Support M3U (web/local), Xtream, Update Frequency, and Direct Links.
 
-### Step 2.4: Group & Channel Browsing 🔄 In Progress
+### Step 2.4: Group & Channel Browsing ✅ Complete
 - [x] `GroupListView.qml`: 3-column grid of folder tiles + Dual Global Search.
 - [x] `ChannelListView.qml`: 4 View Modes (List, Grid, Title Only, Poster), Sort logic.
-- [ ] Fuzzy Search Engine implemented in C++.
+- [x] Fuzzy Search Engine implemented in C++.
 
 ---
 
