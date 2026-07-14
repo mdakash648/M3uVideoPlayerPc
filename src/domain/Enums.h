@@ -30,4 +30,11 @@ enum class TimeZoneMode {
 };
 Q_ENUM_NS(TimeZoneMode)
 
+enum class SortMode {
+    ASCENDING,
+    DESCENDING,
+    PLAYLIST_ORDER
+};
+Q_ENUM_NS(SortMode)
+
 } // namespace Domain

@@ -28,7 +28,8 @@ bool ChannelRepository::insertGroup(Domain::Group& group) {
 std::vector<Domain::Group> ChannelRepository::getGroupsByPlaylistId(int playlistId) {
     std::vector<Domain::Group> groups;
     QSqlQuery query(m_db);
-    query.prepare("SELECT * FROM Groups WHERE playlistId = :playlistId ORDER BY orderIndex ASC");
+    query.prepare("SELECT g.*, (SELECT COUNT(id) FROM Channels c WHERE c.groupId = g.id) as channelCount "
+                  "FROM Groups g WHERE g.playlistId = :playlistId ORDER BY g.orderIndex ASC");
     query.bindValue(":playlistId", playlistId);
 
     if (query.exec()) {
@@ -38,6 +39,7 @@ std::vector<Domain::Group> ChannelRepository::getGroupsByPlaylistId(int playlist
             group.playlistId = query.value("playlistId").toInt();
             group.name = query.value("name").toString();
             group.orderIndex = query.value("orderIndex").toInt();
+            group.channelCount = query.value("channelCount").toInt();
             groups.push_back(group);
         }
     }
@@ -76,7 +78,7 @@ bool ChannelRepository::insertChannel(Domain::Channel& channel) {
 bool ChannelRepository::insertChannels(std::vector<Domain::Channel>& channels) {
     if (channels.empty()) return true;
 
-    QSqlDatabase::database().transaction();
+    m_db.transaction();
     
     QSqlQuery query(m_db);
     query.prepare("INSERT INTO Channels (playlistId, groupId, name, streamUrl, logoUrl, type, tvgId, tvgName, tvgShift, referer, userAgent, isFavorite, orderIndex) "
@@ -99,13 +101,13 @@ bool ChannelRepository::insertChannels(std::vector<Domain::Channel>& channels) {
 
         if (!query.exec()) {
             qWarning() << "Failed to batch insert channel:" << query.lastError().text();
-            QSqlDatabase::database().rollback();
+            m_db.rollback();
             return false;
         }
         channel.id = query.lastInsertId().toInt();
     }
-    
-    return QSqlDatabase::database().commit();
+
+    return m_db.commit();
 }
 
 bool ChannelRepository::updateChannel(const Domain::Channel& channel) {
@@ -173,6 +175,35 @@ std::vector<Domain::Channel> ChannelRepository::getChannelsByGroupId(int groupId
     QSqlQuery query(m_db);
     query.prepare("SELECT * FROM Channels WHERE groupId = :groupId ORDER BY orderIndex ASC");
     query.bindValue(":groupId", groupId);
+
+    if (query.exec()) {
+        while (query.next()) {
+            Domain::Channel channel;
+            channel.id = query.value("id").toInt();
+            channel.playlistId = query.value("playlistId").toInt();
+            channel.groupId = query.value("groupId").toInt();
+            channel.name = query.value("name").toString();
+            channel.streamUrl = query.value("streamUrl").toString();
+            channel.logoUrl = query.value("logoUrl").toString();
+            channel.type = static_cast<Domain::ContentType>(query.value("type").toInt());
+            channel.tvgId = query.value("tvgId").toString();
+            channel.tvgName = query.value("tvgName").toString();
+            channel.tvgShift = query.value("tvgShift").toString();
+            channel.referer = query.value("referer").toString();
+            channel.userAgent = query.value("userAgent").toString();
+            channel.isFavorite = query.value("isFavorite").toInt() == 1;
+            channel.orderIndex = query.value("orderIndex").toInt();
+            channels.push_back(channel);
+        }
+    }
+    return channels;
+}
+
+std::vector<Domain::Channel> ChannelRepository::getChannelsByPlaylistId(int playlistId) {
+    std::vector<Domain::Channel> channels;
+    QSqlQuery query(m_db);
+    query.prepare("SELECT * FROM Channels WHERE playlistId = :playlistId ORDER BY orderIndex ASC");
+    query.bindValue(":playlistId", playlistId);
 
     if (query.exec()) {
         while (query.next()) {

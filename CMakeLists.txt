@@ -9,7 +9,7 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
 
-find_package(Qt6 COMPONENTS Core Gui Qml Quick QuickControls2 Sql Network REQUIRED)
+find_package(Qt6 COMPONENTS Core Gui Qml Quick QuickControls2 Sql Network Concurrent REQUIRED)
 
 # Try to find libmpv
 # Note: On Windows, you might need to specify the path to mpv headers and lib
@@ -20,8 +20,25 @@ if(PKG_CONFIG_FOUND)
 endif()
 
 if(NOT MPV_FOUND)
-    find_path(MPV_INCLUDE_DIR mpv/client.h)
-    find_library(MPV_LIBRARY NAMES mpv mpv.dll)
+    # Hint CMake to look in a local 3rdparty folder first
+    set(LOCAL_MPV_DIR "${CMAKE_SOURCE_DIR}/3rdparty/libmpv")
+    
+    # Clear cache if it previously failed
+    if(MPV_INCLUDE_DIR MATCHES "NOTFOUND")
+        unset(MPV_INCLUDE_DIR CACHE)
+    endif()
+    if(MPV_LIBRARY MATCHES "NOTFOUND")
+        unset(MPV_LIBRARY CACHE)
+    endif()
+    
+    find_path(MPV_INCLUDE_DIR 
+        NAMES mpv/client.h
+        PATHS ${LOCAL_MPV_DIR}/include
+    )
+    find_library(MPV_LIBRARY 
+        NAMES mpv mpv-2 libmpv
+        PATHS ${LOCAL_MPV_DIR}/lib ${LOCAL_MPV_DIR}
+    )
     if(MPV_INCLUDE_DIR AND MPV_LIBRARY)
         set(MPV_FOUND TRUE)
         set(MPV_LIBRARIES ${MPV_LIBRARY})
@@ -46,6 +63,13 @@ set(SOURCES
     src/data/XtreamApiClient.cpp
     src/infrastructure/TrustedTimeSource.cpp
     src/infrastructure/TimeZoneManager.cpp
+    src/infrastructure/player/MpvVideoItem.cpp
+    src/ui/PlaylistViewModel.h
+    src/ui/PlaylistViewModel.cpp
+    src/ui/GroupViewModel.h
+    src/ui/GroupViewModel.cpp
+    src/ui/ChannelViewModel.h
+    src/ui/ChannelViewModel.cpp
     src/ui/AppController.h
     src/ui/AppController.cpp
 )
@@ -66,10 +90,15 @@ qt_add_qml_module(${PROJECT_NAME}
         src/ui/components/Sidebar.qml
         src/ui/components/SidebarButton.qml
         src/ui/components/AddPlaylistDialog.qml
+        src/ui/components/SortMenuButton.qml
+        src/ui/components/ViewModeToggle.qml
+        src/ui/components/FolderIcon.qml
+        src/ui/components/ChannelLogo.qml
         src/ui/screens/PlaylistListView.qml
         src/ui/screens/DirectLinkView.qml
         src/ui/screens/GroupListView.qml
         src/ui/screens/ChannelListView.qml
+        src/ui/screens/PlayerView.qml
 )
 
 target_include_directories(${PROJECT_NAME} PRIVATE
@@ -86,6 +115,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     Qt6::QuickControls2
     Qt6::Sql
     Qt6::Network
+    Qt6::Concurrent
 )
 
 if(MPV_FOUND)

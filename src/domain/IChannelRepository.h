@@ -23,6 +23,7 @@ public:
     
     virtual std::optional<Channel> getChannelById(int id) = 0;
     virtual std::vector<Channel> getChannelsByGroupId(int groupId) = 0;
+    virtual std::vector<Channel> getChannelsByPlaylistId(int playlistId) = 0;
     virtual std::vector<Channel> searchChannels(const QString& query) = 0;
     
     // Favorites

@@ -1,6 +1,7 @@
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
+import M3uVideoPlayer
 
 Popup {
     id: dialog
@@ -149,8 +150,12 @@ Popup {
                 background: Rectangle { color: "#FFD54F"; radius: 6; implicitHeight: 40; implicitWidth: 120 }
                 contentItem: Text { text: parent.text; color: "#121212"; font.bold: true; horizontalAlignment: Text.AlignHCenter; verticalAlignment: Text.AlignVCenter }
                 onClicked: {
-                    // TODO: Pass data to C++ backend
-                    console.log("Adding playlist...")
+                    var name = nameField.text;
+                    if (dialog.currentTab === 0) {
+                        AppController.playlistViewModel.addPlaylistAsync(name, urlField.text, false, "", "");
+                    } else {
+                        AppController.playlistViewModel.addPlaylistAsync(name, xtreamUrlField.text, true, usernameField.text, passwordField.text);
+                    }
                     dialog.close()
                 }
             }

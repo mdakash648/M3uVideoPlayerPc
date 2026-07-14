@@ -4,13 +4,18 @@
 #include <QtSql/QSqlDatabase>
 #include <QDebug>
 
+#include <QQuickWindow>
 #include <QQuickStyle>
-
+#include "infrastructure/player/MpvVideoItem.h"
 #include "ui/AppController.h"
 
 int main(int argc, char *argv[])
 {
     QQuickStyle::setStyle("Basic");
+
+    // Force OpenGL RHI backend for libmpv mpv_render_context
+    QQuickWindow::setGraphicsApi(QSGRendererInterface::OpenGL);
+
     QGuiApplication app(argc, argv);
     
     // Application Info
@@ -23,10 +28,13 @@ int main(int argc, char *argv[])
     AppController appController;
     appController.init();
 
+    // Register MpvVideoItem for QML
+    qmlRegisterType<MpvVideoItem>("M3uVideoPlayer", 1, 0, "MpvVideoItem");
+
     QQmlApplicationEngine engine;
     
     // Expose ViewModels to QML
-    // engine.rootContext()->setContextProperty("mainViewModel", mainViewModel.get());
+    qmlRegisterSingletonInstance("M3uVideoPlayer", 1, 0, "AppController", &appController);
     
     // Global properties or Enums
     // qmlRegisterType<Enums>("M3uVideoPlayer", 1, 0, "AppEnums");

@@ -1,9 +1,26 @@
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
+import "../components"
+import M3uVideoPlayer
 
 Rectangle {
     color: "#121212"
+
+    property int playlistId: -1
+    property string playlistName: "Groups / Categories"
+    property string viewMode: "Grid" // "Grid" or "List"
+
+    signal backRequested()
+    signal groupOpened(int groupId, string groupName)
+    signal allChannelsOpened()
+    signal favoritesOpened()
+
+    onPlaylistIdChanged: {
+        if (playlistId !== -1) {
+            AppController.groupViewModel.loadGroups(playlistId);
+        }
+    }
 
     ColumnLayout {
         anchors.fill: parent
@@ -13,44 +30,144 @@ Rectangle {
         // Header and Search
         RowLayout {
             Layout.fillWidth: true
-            
+
             Button {
                 text: "← Back"
-                background: Rectangle { color: "transparent" }
-                contentItem: Text { text: parent.text; color: "#FFD54F"; font.bold: true; font.pixelSize: 16 }
-                // onClicked: go back
+                background: Rectangle { color: "transparent"; implicitWidth: 60; implicitHeight: 30 }
+                contentItem: Text { text: parent.text; color: "#FFD54F"; font.bold: true; font.pixelSize: 16; horizontalAlignment: Text.AlignHCenter; verticalAlignment: Text.AlignVCenter }
+                onClicked: backRequested()
             }
 
             Text {
-                text: qsTr("Groups / Categories")
+                text: playlistName
                 color: "#FFFFFF"
                 font.pixelSize: 24
                 font.bold: true
                 Layout.leftMargin: 15
             }
-            
+
             Item { Layout.fillWidth: true } // spacer
-            
+
+            ViewModeToggle {
+                modes: ["Grid", "List"]
+                currentMode: viewMode
+                onModeSelected: (mode) => viewMode = mode
+            }
+
+            SortMenuButton {
+                onSortSelected: (mode) => AppController.groupViewModel.setSortMode(mode)
+            }
+
             TextField {
                 placeholderText: "Search categories..."
                 color: "#FFFFFF"
-                background: Rectangle { color: "#1E1E1E"; radius: 6; implicitHeight: 40; implicitWidth: 250; border.color: "#333333" }
+                background: Rectangle { color: "#1E1E1E"; radius: 6; implicitHeight: 40; implicitWidth: 220; border.color: "#333333" }
                 leftPadding: 10
+                onTextChanged: AppController.groupViewModel.setSearchQuery(text)
+            }
+        }
+
+        // Pinned "All Channels" folder - shows every channel in this playlist regardless of category
+        Rectangle {
+            Layout.fillWidth: true
+            height: 60
+            radius: 8
+            color: "#1E1E1E"
+            border.color: allChannelsMouseArea.containsMouse ? "#FFD54F" : "#333333"
+            border.width: 1
+
+            RowLayout {
+                anchors.fill: parent
+                anchors.margins: 12
+                spacing: 12
+
+                Rectangle {
+                    width: 36; height: 36
+                    radius: 6
+                    color: "transparent"
+                    FolderIcon { anchors.centerIn: parent; size: 30 }
+                }
+
+                Text {
+                    text: "All Channels"
+                    color: "#FFFFFF"
+                    font.pixelSize: 16
+                    font.bold: true
+                    Layout.fillWidth: true
+                }
+
+                Text {
+                    text: "→"
+                    color: "#FFD54F"
+                    font.pixelSize: 18
+                }
+            }
+
+            MouseArea {
+                id: allChannelsMouseArea
+                anchors.fill: parent
+                hoverEnabled: true
+                onClicked: allChannelsOpened()
+            }
+        }
+
+        // Pinned "Favorites" folder - shows every channel marked as favorite in this playlist
+        Rectangle {
+            Layout.fillWidth: true
+            height: 60
+            radius: 8
+            color: "#1E1E1E"
+            border.color: favoritesMouseArea.containsMouse ? "#FFD54F" : "#333333"
+            border.width: 1
+
+            RowLayout {
+                anchors.fill: parent
+                anchors.margins: 12
+                spacing: 12
+
+                Rectangle {
+                    width: 36; height: 36
+                    radius: 6
+                    color: "#2A2A2A"
+                    Text { anchors.centerIn: parent; text: "★"; color: "#FFD54F"; font.pixelSize: 20 }
+                }
+
+                Text {
+                    text: "Favorites"
+                    color: "#FFFFFF"
+                    font.pixelSize: 16
+                    font.bold: true
+                    Layout.fillWidth: true
+                }
+
+                Text {
+                    text: "→"
+                    color: "#FFD54F"
+                    font.pixelSize: 18
+                }
+            }
+
+            MouseArea {
+                id: favoritesMouseArea
+                anchors.fill: parent
+                hoverEnabled: true
+                onClicked: favoritesOpened()
             }
         }
 
         // Grid View for Groups
         GridView {
             id: groupGrid
+            visible: viewMode === "Grid"
             Layout.fillWidth: true
             Layout.fillHeight: true
             clip: true
-            
+
             cellWidth: (width / 3) - 10
             cellHeight: 120
-            
-            model: 12 // Dummy groups
-            
+
+            model: AppController.groupViewModel
+
             delegate: Rectangle {
                 width: groupGrid.cellWidth - 15
                 height: groupGrid.cellHeight - 15
@@ -58,39 +175,99 @@ Rectangle {
                 radius: 12
                 border.color: "#333333"
                 border.width: 1
-                
+
                 ColumnLayout {
                     anchors.centerIn: parent
-                    
-                    // Folder Icon placeholder
-                    Rectangle {
-                        width: 40; height: 30
-                        color: "#FFD54F"
-                        radius: 4
+
+                    // Windows-style folder icon
+                    FolderIcon {
+                        size: 46
                         Layout.alignment: Qt.AlignHCenter
                     }
-                    
+
                     Text {
-                        text: "Category " + (index + 1)
+                        text: model.name ? model.name : ("Category " + (index + 1))
                         color: "#FFFFFF"
                         font.pixelSize: 16
                         font.bold: true
                         Layout.alignment: Qt.AlignHCenter
                     }
-                    
+
                     Text {
-                        text: "150 Channels"
+                        text: (model.channelCount !== undefined ? model.channelCount : 0) + " Channels"
                         color: "#AAAAAA"
                         font.pixelSize: 12
                         Layout.alignment: Qt.AlignHCenter
                     }
                 }
-                
+
                 MouseArea {
                     anchors.fill: parent
                     hoverEnabled: true
                     onEntered: parent.border.color = "#FFD54F"
                     onExited: parent.border.color = "#333333"
+                    onClicked: {
+                        var gId = model.id !== undefined ? model.id : -1;
+                        var gName = model.name !== undefined ? model.name : ("Category " + (index + 1));
+                        groupOpened(gId, gName);
+                    }
+                }
+            }
+        }
+
+        // List View for Groups
+        ListView {
+            id: groupList
+            visible: viewMode === "List"
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+            clip: true
+            spacing: 10
+
+            model: AppController.groupViewModel
+
+            delegate: Rectangle {
+                width: groupList.width
+                height: 55
+                color: "#1E1E1E"
+                radius: 8
+                border.color: "#333333"
+                border.width: 1
+
+                RowLayout {
+                    anchors.fill: parent
+                    anchors.margins: 12
+                    spacing: 12
+
+                    FolderIcon {
+                        size: 32
+                    }
+
+                    Text {
+                        text: model.name ? model.name : ("Category " + (index + 1))
+                        color: "#FFFFFF"
+                        font.pixelSize: 15
+                        font.bold: true
+                        Layout.fillWidth: true
+                    }
+
+                    Text {
+                        text: (model.channelCount !== undefined ? model.channelCount : 0) + " Channels"
+                        color: "#AAAAAA"
+                        font.pixelSize: 12
+                    }
+                }
+
+                MouseArea {
+                    anchors.fill: parent
+                    hoverEnabled: true
+                    onEntered: parent.border.color = "#FFD54F"
+                    onExited: parent.border.color = "#333333"
+                    onClicked: {
+                        var gId = model.id !== undefined ? model.id : -1;
+                        var gName = model.name !== undefined ? model.name : ("Category " + (index + 1));
+                        groupOpened(gId, gName);
+                    }
                 }
             }
         }

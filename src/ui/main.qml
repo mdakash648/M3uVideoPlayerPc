@@ -75,6 +75,22 @@ ApplicationWindow {
                         duration: 200
                     }
                 }
+                popEnter: Transition {
+                    PropertyAnimation {
+                        property: "opacity"
+                        from: 0
+                        to: 1
+                        duration: 200
+                    }
+                }
+                popExit: Transition {
+                    PropertyAnimation {
+                        property: "opacity"
+                        from: 1
+                        to: 0
+                        duration: 200
+                    }
+                }
             }
         }
     }
@@ -82,7 +98,44 @@ ApplicationWindow {
     // Components for StackView
     Component {
         id: playlistViewComponent
-        PlaylistListView {}
+        PlaylistListView {
+            onPlaylistOpened: function(id, name) {
+                stackView.push(groupViewComponent, { "playlistId": id, "playlistName": name })
+            }
+        }
+    }
+
+    Component {
+        id: groupViewComponent
+        GroupListView {
+            onBackRequested: stackView.pop()
+            onGroupOpened: function(id, name) {
+                stackView.push(channelViewComponent, { "groupId": id, "groupName": name })
+            }
+            onAllChannelsOpened: {
+                stackView.push(channelViewComponent, { "groupId": -1, "groupName": "All Channels", "playlistId": playlistId })
+            }
+            onFavoritesOpened: {
+                stackView.push(channelViewComponent, { "groupId": -1, "groupName": "Favorites", "favoritesMode": true })
+            }
+        }
+    }
+
+    Component {
+        id: channelViewComponent
+        ChannelListView {
+            onBackRequested: stackView.pop()
+            onChannelOpened: function(streamUrl, channelName) {
+                stackView.push(playerViewComponent, { "streamUrl": streamUrl })
+            }
+        }
+    }
+
+    Component {
+        id: playerViewComponent
+        PlayerView {
+            onBackRequested: stackView.pop()
+        }
     }
 
     Component {

@@ -1,10 +1,13 @@
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
+import M3uVideoPlayer
 import "../components" as Components
 
 Rectangle {
     color: "#121212"
+
+    signal playlistOpened(int playlistId, string playlistName)
 
     ColumnLayout {
         anchors.fill: parent
@@ -52,7 +55,7 @@ Rectangle {
             Layout.fillHeight: true
             clip: true
             
-            model: 5 // Dummy data
+            model: AppController.playlistViewModel
             
             delegate: Rectangle {
                 width: ListView.view.width
@@ -69,13 +72,13 @@ Rectangle {
                     ColumnLayout {
                         Layout.fillWidth: true
                         Text {
-                            text: "Playlist " + (index + 1)
+                            text: model.name ? model.name : ("Playlist " + (index + 1))
                             color: "#FFFFFF"
                             font.pixelSize: 18
                             font.bold: true
                         }
                         Text {
-                            text: "Updated: Just now"
+                            text: "Type: " + (model.type ? "Xtream Codes" : "M3U")
                             color: "#AAAAAA"
                             font.pixelSize: 12
                         }
@@ -104,6 +107,11 @@ Rectangle {
                     hoverEnabled: true
                     onEntered: parent.border.color = "#FFD54F"
                     onExited: parent.border.color = "#333333"
+                    onClicked: {
+                        var pId = model.id !== undefined ? model.id : -1;
+                        var pName = model.name !== undefined ? model.name : ("Playlist " + (index + 1));
+                        playlistOpened(pId, pName);
+                    }
                 }
             }
             

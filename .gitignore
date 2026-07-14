@@ -1,0 +1,56 @@
+# C++ objects and libs
+*.slo
+*.lo
+*.o
+*.obj
+*.suo
+*.tlb
+*.tlh
+*.bak
+*.cache
+*.ilk
+*.log
+*.dll
+*.so
+*.dylib
+*.exe
+*.out
+*.app
+
+# Qt Creator
+CMakeLists.txt.user
+CMakeLists.txt.user.*
+*.pro.user
+*.pro.user.*
+*.qbs.user
+*.qbs.user.*
+*.qmlproject.user
+*.qmlproject.user.*
+
+# CMake
+CMakeCache.txt
+CMakeFiles/
+CMakeScripts/
+Testing/
+Makefile
+cmake_install.cmake
+install_manifest.txt
+compile_commands.json
+CTestTestfile.cmake
+_deps/
+
+# Build Directories
+build/
+build-*/
+out/
+bin/
+
+# Temporary / OS files
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Project Specific
+export_for_ai.bat
+M3uVideoPlayerPc_Source.zip
+implementation_plan.md

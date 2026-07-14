@@ -1,5 +1,12 @@
 #include "AppController.h"
 #include <QDebug>
+#include "../infrastructure/TrustedTimeSource.h"
+#include "PlaylistViewModel.h"
+#include "GroupViewModel.h"
+#include "ChannelViewModel.h"
+#include "../data/DatabaseManager.h"
+#include "../data/PlaylistRepository.h"
+#include "../data/ChannelRepository.h"
 
 static AppController *s_instance = nullptr;
 
@@ -17,6 +24,12 @@ AppController::AppController(QObject *parent)
 }
 
 AppController::~AppController() {
+    if (m_channelViewModel) delete m_channelViewModel;
+    if (m_groupViewModel) delete m_groupViewModel;
+    if (m_playlistViewModel) delete m_playlistViewModel;
+    if (m_channelRepo) delete m_channelRepo;
+    if (m_playlistRepo) delete m_playlistRepo;
+
     if (s_instance == this) {
         s_instance = nullptr;
     }
@@ -37,6 +50,12 @@ void AppController::init() {
     // Initialize Database
     if (m_dbManager->init("m3uplayer.db")) {
         qDebug() << "Database initialized successfully.";
+        
+        m_playlistRepo = new Data::PlaylistRepository(m_dbManager->getDatabase());
+        m_channelRepo = new Data::ChannelRepository(m_dbManager->getDatabase());
+        m_playlistViewModel = new PlaylistViewModel(m_playlistRepo, m_channelRepo, this);
+        m_groupViewModel = new GroupViewModel(m_channelRepo, this);
+        m_channelViewModel = new ChannelViewModel(m_channelRepo, this);
     } else {
         qWarning() << "Database initialization failed!";
     }
