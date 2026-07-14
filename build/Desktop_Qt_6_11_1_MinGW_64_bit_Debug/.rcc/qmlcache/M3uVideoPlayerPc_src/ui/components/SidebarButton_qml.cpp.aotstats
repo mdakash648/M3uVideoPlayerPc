@@ -1,0 +1,55 @@
+{
+    "formatRevision": 1,
+    "modules": [
+        {
+            "moduleFiles": [
+                {
+                    "entries": [
+                        {
+                            "codegenResult": 2,
+                            "column": 16,
+                            "durationMicroseconds": 0,
+                            "functionName": "color",
+                            "line": 12,
+                            "message": "Cannot access value for name control"
+                        },
+                        {
+                            "codegenResult": 2,
+                            "column": 20,
+                            "durationMicroseconds": 0,
+                            "functionName": "color",
+                            "line": 27,
+                            "message": "Cannot access value for name control"
+                        },
+                        {
+                            "codegenResult": 2,
+                            "column": 19,
+                            "durationMicroseconds": 0,
+                            "functionName": "text",
+                            "line": 33,
+                            "message": "Cannot access value for name control"
+                        },
+                        {
+                            "codegenResult": 2,
+                            "column": 20,
+                            "durationMicroseconds": 0,
+                            "functionName": "color",
+                            "line": 34,
+                            "message": "Cannot access value for name control"
+                        },
+                        {
+                            "codegenResult": 2,
+                            "column": 24,
+                            "durationMicroseconds": 0,
+                            "functionName": "bold",
+                            "line": 36,
+                            "message": "Cannot access value for name control"
+                        }
+                    ],
+                    "filePath": "D:/c++ project/M3uVideoPlayerPc/src/ui/components/SidebarButton.qml"
+                }
+            ],
+            "moduleId": "M3uVideoPlayer(M3uVideoPlayerPc)"
+        }
+    ]
+}

@@ -1,0 +1,13 @@
+<RCC>
+  <qresource prefix="/M3uVideoPlayer/">
+    <file alias="src/ui/main.qml">D:/c++ project/M3uVideoPlayerPc/src/ui/main.qml</file>
+    <file alias="src/ui/components/Sidebar.qml">D:/c++ project/M3uVideoPlayerPc/src/ui/components/Sidebar.qml</file>
+    <file alias="src/ui/components/SidebarButton.qml">D:/c++ project/M3uVideoPlayerPc/src/ui/components/SidebarButton.qml</file>
+    <file alias="src/ui/components/AddPlaylistDialog.qml">D:/c++ project/M3uVideoPlayerPc/src/ui/components/AddPlaylistDialog.qml</file>
+    <file alias="src/ui/screens/PlaylistListView.qml">D:/c++ project/M3uVideoPlayerPc/src/ui/screens/PlaylistListView.qml</file>
+    <file alias="src/ui/screens/DirectLinkView.qml">D:/c++ project/M3uVideoPlayerPc/src/ui/screens/DirectLinkView.qml</file>
+    <file alias="src/ui/screens/GroupListView.qml">D:/c++ project/M3uVideoPlayerPc/src/ui/screens/GroupListView.qml</file>
+    <file alias="src/ui/screens/ChannelListView.qml">D:/c++ project/M3uVideoPlayerPc/src/ui/screens/ChannelListView.qml</file>
+  </qresource>
+</RCC>
+

@@ -1,0 +1,6 @@
+<RCC>
+  <qresource prefix="/">
+    <file alias="/M3uVideoPlayer">D:/c++ project/M3uVideoPlayerPc/build/Desktop_Qt_6_11_1_MinGW_64_bit_Debug/M3uVideoPlayer</file>
+
+  </qresource>
+</RCC>

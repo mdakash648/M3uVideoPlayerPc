@@ -1,0 +1,23 @@
+--bare
+-I
+D:/c++ project/M3uVideoPlayerPc/build/Desktop_Qt_6_11_1_MinGW_64_bit_Debug
+-I
+D:/c++ project/M3uVideoPlayerPc/build/Desktop_Qt_6_11_1_MinGW_64_bit_Debug/M3uVideoPlayer
+-I
+D:/c++ project/M3uVideoPlayerPc/build/Desktop_Qt_6_11_1_MinGW_64_bit_Debug
+-I
+C:/Qt/6.11.1/mingw_64/qml
+--resource
+D:/c++ project/M3uVideoPlayerPc/build/Desktop_Qt_6_11_1_MinGW_64_bit_Debug/.qt/rcc/qmake_M3uVideoPlayer.qrc
+--resource
+D:/c++ project/M3uVideoPlayerPc/build/Desktop_Qt_6_11_1_MinGW_64_bit_Debug/.qt/rcc/M3uVideoPlayerPc_raw_qml_0.qrc
+D:/c++ project/M3uVideoPlayerPc/src/ui/main.qml
+D:/c++ project/M3uVideoPlayerPc/src/ui/components/Sidebar.qml
+D:/c++ project/M3uVideoPlayerPc/src/ui/components/SidebarButton.qml
+D:/c++ project/M3uVideoPlayerPc/src/ui/components/AddPlaylistDialog.qml
+D:/c++ project/M3uVideoPlayerPc/src/ui/screens/PlaylistListView.qml
+D:/c++ project/M3uVideoPlayerPc/src/ui/screens/DirectLinkView.qml
+D:/c++ project/M3uVideoPlayerPc/src/ui/screens/GroupListView.qml
+D:/c++ project/M3uVideoPlayerPc/src/ui/screens/ChannelListView.qml
+--json
+D:/c++ project/M3uVideoPlayerPc/build/Desktop_Qt_6_11_1_MinGW_64_bit_Debug/M3uVideoPlayerPc_qmllint.json

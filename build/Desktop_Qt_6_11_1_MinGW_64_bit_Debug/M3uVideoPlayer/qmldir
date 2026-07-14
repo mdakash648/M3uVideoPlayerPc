@@ -1,0 +1,12 @@
+module M3uVideoPlayer
+typeinfo M3uVideoPlayerPc.qmltypes
+prefer :/M3uVideoPlayer/
+Sidebar 1.0 src/ui/components/Sidebar.qml
+SidebarButton 1.0 src/ui/components/SidebarButton.qml
+AddPlaylistDialog 1.0 src/ui/components/AddPlaylistDialog.qml
+PlaylistListView 1.0 src/ui/screens/PlaylistListView.qml
+DirectLinkView 1.0 src/ui/screens/DirectLinkView.qml
+GroupListView 1.0 src/ui/screens/GroupListView.qml
+ChannelListView 1.0 src/ui/screens/ChannelListView.qml
+depends QtQuick
+

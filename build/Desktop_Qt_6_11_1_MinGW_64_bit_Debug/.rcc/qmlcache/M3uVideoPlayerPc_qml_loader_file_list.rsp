@@ -1,0 +1,12 @@
+--resource
+D:/c++ project/M3uVideoPlayerPc/build/Desktop_Qt_6_11_1_MinGW_64_bit_Debug/.qt/rcc/qmake_M3uVideoPlayer.qrc
+--resource
+D:/c++ project/M3uVideoPlayerPc/build/Desktop_Qt_6_11_1_MinGW_64_bit_Debug/.qt/rcc/M3uVideoPlayerPc_raw_qml_0.qrc
+/M3uVideoPlayer/src/ui/main.qml
+/M3uVideoPlayer/src/ui/components/Sidebar.qml
+/M3uVideoPlayer/src/ui/components/SidebarButton.qml
+/M3uVideoPlayer/src/ui/components/AddPlaylistDialog.qml
+/M3uVideoPlayer/src/ui/screens/PlaylistListView.qml
+/M3uVideoPlayer/src/ui/screens/DirectLinkView.qml
+/M3uVideoPlayer/src/ui/screens/GroupListView.qml
+/M3uVideoPlayer/src/ui/screens/ChannelListView.qml
