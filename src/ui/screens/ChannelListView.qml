@@ -39,7 +39,6 @@ Rectangle {
         anchors.margins: 20
         spacing: 20
 
-        // Header and Search
         RowLayout {
             Layout.fillWidth: true
 
@@ -58,7 +57,7 @@ Rectangle {
                 Layout.leftMargin: 15
             }
 
-            Item { Layout.fillWidth: true } // spacer
+            Item { Layout.fillWidth: true }
 
             ViewModeToggle {
                 modes: ["List", "Grid", "Title", "Poster"]
@@ -79,7 +78,6 @@ Rectangle {
             }
         }
 
-        // List / Title modes
         ListView {
             id: channelList
             visible: viewMode === "List" || viewMode === "Title"
@@ -103,7 +101,6 @@ Rectangle {
                     anchors.margins: viewMode === "Title" ? 6 : 10
                     spacing: 15
 
-                    // Channel logo (tvg-icon), list mode only
                     ChannelLogo {
                         visible: viewMode === "List"
                         width: 60; height: 40
@@ -112,11 +109,24 @@ Rectangle {
                     }
 
                     Text {
+                        id: titleText
                         text: model.name ? model.name : ("Channel " + (index + 1))
                         color: "#FFFFFF"
                         font.pixelSize: viewMode === "Title" ? 13 : 16
                         font.bold: viewMode !== "Title"
+                        elide: Text.ElideRight
+                        maximumLineCount: 1
+                        wrapMode: Text.NoWrap
+                        clip: true
                         Layout.fillWidth: true
+                        Layout.minimumWidth: 0
+                        Layout.preferredWidth: 0
+                        Layout.maximumWidth: parent.width
+
+                        HoverHandler { id: titleHover }
+                        ToolTip.visible: titleHover.hovered && titleText.truncated
+                        ToolTip.text: model.name ? model.name : ""
+                        ToolTip.delay: 400
                     }
 
                     Button {
@@ -145,7 +155,6 @@ Rectangle {
             }
         }
 
-        // Grid / Poster modes
         GridView {
             id: channelGrid
             visible: viewMode === "Grid" || viewMode === "Poster"
@@ -179,25 +188,36 @@ Rectangle {
                     }
 
                     Text {
+                        id: gridTitleText
                         text: model.name ? model.name : ("Channel " + (index + 1))
                         color: "#FFFFFF"
                         font.pixelSize: 13
                         font.bold: true
                         elide: Text.ElideRight
+                        maximumLineCount: 1
+                        wrapMode: Text.NoWrap
+                        clip: true
                         Layout.fillWidth: true
+                        Layout.minimumWidth: 0
+                        Layout.preferredWidth: 0
                         horizontalAlignment: Text.AlignHCenter
+
+                        HoverHandler { id: gridTitleHover }
+                        ToolTip.visible: gridTitleHover.hovered && gridTitleText.truncated
+                        ToolTip.text: model.name ? model.name : ""
+                        ToolTip.delay: 400
                     }
                 }
 
                 MouseArea {
                     anchors.fill: parent
                     hoverEnabled: true
+                    z: -1
                     onEntered: parent.border.color = "#FFD54F"
                     onExited: parent.border.color = "#333333"
                     onClicked: channelOpened(model.streamUrl, model.name)
                 }
 
-                // Favorite toggle, top-right corner
                 Button {
                     anchors.top: parent.top
                     anchors.right: parent.right
