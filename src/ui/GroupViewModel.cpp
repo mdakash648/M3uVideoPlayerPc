@@ -43,6 +43,18 @@ void GroupViewModel::loadGroups(int playlistId) {
         for (const auto& g : stdList) {
             m_sourceGroups.append(g);
         }
+        
+        int newAllChannelsCount = m_channelRepo->getChannelCountByPlaylistId(playlistId);
+        if (m_allChannelsCount != newAllChannelsCount) {
+            m_allChannelsCount = newAllChannelsCount;
+            emit allChannelsCountChanged();
+        }
+        
+        int newFavoritesCount = m_channelRepo->getFavoritesCount();
+        if (m_favoritesCount != newFavoritesCount) {
+            m_favoritesCount = newFavoritesCount;
+            emit favoritesCountChanged();
+        }
     }
     applyFilterAndSort();
 }
@@ -63,26 +75,43 @@ void GroupViewModel::applyFilterAndSort() {
     beginResetModel();
 
     m_groups.clear();
+
+    Domain::Group allChannels;
+    allChannels.id = -100;
+    allChannels.name = "All Channels";
+    allChannels.channelCount = m_allChannelsCount;
+    allChannels.orderIndex = -2;
+    m_groups.append(allChannels);
+
+    Domain::Group favorites;
+    favorites.id = -200;
+    favorites.name = "Favorites";
+    favorites.channelCount = m_favoritesCount;
+    favorites.orderIndex = -1;
+    m_groups.append(favorites);
+
+    QList<Domain::Group> filteredGroups;
     if (m_searchQuery.isEmpty()) {
-        m_groups = m_sourceGroups;
+        filteredGroups = m_sourceGroups;
     } else {
         for (const auto& g : m_sourceGroups) {
             if (g.name.contains(m_searchQuery, Qt::CaseInsensitive)) {
-                m_groups.append(g);
+                filteredGroups.append(g);
             }
         }
     }
 
     if (m_sortMode == Ascending) {
-        std::sort(m_groups.begin(), m_groups.end(), [](const Domain::Group& a, const Domain::Group& b) {
+        std::sort(filteredGroups.begin(), filteredGroups.end(), [](const Domain::Group& a, const Domain::Group& b) {
             return QString::localeAwareCompare(a.name, b.name) < 0;
         });
     } else if (m_sortMode == Descending) {
-        std::sort(m_groups.begin(), m_groups.end(), [](const Domain::Group& a, const Domain::Group& b) {
+        std::sort(filteredGroups.begin(), filteredGroups.end(), [](const Domain::Group& a, const Domain::Group& b) {
             return QString::localeAwareCompare(a.name, b.name) > 0;
         });
     }
-    // PlaylistOrder: keep the order already returned by the repository (ORDER BY orderIndex ASC)
+
+    m_groups.append(filteredGroups);
 
     endResetModel();
 }

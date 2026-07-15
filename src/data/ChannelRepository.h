@@ -23,11 +23,13 @@ public:
     std::optional<Domain::Channel> getChannelById(int id) override;
     std::vector<Domain::Channel> getChannelsByGroupId(int groupId) override;
     std::vector<Domain::Channel> getChannelsByPlaylistId(int playlistId) override;
+    int getChannelCountByPlaylistId(int playlistId) override;
     std::vector<Domain::Channel> searchChannels(const QString& query) override;
     
     // Favorites
     bool setFavorite(int channelId, bool isFavorite) override;
     std::vector<Domain::Channel> getFavorites() override;
+    int getFavoritesCount() override;
 
 private:
     QSqlDatabase m_db;

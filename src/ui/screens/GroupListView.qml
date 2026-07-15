@@ -67,93 +67,7 @@ Rectangle {
             }
         }
 
-        // Pinned "All Channels" folder - shows every channel in this playlist regardless of category
-        Rectangle {
-            Layout.fillWidth: true
-            height: 60
-            radius: 8
-            color: "#1E1E1E"
-            border.color: allChannelsMouseArea.containsMouse ? "#FFD54F" : "#333333"
-            border.width: 1
 
-            RowLayout {
-                anchors.fill: parent
-                anchors.margins: 12
-                spacing: 12
-
-                Rectangle {
-                    width: 36; height: 36
-                    radius: 6
-                    color: "transparent"
-                    FolderIcon { anchors.centerIn: parent; size: 30 }
-                }
-
-                Text {
-                    text: "All Channels"
-                    color: "#FFFFFF"
-                    font.pixelSize: 16
-                    font.bold: true
-                    Layout.fillWidth: true
-                }
-
-                Text {
-                    text: "→"
-                    color: "#FFD54F"
-                    font.pixelSize: 18
-                }
-            }
-
-            MouseArea {
-                id: allChannelsMouseArea
-                anchors.fill: parent
-                hoverEnabled: true
-                onClicked: allChannelsOpened()
-            }
-        }
-
-        // Pinned "Favorites" folder - shows every channel marked as favorite in this playlist
-        Rectangle {
-            Layout.fillWidth: true
-            height: 60
-            radius: 8
-            color: "#1E1E1E"
-            border.color: favoritesMouseArea.containsMouse ? "#FFD54F" : "#333333"
-            border.width: 1
-
-            RowLayout {
-                anchors.fill: parent
-                anchors.margins: 12
-                spacing: 12
-
-                Rectangle {
-                    width: 36; height: 36
-                    radius: 6
-                    color: "#2A2A2A"
-                    Text { anchors.centerIn: parent; text: "★"; color: "#FFD54F"; font.pixelSize: 20 }
-                }
-
-                Text {
-                    text: "Favorites"
-                    color: "#FFFFFF"
-                    font.pixelSize: 16
-                    font.bold: true
-                    Layout.fillWidth: true
-                }
-
-                Text {
-                    text: "→"
-                    color: "#FFD54F"
-                    font.pixelSize: 18
-                }
-            }
-
-            MouseArea {
-                id: favoritesMouseArea
-                anchors.fill: parent
-                hoverEnabled: true
-                onClicked: favoritesOpened()
-            }
-        }
 
         // Grid View for Groups
         GridView {
@@ -181,8 +95,18 @@ Rectangle {
 
                     // Windows-style folder icon
                     FolderIcon {
+                        visible: model.id !== -200
                         size: 46
                         Layout.alignment: Qt.AlignHCenter
+                    }
+
+                    Rectangle {
+                        visible: model.id === -200
+                        width: 46; height: 46
+                        radius: 8
+                        color: "#2A2A2A"
+                        Layout.alignment: Qt.AlignHCenter
+                        Text { anchors.centerIn: parent; text: "★"; color: "#FFD54F"; font.pixelSize: 24 }
                     }
 
                     Text {
@@ -209,7 +133,13 @@ Rectangle {
                     onClicked: {
                         var gId = model.id !== undefined ? model.id : -1;
                         var gName = model.name !== undefined ? model.name : ("Category " + (index + 1));
-                        groupOpened(gId, gName);
+                        if (gId === -100) {
+                            allChannelsOpened();
+                        } else if (gId === -200) {
+                            favoritesOpened();
+                        } else {
+                            groupOpened(gId, gName);
+                        }
                     }
                 }
             }
@@ -240,7 +170,16 @@ Rectangle {
                     spacing: 12
 
                     FolderIcon {
+                        visible: model.id !== -200
                         size: 32
+                    }
+
+                    Rectangle {
+                        visible: model.id === -200
+                        width: 32; height: 32
+                        radius: 6
+                        color: "#2A2A2A"
+                        Text { anchors.centerIn: parent; text: "★"; color: "#FFD54F"; font.pixelSize: 18 }
                     }
 
                     Text {
@@ -266,7 +205,13 @@ Rectangle {
                     onClicked: {
                         var gId = model.id !== undefined ? model.id : -1;
                         var gName = model.name !== undefined ? model.name : ("Category " + (index + 1));
-                        groupOpened(gId, gName);
+                        if (gId === -100) {
+                            allChannelsOpened();
+                        } else if (gId === -200) {
+                            favoritesOpened();
+                        } else {
+                            groupOpened(gId, gName);
+                        }
                     }
                 }
             }

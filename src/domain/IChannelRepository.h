@@ -24,11 +24,13 @@ public:
     virtual std::optional<Channel> getChannelById(int id) = 0;
     virtual std::vector<Channel> getChannelsByGroupId(int groupId) = 0;
     virtual std::vector<Channel> getChannelsByPlaylistId(int playlistId) = 0;
+    virtual int getChannelCountByPlaylistId(int playlistId) = 0;
     virtual std::vector<Channel> searchChannels(const QString& query) = 0;
     
     // Favorites
     virtual bool setFavorite(int channelId, bool isFavorite) = 0;
     virtual std::vector<Channel> getFavorites() = 0;
+    virtual int getFavoritesCount() = 0;
 };
 
 } // namespace Domain

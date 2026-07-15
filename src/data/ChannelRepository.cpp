@@ -228,6 +228,17 @@ std::vector<Domain::Channel> ChannelRepository::getChannelsByPlaylistId(int play
     return channels;
 }
 
+int ChannelRepository::getChannelCountByPlaylistId(int playlistId) {
+    QSqlQuery query(m_db);
+    query.prepare("SELECT COUNT(*) FROM Channels WHERE playlistId = :playlistId");
+    query.bindValue(":playlistId", playlistId);
+    
+    if (query.exec() && query.next()) {
+        return query.value(0).toInt();
+    }
+    return 0;
+}
+
 std::vector<Domain::Channel> ChannelRepository::searchChannels(const QString& searchQuery) {
     std::vector<Domain::Channel> channels;
     QSqlQuery query(m_db);
@@ -293,6 +304,16 @@ std::vector<Domain::Channel> ChannelRepository::getFavorites() {
         }
     }
     return channels;
+}
+
+int ChannelRepository::getFavoritesCount() {
+    QSqlQuery query(m_db);
+    query.prepare("SELECT COUNT(*) FROM Channels WHERE isFavorite = 1");
+    
+    if (query.exec() && query.next()) {
+        return query.value(0).toInt();
+    }
+    return 0;
 }
 
 } // namespace Data
