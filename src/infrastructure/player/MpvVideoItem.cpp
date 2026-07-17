@@ -7,9 +7,16 @@
 #include <mpv/render_gl.h>
 #include <stdexcept>
 #include <iostream>
+#include <vector>
 #include <QVariantMap>
 
 namespace {
+// Fallback UA for playlist entries that don't specify one. Many CDNs return
+// 403 for mpv's default "libmpv" user agent, so pretend to be a browser.
+constexpr const char *kDefaultUserAgent =
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
+    "(KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36";
+
 void *get_proc_address_mpv(void *fn_ctx, const char *name) {
     Q_UNUSED(fn_ctx);
     QOpenGLContext *glctx = QOpenGLContext::currentContext();
@@ -120,6 +127,7 @@ MpvVideoItem::MpvVideoItem(QQuickItem *parent)
     mpv_observe_property(m_mpv, 0, "pause", MPV_FORMAT_FLAG);
     mpv_observe_property(m_mpv, 0, "volume", MPV_FORMAT_DOUBLE);
     mpv_observe_property(m_mpv, 0, "track-list", MPV_FORMAT_NONE);
+    mpv_observe_property(m_mpv, 0, "paused-for-cache", MPV_FORMAT_FLAG);
 
     mpv_set_wakeup_callback(m_mpv, on_mpv_events, this);
 
@@ -197,6 +205,27 @@ void MpvVideoItem::handleMpvEvent() {
                     emit volumeChanged();
                 } else if (QString(prop->name) == "track-list") {
                     updateTrackList();
+                } else if (QString(prop->name) == "paused-for-cache" && prop->format == MPV_FORMAT_FLAG) {
+                    bool buffering = (*static_cast<int *>(prop->data)) != 0;
+                    if (m_loading != buffering) {
+                        m_loading = buffering;
+                        emit loadingChanged();
+                    }
+                }
+                break;
+            }
+            case MPV_EVENT_START_FILE: {
+                if (!m_loading) {
+                    m_loading = true;
+                    emit loadingChanged();
+                }
+                break;
+            }
+            case MPV_EVENT_FILE_LOADED:
+            case MPV_EVENT_PLAYBACK_RESTART: {
+                if (m_loading) {
+                    m_loading = false;
+                    emit loadingChanged();
                 }
                 break;
             }
@@ -213,8 +242,19 @@ QString MpvVideoItem::mediaUrl() const {
 void MpvVideoItem::setMediaUrl(const QString &url) {
     if (m_mediaUrl != url) {
         m_mediaUrl = url;
-        const char *args[] = {"loadfile", url.toUtf8().constData(), nullptr};
+
+        // Apply Referer / User-Agent on the mpv handle BEFORE loading the
+        // file. Per-file loadfile options are unreliable across mpv versions
+        // (>= 0.38 changed the positional arguments), and header values may
+        // contain commas which break the options list syntax.
+        updateHttpHeaders();
+
+        // Keep the QByteArray alive for the duration of the command —
+        // url.toUtf8().constData() inline would leave a dangling pointer.
+        const QByteArray urlUtf8 = url.toUtf8();
+        const char *args[] = {"loadfile", urlUtf8.constData(), nullptr};
         mpv_command(m_mpv, args);
+
         emit mediaUrlChanged();
     }
 }
@@ -228,6 +268,10 @@ void MpvVideoItem::setPlaying(bool playing) {
         int val = playing ? 0 : 1;
         mpv_set_property(m_mpv, "pause", MPV_FORMAT_FLAG, &val);
     }
+}
+
+bool MpvVideoItem::isLoading() const {
+    return m_loading;
 }
 
 int MpvVideoItem::duration() const {
@@ -259,7 +303,7 @@ QString MpvVideoItem::userAgent() const {
 void MpvVideoItem::setUserAgent(const QString &userAgent) {
     if (m_userAgent != userAgent) {
         m_userAgent = userAgent;
-        mpv_set_property_string(m_mpv, "user-agent", userAgent.toUtf8().constData());
+        updateHttpHeaders();
         emit userAgentChanged();
     }
 }
@@ -271,9 +315,55 @@ QString MpvVideoItem::referer() const {
 void MpvVideoItem::setReferer(const QString &referer) {
     if (m_referer != referer) {
         m_referer = referer;
-        mpv_set_property_string(m_mpv, "referrer", referer.toUtf8().constData());
+        updateHttpHeaders();
         emit refererChanged();
     }
+}
+
+void MpvVideoItem::updateHttpHeaders() {
+    // Effective UA: playlist-provided, or a browser-like fallback so hosts
+    // that reject mpv's default "libmpv" agent still serve the stream.
+    const QString ua = m_userAgent.isEmpty() ? QString::fromLatin1(kDefaultUserAgent)
+                                             : m_userAgent;
+
+    // "user-agent" and "referrer" are the canonical mpv options and are also
+    // forwarded to yt-dlp/ffmpeg by mpv itself, so no ytdl-raw-options needed.
+    mpv_set_property_string(m_mpv, "user-agent", ua.toUtf8().constData());
+    mpv_set_property_string(m_mpv, "referrer", m_referer.toUtf8().constData());
+
+    // Also set the raw header fields — some demuxer paths (e.g. HLS segment
+    // requests through ffmpeg) only pick headers up from here.
+    QStringList headers;
+    if (!m_referer.isEmpty()) {
+        headers << QString("Referer: %1").arg(m_referer);
+    }
+    headers << QString("User-Agent: %1").arg(ua);
+
+    // Use the MPV_FORMAT_NODE list form instead of a comma-joined string:
+    // UA strings contain commas ("KHTML, like Gecko") which would otherwise
+    // be split into separate (broken) header entries.
+    QList<QByteArray> headerBytes;
+    std::vector<mpv_node> items;
+    headerBytes.reserve(headers.size());
+    items.reserve(headers.size());
+    for (const QString &h : headers) {
+        headerBytes.append(h.toUtf8());
+        mpv_node item;
+        item.format = MPV_FORMAT_STRING;
+        item.u.string = const_cast<char *>(headerBytes.last().constData());
+        items.push_back(item);
+    }
+
+    mpv_node_list list;
+    list.num = static_cast<int>(items.size());
+    list.values = items.data();
+    list.keys = nullptr;
+
+    mpv_node node;
+    node.format = MPV_FORMAT_NODE_ARRAY;
+    node.u.list = &list;
+
+    mpv_set_property(m_mpv, "http-header-fields", MPV_FORMAT_NODE, &node);
 }
 
 QVariantList MpvVideoItem::videoTracks() const { return m_videoTracks; }

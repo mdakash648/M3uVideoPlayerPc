@@ -2,6 +2,7 @@
 #include <QDebug>
 #include <QGuiApplication>
 #include <QWindow>
+#include <QScreen>
 #include "../infrastructure/TrustedTimeSource.h"
 #include "PlaylistViewModel.h"
 #include "GroupViewModel.h"
@@ -73,9 +74,44 @@ void AppController::triggerBackgroundSync() {
     onSyncTimerFired();
 }
 
-void AppController::restoreMaximized() {
-    if (QWindow *win = QGuiApplication::focusWindow()) {
+void AppController::enterFullscreen() {
+    QWindow *win = QGuiApplication::focusWindow();
+    if (!win) {
+        return;
+    }
+    QScreen *screen = win->screen();
+    if (!screen) {
+        return;
+    }
+
+    // "Fake" fullscreen: strip the window frame and resize to the full
+    // screen geometry. We deliberately avoid Qt::WindowFullScreen here —
+    // on Windows that state change goes through the OS's exclusive
+    // fullscreen enter/exit animation, which is what caused the visible
+    // minimize/maximize flicker. A plain frameless + geometry change is a
+    // single, instant, unanimated operation — this is the same technique
+    // players like VLC/MPC-HC use for a snap-instant fullscreen toggle.
+    win->setFlag(Qt::FramelessWindowHint, true);
+    win->setWindowState(Qt::WindowNoState);
+    win->setGeometry(screen->geometry());
+}
+
+void AppController::exitFullscreen(bool wasMaximized, qreal x, qreal y, qreal width, qreal height) {
+    QWindow *win = QGuiApplication::focusWindow();
+    if (!win) {
+        return;
+    }
+
+    win->setFlag(Qt::FramelessWindowHint, false);
+
+    if (wasMaximized) {
+        // Never having entered a real fullscreen WindowState means this is a
+        // normal, non-animated maximize — no flicker, unlike restoring from
+        // an actual Qt::WindowFullScreen state.
         win->setWindowState(Qt::WindowMaximized);
+    } else if (width > 0 && height > 0) {
+        win->setWindowState(Qt::WindowNoState);
+        win->setGeometry(int(x), int(y), int(width), int(height));
     }
 }
 

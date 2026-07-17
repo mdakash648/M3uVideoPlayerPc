@@ -10,6 +10,17 @@ RowLayout {
     property string currentMode: "List"
     signal modeSelected(string mode)
 
+    focus: true
+
+    Keys.onPressed: (event) => {
+        if (event.key === Qt.Key_Enter || event.key === Qt.Key_Return || event.key === Qt.Key_Space) {
+            var currentIndex = root.modes.indexOf(root.currentMode);
+            var nextIndex = (currentIndex + 1) % root.modes.length;
+            root.modeSelected(root.modes[nextIndex]);
+            event.accepted = true;
+        }
+    }
+
     Repeater {
         model: root.modes
         Button {
@@ -19,6 +30,8 @@ RowLayout {
                 radius: 4
                 implicitHeight: 30
                 implicitWidth: 60
+                border.color: root.activeFocus ? "#FFFFFF" : "transparent"
+                border.width: root.activeFocus && modelData === root.currentMode ? 2 : 0
             }
             contentItem: Text {
                 text: modelData

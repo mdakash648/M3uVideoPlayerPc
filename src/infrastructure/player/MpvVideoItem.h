@@ -21,6 +21,7 @@ class MpvVideoItem : public QQuickFramebufferObject {
     Q_OBJECT
     Q_PROPERTY(QString mediaUrl READ mediaUrl WRITE setMediaUrl NOTIFY mediaUrlChanged)
     Q_PROPERTY(bool playing READ isPlaying WRITE setPlaying NOTIFY playingChanged)
+    Q_PROPERTY(bool loading READ isLoading NOTIFY loadingChanged)
     Q_PROPERTY(int duration READ duration NOTIFY durationChanged)
     Q_PROPERTY(int position READ position WRITE setPosition NOTIFY positionChanged)
     Q_PROPERTY(int volume READ volume WRITE setVolume NOTIFY volumeChanged)
@@ -42,6 +43,8 @@ public:
 
     bool isPlaying() const;
     void setPlaying(bool playing);
+
+    bool isLoading() const;
 
     int duration() const;
     int position() const;
@@ -71,6 +74,7 @@ public slots:
 signals:
     void mediaUrlChanged();
     void playingChanged();
+    void loadingChanged();
     void durationChanged();
     void positionChanged();
     void volumeChanged();
@@ -89,12 +93,14 @@ private:
 
     void processMpvEvents();
     void updateTrackList();
+    void updateHttpHeaders();
 
     std::shared_ptr<mpv_handle> m_mpv_shared;
     mpv_handle *m_mpv = nullptr;
     std::shared_ptr<MpvCallbackCtx> m_callbackCtx;
     QString m_mediaUrl;
     bool m_playing = false;
+    bool m_loading = false;
     int m_duration = 0;
     int m_position = 0;
     int m_volume = 100;

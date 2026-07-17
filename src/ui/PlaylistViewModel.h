@@ -26,6 +26,7 @@ public:
     QHash<int, QByteArray> roleNames() const override;
 
     Q_INVOKABLE void loadPlaylists();
+    Q_INVOKABLE void deletePlaylist(int id);
     Q_INVOKABLE void addPlaylistAsync(const QString& name, const QString& url, bool isXtream, const QString& username, const QString& password);
 
 signals:

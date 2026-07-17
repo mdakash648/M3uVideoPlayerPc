@@ -20,6 +20,10 @@ Rectangle {
 
     signal navigationRequested(string page)
 
+    function focusFirstItem() {
+        btnPlaylists.forceActiveFocus();
+    }
+
     ColumnLayout {
         anchors.fill: parent
         anchors.margins: 10
@@ -30,11 +34,18 @@ Rectangle {
             Layout.bottomMargin: 20
 
             Button {
+                id: btnMenu
                 text: "☰"
                 Layout.preferredWidth: 45
                 Layout.preferredHeight: 45
                 padding: 0
-                background: Rectangle { color: "transparent"; radius: 8 }
+                KeyNavigation.down: btnPlaylists
+                background: Rectangle { 
+                    color: btnMenu.activeFocus ? "#333333" : "transparent"
+                    radius: 8 
+                    border.color: btnMenu.activeFocus ? "#FFD54F" : "transparent"
+                    border.width: btnMenu.activeFocus ? 1 : 0
+                }
                 contentItem: Item {
                     Text { 
                         text: parent.parent.text
@@ -63,25 +74,34 @@ Rectangle {
         }
 
         SidebarButton {
+            id: btnPlaylists
             text: "Playlists"
             iconName: "list"
             isCollapsed: root.isCollapsed
+            KeyNavigation.up: btnMenu
+            KeyNavigation.down: btnDirectLink
             onClicked: root.navigationRequested("Playlists")
             Layout.fillWidth: true
         }
 
         SidebarButton {
+            id: btnDirectLink
             text: "Direct Link"
             iconName: "link"
             isCollapsed: root.isCollapsed
+            KeyNavigation.up: btnPlaylists
+            KeyNavigation.down: btnHistory
             onClicked: root.navigationRequested("DirectLink")
             Layout.fillWidth: true
         }
 
         SidebarButton {
+            id: btnHistory
             text: "History"
             iconName: "history"
             isCollapsed: root.isCollapsed
+            KeyNavigation.up: btnDirectLink
+            KeyNavigation.down: btnSettings
             onClicked: root.navigationRequested("History")
             Layout.fillWidth: true
         }
@@ -91,9 +111,11 @@ Rectangle {
         }
 
         SidebarButton {
+            id: btnSettings
             text: "Settings"
             iconName: "settings"
             isCollapsed: root.isCollapsed
+            KeyNavigation.up: btnHistory
             onClicked: root.navigationRequested("Settings")
             Layout.fillWidth: true
         }

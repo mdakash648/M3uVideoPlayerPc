@@ -14,7 +14,9 @@ public:
         NameRole,
         StreamUrlRole,
         LogoUrlRole,
-        IsFavoriteRole
+        IsFavoriteRole,
+        RefererRole,
+        UserAgentRole
     };
 
     enum SortMode {
@@ -42,6 +44,8 @@ public:
     Q_INVOKABLE int findIndexByUrl(const QString& url) const;
     Q_INVOKABLE QString channelName(int index) const;
     Q_INVOKABLE QString channelStreamUrl(int index) const;
+    Q_INVOKABLE QString channelReferer(int index) const;
+    Q_INVOKABLE QString channelUserAgent(int index) const;
 
 private:
     void applyFilterAndSort();

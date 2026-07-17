@@ -9,6 +9,8 @@ Item {
     
     property string streamUrl: ""
     property string streamTitle: "" // Allows dynamic titles
+    property string streamReferer: ""
+    property string streamUserAgent: ""
     property bool playlistOpen: false
     signal backRequested()
 
@@ -18,22 +20,38 @@ Item {
     property bool seekingRight: false
     property int savedVolume: 100      // For mute toggle
     property int prevVisibility: Window.Windowed
+    property real prevX: 0
+    property real prevY: 0
+    property real prevWidth: 0
+    property real prevHeight: 0
+    property bool isFullscreen: false
 
     focus: true  // Enable keyboard input
 
     function toggleFullscreen() {
         var win = root.Window.window;
-        if (win.visibility === Window.FullScreen) {
-            if (root.prevVisibility === Window.Maximized) {
-                // Use C++ native QWindow::setWindowState to bypass QML's glitchy state machine
-                // which causes the "minimize then maximize" flicker on Windows.
-                AppController.restoreMaximized();
-            } else {
-                win.showNormal();
-            }
+        if (root.isFullscreen) {
+            // Leaving fullscreen: drop the frameless hint and put geometry back
+            // via C++ (single native call, no intermediate OS animation).
+            AppController.exitFullscreen(
+                root.prevVisibility === Window.Maximized,
+                root.prevX, root.prevY, root.prevWidth, root.prevHeight
+            );
+            root.isFullscreen = false;
         } else {
+            // Remember exactly where/how the window was before going fullscreen.
             root.prevVisibility = win.visibility;
-            win.showFullScreen();
+            root.prevX = win.x;
+            root.prevY = win.y;
+            root.prevWidth = win.width;
+            root.prevHeight = win.height;
+            // Entering fullscreen: just strip the frame and resize to the
+            // screen's bounds. This never touches Qt::WindowFullScreen, so
+            // Windows never runs its exclusive-fullscreen enter/exit animation
+            // (the thing that was causing the flicker) — same technique VLC /
+            // MPC-HC use for instant, flicker-free fullscreen.
+            AppController.enterFullscreen();
+            root.isFullscreen = true;
         }
     }
 
@@ -140,10 +158,12 @@ Item {
             break;
 
         case Qt.Key_Escape:
-            if (root.Window.window.visibility === Window.FullScreen) {
+            if (root.isFullscreen) {
                 root.toggleFullscreen();
             } else if (root.playlistOpen) {
                 root.playlistOpen = false;
+            } else {
+                root.backRequested();
             }
             break;
 
@@ -201,9 +221,16 @@ Item {
 
         var url = AppController.channelViewModel.channelStreamUrl(index);
         var name = AppController.channelViewModel.channelName(index);
+        var referer = AppController.channelViewModel.channelReferer(index);
+        var userAgent = AppController.channelViewModel.channelUserAgent(index);
+
         if (url !== "") {
-            root.streamUrl = url;
             root.streamTitle = name;
+            // Update root properties (the MpvVideoItem binds to these) BEFORE
+            // the URL, so headers are already applied when loading starts.
+            root.streamReferer = referer !== undefined ? referer : "";
+            root.streamUserAgent = userAgent !== undefined ? userAgent : "";
+            root.streamUrl = url;
             videoPlayer.mediaUrl = url;
             videoPlayer.playing = true;
         }
@@ -227,7 +254,8 @@ Item {
     MpvVideoItem {
         id: videoPlayer
         anchors.fill: parent
-        mediaUrl: root.streamUrl
+        referer: root.streamReferer
+        userAgent: root.streamUserAgent
         
         MouseArea {
             anchors.fill: parent
@@ -235,6 +263,14 @@ Item {
                 videoPlayer.playing = !videoPlayer.playing
                 root.forceActiveFocus()
             }
+        }
+
+        BusyIndicator {
+            anchors.centerIn: parent
+            running: videoPlayer.loading
+            visible: running
+            width: 64
+            height: 64
         }
     }
     
@@ -250,6 +286,16 @@ Item {
         font.letterSpacing: 2.0
         z: 20
         style: Text.Outline; styleColor: "#80000000"
+    }
+
+    Text {
+        anchors.top: parent.top
+        anchors.right: parent.right
+        anchors.margins: 10
+        text: "Referer: " + (root.streamReferer ? root.streamReferer : "None")
+        color: "#88FFFFFF"
+        font.pixelSize: 10
+        z: 20
     }
     
     // Top Bar Floating
@@ -759,6 +805,7 @@ Item {
     }
     
     Component.onCompleted: {
+        videoPlayer.mediaUrl = root.streamUrl
         videoPlayer.playing = true
         root.forceActiveFocus()
     }

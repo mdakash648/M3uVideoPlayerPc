@@ -8,6 +8,7 @@ import M3uVideoPlayer
 Rectangle {
     id: root
     color: "#121212"
+    focus: true
 
     property int groupId: -1
     property int playlistId: -1
@@ -21,7 +22,25 @@ Rectangle {
     }
 
     signal backRequested()
-    signal channelOpened(string streamUrl, string channelName)
+    signal channelOpened(string streamUrl, string channelName, string referer, string userAgent)
+
+    function focusHeader() {
+        backBtn.forceActiveFocus();
+    }
+
+    function focusMain() {
+        if (viewMode === "Grid" || viewMode === "Poster") {
+            if (channelGrid.currentIndex < 0 && channelGrid.count > 0) channelGrid.currentIndex = 0;
+            channelGrid.forceActiveFocus();
+        } else {
+            if (channelList.currentIndex < 0 && channelList.count > 0) channelList.currentIndex = 0;
+            channelList.forceActiveFocus();
+        }
+    }
+
+    Keys.onEscapePressed: root.backRequested()
+
+    StackView.onActivated: focusMain()
 
     onGroupIdChanged: {
         if (!favoritesMode && groupId !== -1) {
@@ -50,8 +69,18 @@ Rectangle {
             Layout.fillWidth: true
 
             Button {
+                id: backBtn
                 text: "← Back"
-                background: Rectangle { color: "transparent"; implicitWidth: 60; implicitHeight: 30 }
+                focus: true
+                KeyNavigation.right: viewToggle
+                background: Rectangle { 
+                    color: "transparent"
+                    implicitWidth: 60
+                    implicitHeight: 30
+                    border.color: backBtn.activeFocus ? "#FFD54F" : "transparent"
+                    border.width: backBtn.activeFocus ? 1 : 0
+                    radius: 4
+                }
                 contentItem: Text { text: parent.text; color: "#FFD54F"; font.bold: true; font.pixelSize: 16; horizontalAlignment: Text.AlignHCenter; verticalAlignment: Text.AlignVCenter }
                 onClicked: backRequested()
             }
@@ -67,19 +96,37 @@ Rectangle {
             Item { Layout.fillWidth: true }
 
             ViewModeToggle {
+                id: viewToggle
                 modes: ["List", "Grid", "Title", "Poster"]
                 currentMode: viewMode
+                focus: true
+                KeyNavigation.left: backBtn
+                KeyNavigation.right: sortMenu
                 onModeSelected: (mode) => viewMode = mode
             }
 
             SortMenuButton {
+                id: sortMenu
+                focus: true
+                KeyNavigation.left: viewToggle
+                KeyNavigation.right: searchField
                 onSortSelected: (mode) => AppController.channelViewModel.setSortMode(mode)
             }
 
             TextField {
+                id: searchField
                 placeholderText: "Search channel..."
                 color: "#FFFFFF"
-                background: Rectangle { color: "#1E1E1E"; radius: 6; implicitHeight: 40; implicitWidth: 200; border.color: "#333333" }
+                focus: true
+                KeyNavigation.left: sortMenu
+                background: Rectangle { 
+                    color: "#1E1E1E"
+                    radius: 6
+                    implicitHeight: 40
+                    implicitWidth: 200
+                    border.color: searchField.activeFocus ? "#FFD54F" : "#333333"
+                    border.width: searchField.activeFocus ? 2 : 1
+                }
                 leftPadding: 10
                 onTextChanged: AppController.channelViewModel.setSearchQuery(text)
             }
@@ -92,6 +139,8 @@ Rectangle {
             Layout.fillHeight: true
             clip: true
             spacing: viewMode === "Title" ? 4 : 10
+            focus: visible
+            KeyNavigation.up: backBtn
 
             add: Transition {
                 ParallelAnimation {
@@ -122,8 +171,9 @@ Rectangle {
                 height: viewMode === "Title" ? 36 : 60
                 color: "#1E1E1E"
                 radius: 8
-                border.color: "#333333"
-                border.width: 1
+                property bool isActiveItem: channelList.activeFocus && ListView.isCurrentItem
+                border.color: isActiveItem ? "#FFD54F" : "#333333"
+                border.width: isActiveItem ? 2 : 1
 
                 RowLayout {
                     anchors.fill: parent
@@ -170,7 +220,7 @@ Rectangle {
                         text: "Play"
                         background: Rectangle { color: "#FFD54F"; radius: 6; implicitHeight: viewMode === "Title" ? 24 : 35; implicitWidth: viewMode === "Title" ? 60 : 80 }
                         contentItem: Text { text: parent.text; color: "#121212"; font.bold: true; font.pixelSize: viewMode === "Title" ? 11 : 13; horizontalAlignment: Text.AlignHCenter; verticalAlignment: Text.AlignVCenter }
-                        onClicked: channelOpened(model.streamUrl, model.name)
+                        onClicked: channelOpened(model.streamUrl, model.name, model.referer, model.userAgent)
                     }
                 }
 
@@ -179,7 +229,21 @@ Rectangle {
                     hoverEnabled: true
                     z: -1
                     onEntered: parent.border.color = "#FFD54F"
-                    onExited: parent.border.color = "#333333"
+                    onExited: parent.border.color = (channelList.activeFocus && ListView.isCurrentItem) ? "#FFD54F" : "#333333"
+                    onClicked: {
+                        channelList.currentIndex = index;
+                        channelOpened(model.streamUrl, model.name, model.referer, model.userAgent);
+                    }
+                }
+
+                Keys.onPressed: (event) => {
+                    if (event.key === Qt.Key_Enter || event.key === Qt.Key_Return || event.key === Qt.Key_Space) {
+                        channelOpened(model.streamUrl, model.name, model.referer, model.userAgent);
+                        event.accepted = true;
+                    } else if (event.key === Qt.Key_F) {
+                        AppController.channelViewModel.toggleFavorite(model.id);
+                        event.accepted = true;
+                    }
                 }
             }
         }
@@ -190,6 +254,8 @@ Rectangle {
             Layout.fillWidth: true
             Layout.fillHeight: true
             clip: true
+            focus: visible
+            KeyNavigation.up: backBtn
 
             cellWidth: viewMode === "Poster" ? Math.floor(width / 5) : Math.floor(width / 3)
             cellHeight: viewMode === "Poster" ? 235 : 145
@@ -222,14 +288,25 @@ Rectangle {
                 width: channelGrid.cellWidth
                 height: channelGrid.cellHeight
 
+                Keys.onPressed: (event) => {
+                    if (event.key === Qt.Key_Enter || event.key === Qt.Key_Return || event.key === Qt.Key_Space) {
+                        channelOpened(model.streamUrl, model.name, model.referer, model.userAgent);
+                        event.accepted = true;
+                    } else if (event.key === Qt.Key_F) {
+                        AppController.channelViewModel.toggleFavorite(model.id);
+                        event.accepted = true;
+                    }
+                }
+
                 Rectangle {
                     anchors.centerIn: parent
                     width: parent.width - 15
                     height: parent.height - 15
                     color: "#1E1E1E"
                     radius: 10
-                    border.color: hoverArea.containsMouse ? "#FFD54F" : "#333333"
-                    border.width: 1
+                    property bool isActiveItem: channelGrid.activeFocus && parent.GridView.isCurrentItem
+                    border.color: (hoverArea.containsMouse || isActiveItem) ? "#FFD54F" : "#333333"
+                    border.width: isActiveItem ? 2 : 1
 
                     ColumnLayout {
                         anchors.fill: parent
@@ -270,7 +347,10 @@ Rectangle {
                         anchors.fill: parent
                         hoverEnabled: true
                         z: -1
-                        onClicked: channelOpened(model.streamUrl, model.name)
+                        onClicked: {
+                            channelGrid.currentIndex = index;
+                            channelOpened(model.streamUrl, model.name, model.referer, model.userAgent);
+                        }
                     }
 
                     Button {

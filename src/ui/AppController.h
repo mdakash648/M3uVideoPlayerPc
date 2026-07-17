@@ -24,7 +24,8 @@ public:
 
     Q_INVOKABLE void init();
     Q_INVOKABLE void triggerBackgroundSync();
-    Q_INVOKABLE void restoreMaximized();
+    Q_INVOKABLE void enterFullscreen();
+    Q_INVOKABLE void exitFullscreen(bool wasMaximized, qreal x, qreal y, qreal width, qreal height);
 
     PlaylistViewModel* playlistViewModel() const { return m_playlistViewModel; }
     GroupViewModel* groupViewModel() const { return m_groupViewModel; }

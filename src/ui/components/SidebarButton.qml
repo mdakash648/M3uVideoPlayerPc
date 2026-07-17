@@ -12,8 +12,10 @@ Button {
     padding: 0
     
     background: Rectangle {
-        color: control.hovered ? "#222222" : "transparent"
+        color: (control.hovered || control.activeFocus) ? "#222222" : "transparent"
         radius: 8
+        border.color: control.activeFocus ? "#FFD54F" : "transparent"
+        border.width: control.activeFocus ? 1 : 0
         
         Behavior on color {
             ColorAnimation { duration: 150 }
@@ -29,7 +31,7 @@ Button {
             width: 3
             color: "#FFD54F"
             radius: 2
-            visible: control.hovered
+            visible: control.hovered || control.activeFocus
         }
     }
     
@@ -47,7 +49,7 @@ Button {
         Text {
             id: iconText
             text: getIconChar(control.iconName)
-            color: control.hovered ? "#FFFFFF" : "#AAAAAA"
+            color: (control.hovered || control.activeFocus) ? "#FFFFFF" : "#AAAAAA"
             font.pixelSize: 18
             anchors.verticalCenter: parent.verticalCenter
             x: control.isCollapsed ? (parent.width - width) / 2 : 10
@@ -64,9 +66,9 @@ Button {
         Text {
             visible: !control.isCollapsed
             text: control.text
-            color: control.hovered ? "#FFFFFF" : "#AAAAAA"
+            color: (control.hovered || control.activeFocus) ? "#FFFFFF" : "#AAAAAA"
             font.pixelSize: 16
-            font.bold: control.hovered
+            font.bold: control.hovered || control.activeFocus
             anchors.verticalCenter: parent.verticalCenter
             anchors.left: iconText.right
             anchors.leftMargin: 12

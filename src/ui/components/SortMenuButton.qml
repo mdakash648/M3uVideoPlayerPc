@@ -15,7 +15,14 @@ Button {
         return "Playlist"
     }
 
-    background: Rectangle { color: "#1E1E1E"; radius: 6; implicitHeight: 40; implicitWidth: 130; border.color: "#333333" }
+    background: Rectangle { 
+        color: "#1E1E1E"
+        radius: 6
+        implicitHeight: 40
+        implicitWidth: 130
+        border.color: root.activeFocus ? "#FFD54F" : "#333333"
+        border.width: root.activeFocus ? 2 : 1
+    }
     contentItem: Text {
         text: root.text
         color: "#FFD54F"

@@ -8,6 +8,7 @@ import M3uVideoPlayer
 Rectangle {
     id: root
     color: "#121212"
+    focus: true
 
     property int playlistId: -1
     property string playlistName: "Groups / Categories"
@@ -22,6 +23,24 @@ Rectangle {
     signal groupOpened(int groupId, string groupName)
     signal allChannelsOpened()
     signal favoritesOpened()
+
+    function focusHeader() {
+        backBtn.forceActiveFocus();
+    }
+
+    function focusMain() {
+        if (viewMode === "Grid") {
+            if (groupGrid.currentIndex < 0 && groupGrid.count > 0) groupGrid.currentIndex = 0;
+            groupGrid.forceActiveFocus();
+        } else {
+            if (groupList.currentIndex < 0 && groupList.count > 0) groupList.currentIndex = 0;
+            groupList.forceActiveFocus();
+        }
+    }
+
+    Keys.onEscapePressed: root.backRequested()
+
+    StackView.onActivated: focusMain()
 
     onPlaylistIdChanged: {
         if (playlistId !== -1) {
@@ -39,8 +58,18 @@ Rectangle {
             Layout.fillWidth: true
 
             Button {
+                id: backBtn
                 text: "← Back"
-                background: Rectangle { color: "transparent"; implicitWidth: 60; implicitHeight: 30 }
+                focus: true
+                KeyNavigation.right: viewToggle
+                background: Rectangle { 
+                    color: "transparent"
+                    implicitWidth: 60
+                    implicitHeight: 30
+                    border.color: backBtn.activeFocus ? "#FFD54F" : "transparent"
+                    border.width: backBtn.activeFocus ? 1 : 0
+                    radius: 4
+                }
                 contentItem: Text { text: parent.text; color: "#FFD54F"; font.bold: true; font.pixelSize: 16; horizontalAlignment: Text.AlignHCenter; verticalAlignment: Text.AlignVCenter }
                 onClicked: backRequested()
             }
@@ -56,19 +85,37 @@ Rectangle {
             Item { Layout.fillWidth: true } // spacer
 
             ViewModeToggle {
+                id: viewToggle
                 modes: ["Grid", "List"]
                 currentMode: viewMode
+                focus: true
+                KeyNavigation.left: backBtn
+                KeyNavigation.right: sortMenu
                 onModeSelected: (mode) => viewMode = mode
             }
 
             SortMenuButton {
+                id: sortMenu
+                focus: true
+                KeyNavigation.left: viewToggle
+                KeyNavigation.right: searchField
                 onSortSelected: (mode) => AppController.groupViewModel.setSortMode(mode)
             }
 
             TextField {
+                id: searchField
                 placeholderText: "Search categories..."
                 color: "#FFFFFF"
-                background: Rectangle { color: "#1E1E1E"; radius: 6; implicitHeight: 40; implicitWidth: 220; border.color: "#333333" }
+                focus: true
+                KeyNavigation.left: sortMenu
+                background: Rectangle { 
+                    color: "#1E1E1E"
+                    radius: 6
+                    implicitHeight: 40
+                    implicitWidth: 220
+                    border.color: searchField.activeFocus ? "#FFD54F" : "#333333"
+                    border.width: searchField.activeFocus ? 2 : 1
+                }
                 leftPadding: 10
                 onTextChanged: AppController.groupViewModel.setSearchQuery(text)
             }
@@ -83,6 +130,8 @@ Rectangle {
             Layout.fillWidth: true
             Layout.fillHeight: true
             clip: true
+            focus: visible
+            KeyNavigation.up: backBtn
 
             cellWidth: Math.floor(width / 3)
             cellHeight: 140
@@ -115,14 +164,30 @@ Rectangle {
                 width: groupGrid.cellWidth
                 height: groupGrid.cellHeight
 
+                Keys.onPressed: (event) => {
+                    if (event.key === Qt.Key_Enter || event.key === Qt.Key_Return || event.key === Qt.Key_Space) {
+                        var gId = model.id !== undefined ? model.id : -1;
+                        var gName = model.name !== undefined ? model.name : ("Category " + (index + 1));
+                        if (gId === -100) {
+                            allChannelsOpened();
+                        } else if (gId === -200) {
+                            favoritesOpened();
+                        } else {
+                            groupOpened(gId, gName);
+                        }
+                        event.accepted = true;
+                    }
+                }
+
                 Rectangle {
                     anchors.centerIn: parent
                     width: parent.width - 15
                     height: parent.height - 15
                     color: "#1E1E1E"
                     radius: 12
-                    border.color: hoverArea.containsMouse ? "#FFD54F" : "#333333"
-                    border.width: 1
+                    property bool isActiveItem: groupGrid.activeFocus && parent.GridView.isCurrentItem
+                    border.color: (hoverArea.containsMouse || isActiveItem) ? "#FFD54F" : "#333333"
+                    border.width: isActiveItem ? 2 : 1
 
                     ColumnLayout {
                         anchors.centerIn: parent
@@ -164,6 +229,7 @@ Rectangle {
                         anchors.fill: parent
                         hoverEnabled: true
                         onClicked: {
+                            groupGrid.currentIndex = index;
                             var gId = model.id !== undefined ? model.id : -1;
                             var gName = model.name !== undefined ? model.name : ("Category " + (index + 1));
                             if (gId === -100) {
@@ -187,6 +253,8 @@ Rectangle {
             Layout.fillHeight: true
             clip: true
             spacing: 10
+            focus: visible
+            KeyNavigation.up: backBtn
 
             add: Transition {
                 ParallelAnimation {
@@ -217,8 +285,9 @@ Rectangle {
                 height: 55
                 color: "#1E1E1E"
                 radius: 8
-                border.color: "#333333"
-                border.width: 1
+                property bool isActiveItem: groupList.activeFocus && ListView.isCurrentItem
+                border.color: isActiveItem ? "#FFD54F" : "#333333"
+                border.width: isActiveItem ? 2 : 1
 
                 RowLayout {
                     anchors.fill: parent
@@ -257,8 +326,9 @@ Rectangle {
                     anchors.fill: parent
                     hoverEnabled: true
                     onEntered: parent.border.color = "#FFD54F"
-                    onExited: parent.border.color = "#333333"
+                    onExited: parent.border.color = (groupList.activeFocus && ListView.isCurrentItem) ? "#FFD54F" : "#333333"
                     onClicked: {
+                        groupList.currentIndex = index;
                         var gId = model.id !== undefined ? model.id : -1;
                         var gName = model.name !== undefined ? model.name : ("Category " + (index + 1));
                         if (gId === -100) {
@@ -268,6 +338,21 @@ Rectangle {
                         } else {
                             groupOpened(gId, gName);
                         }
+                    }
+                }
+
+                Keys.onPressed: (event) => {
+                    if (event.key === Qt.Key_Enter || event.key === Qt.Key_Return || event.key === Qt.Key_Space) {
+                        var gId = model.id !== undefined ? model.id : -1;
+                        var gName = model.name !== undefined ? model.name : ("Category " + (index + 1));
+                        if (gId === -100) {
+                            allChannelsOpened();
+                        } else if (gId === -200) {
+                            favoritesOpened();
+                        } else {
+                            groupOpened(gId, gName);
+                        }
+                        event.accepted = true;
                     }
                 }
             }

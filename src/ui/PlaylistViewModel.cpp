@@ -68,6 +68,14 @@ void PlaylistViewModel::loadPlaylists() {
     endResetModel();
 }
 
+void PlaylistViewModel::deletePlaylist(int id) {
+    if (m_playlistRepo) {
+        if (m_playlistRepo->deletePlaylist(id)) {
+            loadPlaylists(); // Refresh the list
+        }
+    }
+}
+
 void PlaylistViewModel::addPlaylistAsync(const QString& name, const QString& url, bool isXtream, const QString& username, const QString& password) {
     emit addPlaylistStarted();
 

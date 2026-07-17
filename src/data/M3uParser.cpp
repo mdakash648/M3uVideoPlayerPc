@@ -36,6 +36,9 @@ ParseResult M3uParser::parse(const QString& m3uContent, int playlistId) {
     QRegularExpression tvgLogoRegex(R"re(tvg-logo="([^"]*)")re");
     QRegularExpression tvgShiftRegex(R"re(tvg-shift="([^"]*)")re");
     QRegularExpression groupTitleRegex(R"re(group-title="([^"]*)")re");
+    QRegularExpression httpReferrerRegex(R"re(http-referrer="([^"]*)")re", QRegularExpression::CaseInsensitiveOption);
+    QRegularExpression userAgentRegex(R"re(http-user-agent="([^"]*)")re", QRegularExpression::CaseInsensitiveOption);
+    QRegularExpression userAgentRegex2(R"re(user-agent="([^"]*)")re", QRegularExpression::CaseInsensitiveOption);
     
     for (const QString& line : lines) {
         QString tline = line.trimmed();
@@ -58,6 +61,16 @@ ParseResult M3uParser::parse(const QString& m3uContent, int playlistId) {
             
             match = tvgShiftRegex.match(tline);
             if (match.hasMatch()) currentChannel.tvgShift = match.captured(1);
+            
+            match = httpReferrerRegex.match(tline);
+            if (match.hasMatch()) currentChannel.referer = match.captured(1);
+            
+            match = userAgentRegex.match(tline);
+            if (match.hasMatch()) currentChannel.userAgent = match.captured(1);
+            else {
+                match = userAgentRegex2.match(tline);
+                if (match.hasMatch()) currentChannel.userAgent = match.captured(1);
+            }
             
             QString groupName = "Uncategorized";
             match = groupTitleRegex.match(tline);
@@ -85,11 +98,13 @@ ParseResult M3uParser::parse(const QString& m3uContent, int playlistId) {
                 currentChannel.name = "Unknown Channel";
             }
         } 
-        else if (tline.startsWith("#EXTVLCOPT:http-referrer=")) {
-            currentChannel.referer = tline.mid(25).trimmed();
+        else if (tline.startsWith("#EXTVLCOPT:http-referrer=", Qt::CaseInsensitive)) {
+            int idx = tline.indexOf('=');
+            if (idx != -1) currentChannel.referer = tline.mid(idx + 1).trimmed();
         } 
-        else if (tline.startsWith("#EXTVLCOPT:http-user-agent=")) {
-            currentChannel.userAgent = tline.mid(27).trimmed();
+        else if (tline.startsWith("#EXTVLCOPT:http-user-agent=", Qt::CaseInsensitive)) {
+            int idx = tline.indexOf('=');
+            if (idx != -1) currentChannel.userAgent = tline.mid(idx + 1).trimmed();
         }
         else if (!tline.startsWith("#") && inChannelInfo) {
             // This is likely the stream URL

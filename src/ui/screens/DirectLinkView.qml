@@ -4,6 +4,8 @@ import QtQuick.Layouts
 
 Rectangle {
     color: "#121212"
+    
+    signal playRequested(string streamUrl, string referer, string userAgent)
 
     ColumnLayout {
         anchors.centerIn: parent
@@ -45,6 +47,42 @@ Rectangle {
             rightPadding: 15
         }
 
+        TextField {
+            id: refererInput
+            Layout.fillWidth: true
+            placeholderText: "HTTP Referer (Optional) e.g., https://example.com/"
+            color: "#FFFFFF"
+            font.pixelSize: 16
+            
+            background: Rectangle {
+                color: "#1E1E1E"
+                radius: 8
+                border.color: refererInput.activeFocus ? "#FFD54F" : "#333333"
+                border.width: 1
+                implicitHeight: 50
+            }
+            leftPadding: 15
+            rightPadding: 15
+        }
+
+        TextField {
+            id: userAgentInput
+            Layout.fillWidth: true
+            placeholderText: "User-Agent (Optional)"
+            color: "#FFFFFF"
+            font.pixelSize: 16
+            
+            background: Rectangle {
+                color: "#1E1E1E"
+                radius: 8
+                border.color: userAgentInput.activeFocus ? "#FFD54F" : "#333333"
+                border.width: 1
+                implicitHeight: 50
+            }
+            leftPadding: 15
+            rightPadding: 15
+        }
+
         Button {
             text: "Play Stream"
             Layout.alignment: Qt.AlignHCenter
@@ -63,6 +101,12 @@ Rectangle {
                 font.pixelSize: 16
                 horizontalAlignment: Text.AlignHCenter
                 verticalAlignment: Text.AlignVCenter
+            }
+            
+            onClicked: {
+                if (urlInput.text.trim() !== "") {
+                    playRequested(urlInput.text.trim(), refererInput.text.trim(), userAgentInput.text.trim());
+                }
             }
         }
     }

@@ -15,6 +15,57 @@ ApplicationWindow {
     color: "#121212"
 
     property bool isPlayerActive: stackView.currentItem instanceof PlayerView
+    
+    // Focus Navigation: 0 = Main, 1 = Header, 2 = Sidebar
+    property int currentFocusSection: 0
+
+    function applyFocusSection() {
+        if (currentFocusSection === 0) {
+            if (stackView.currentItem && stackView.currentItem.focusMain) {
+                stackView.currentItem.focusMain();
+            }
+        } else if (currentFocusSection === 1) {
+            if (stackView.currentItem && stackView.currentItem.focusHeader) {
+                stackView.currentItem.focusHeader();
+            }
+        } else if (currentFocusSection === 2) {
+            if (!isPlayerActive) {
+                sidebar.focusFirstItem();
+            } else {
+                // If player is active, skip sidebar and go back to main
+                currentFocusSection = 0;
+                applyFocusSection();
+            }
+        }
+    }
+
+    Shortcut {
+        sequence: "Tab"
+        onActivated: {
+            currentFocusSection = (currentFocusSection + 1) % 3;
+            applyFocusSection();
+        }
+    }
+
+    Shortcut {
+        sequence: "Shift+Tab"
+        onActivated: {
+            currentFocusSection = (currentFocusSection - 1 + 3) % 3;
+            applyFocusSection();
+        }
+    }
+
+    Item {
+        focus: true
+        Keys.onPressed: (event) => {
+             // global fallback to prevent losing focus completely
+        }
+    }
+
+    Component.onCompleted: {
+        currentFocusSection = 0;
+        applyFocusSection();
+    }
 
     RowLayout {
         anchors.fill: parent
@@ -130,8 +181,13 @@ ApplicationWindow {
         id: channelViewComponent
         ChannelListView {
             onBackRequested: stackView.pop()
-            onChannelOpened: function(streamUrl, channelName) {
-                stackView.push(playerViewComponent, { "streamUrl": streamUrl, "streamTitle": channelName })
+            onChannelOpened: function(streamUrl, channelName, referer, userAgent) {
+                stackView.push(playerViewComponent, { 
+                    "streamUrl": streamUrl, 
+                    "streamTitle": channelName,
+                    "streamReferer": referer !== undefined ? referer : "",
+                    "streamUserAgent": userAgent !== undefined ? userAgent : ""
+                })
             }
         }
     }
@@ -145,6 +201,15 @@ ApplicationWindow {
 
     Component {
         id: directLinkViewComponent
-        DirectLinkView {}
+        DirectLinkView {
+            onPlayRequested: function(streamUrl, referer, userAgent) {
+                stackView.push(playerViewComponent, {
+                    "streamUrl": streamUrl,
+                    "streamTitle": "Direct Stream",
+                    "streamReferer": referer,
+                    "streamUserAgent": userAgent
+                })
+            }
+        }
     }
 }

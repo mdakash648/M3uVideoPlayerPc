@@ -22,6 +22,8 @@ QVariant ChannelViewModel::data(const QModelIndex &index, int role) const {
         case StreamUrlRole: return channel.streamUrl;
         case LogoUrlRole: return channel.logoUrl;
         case IsFavoriteRole: return channel.isFavorite;
+        case RefererRole: return channel.referer;
+        case UserAgentRole: return channel.userAgent;
         default: return QVariant();
     }
 }
@@ -33,6 +35,8 @@ QHash<int, QByteArray> ChannelViewModel::roleNames() const {
     roles[StreamUrlRole] = "streamUrl";
     roles[LogoUrlRole] = "logoUrl";
     roles[IsFavoriteRole] = "isFavorite";
+    roles[RefererRole] = "referer";
+    roles[UserAgentRole] = "userAgent";
     return roles;
 }
 
@@ -159,4 +163,14 @@ QString ChannelViewModel::channelName(int index) const {
 QString ChannelViewModel::channelStreamUrl(int index) const {
     if (index < 0 || index >= m_channels.size()) return QString();
     return m_channels[index].streamUrl;
+}
+
+QString ChannelViewModel::channelReferer(int index) const {
+    if (index < 0 || index >= m_channels.size()) return QString();
+    return m_channels[index].referer;
+}
+
+QString ChannelViewModel::channelUserAgent(int index) const {
+    if (index < 0 || index >= m_channels.size()) return QString();
+    return m_channels[index].userAgent;
 }

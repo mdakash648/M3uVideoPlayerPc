@@ -1,0 +1,5 @@
+ei app ar vitore direct link ar video paly hoay. but jei sokol link direct browser ar open korle 403 forbegain error ase oi sokol video paly hoay na. fix this problem i want you add htt-reffer and agent system.
+
+https://raw.githubusercontent.com/mdakash648/MovieM3u/refs/heads/main/playlist.m3u
+
+this is my palylist. amar palylist ar vitore video ar sathe http-rffer and user agent ache. ami cai ei app video calanor somoay palylist ar http-rffer and user agent ar data use korbe. for paly video.
