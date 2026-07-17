@@ -141,3 +141,22 @@ void ChannelViewModel::applyFilterAndSort() {
 
     endResetModel();
 }
+
+int ChannelViewModel::findIndexByUrl(const QString& url) const {
+    for (int i = 0; i < m_channels.size(); ++i) {
+        if (m_channels[i].streamUrl == url) {
+            return i;
+        }
+    }
+    return -1;
+}
+
+QString ChannelViewModel::channelName(int index) const {
+    if (index < 0 || index >= m_channels.size()) return QString();
+    return m_channels[index].name;
+}
+
+QString ChannelViewModel::channelStreamUrl(int index) const {
+    if (index < 0 || index >= m_channels.size()) return QString();
+    return m_channels[index].streamUrl;
+}

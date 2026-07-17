@@ -1,15 +1,22 @@
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
+import QtCore
 import "../components"
 import M3uVideoPlayer
 
 Rectangle {
+    id: root
     color: "#121212"
 
     property int playlistId: -1
     property string playlistName: "Groups / Categories"
     property string viewMode: "Grid" // "Grid" or "List"
+
+    Settings {
+        category: "GroupView"
+        property alias viewMode: root.viewMode
+    }
 
     signal backRequested()
     signal groupOpened(int groupId, string groupName)
@@ -77,68 +84,95 @@ Rectangle {
             Layout.fillHeight: true
             clip: true
 
-            cellWidth: (width / 3) - 10
-            cellHeight: 120
+            cellWidth: Math.floor(width / 3)
+            cellHeight: 140
+
+            add: Transition {
+                ParallelAnimation {
+                    NumberAnimation { property: "opacity"; from: 0; to: 1; duration: 400; easing.type: Easing.OutQuart }
+                    NumberAnimation { property: "scale"; from: 0.001; to: 1.0; duration: 400; easing.type: Easing.OutQuart }
+                }
+            }
+            remove: Transition {
+                ParallelAnimation {
+                    NumberAnimation { property: "opacity"; to: 0; duration: 400; easing.type: Easing.OutQuart }
+                    NumberAnimation { property: "scale"; to: 0.001; duration: 400; easing.type: Easing.OutQuart }
+                }
+            }
+            displaced: Transition {
+                NumberAnimation { properties: "x,y"; duration: 400; easing.type: Easing.OutQuart }
+            }
+            populate: Transition {
+                ParallelAnimation {
+                    NumberAnimation { property: "opacity"; from: 0; to: 1; duration: 400; easing.type: Easing.OutQuart }
+                    NumberAnimation { property: "scale"; from: 0.001; to: 1.0; duration: 400; easing.type: Easing.OutQuart }
+                }
+            }
 
             model: AppController.groupViewModel
 
-            delegate: Rectangle {
-                width: groupGrid.cellWidth - 15
-                height: groupGrid.cellHeight - 15
-                color: "#1E1E1E"
-                radius: 12
-                border.color: "#333333"
-                border.width: 1
+            delegate: Item {
+                width: groupGrid.cellWidth
+                height: groupGrid.cellHeight
 
-                ColumnLayout {
+                Rectangle {
                     anchors.centerIn: parent
+                    width: parent.width - 15
+                    height: parent.height - 15
+                    color: "#1E1E1E"
+                    radius: 12
+                    border.color: hoverArea.containsMouse ? "#FFD54F" : "#333333"
+                    border.width: 1
 
-                    // Windows-style folder icon
-                    FolderIcon {
-                        visible: model.id !== -200
-                        size: 46
-                        Layout.alignment: Qt.AlignHCenter
+                    ColumnLayout {
+                        anchors.centerIn: parent
+
+                        // Windows-style folder icon
+                        FolderIcon {
+                            visible: model.id !== -200
+                            size: 46
+                            Layout.alignment: Qt.AlignHCenter
+                        }
+
+                        Rectangle {
+                            visible: model.id === -200
+                            width: 46; height: 46
+                            radius: 8
+                            color: "#2A2A2A"
+                            Layout.alignment: Qt.AlignHCenter
+                            Text { anchors.centerIn: parent; text: "★"; color: "#FFD54F"; font.pixelSize: 24 }
+                        }
+
+                        Text {
+                            text: model.name ? model.name : ("Category " + (index + 1))
+                            color: "#FFFFFF"
+                            font.pixelSize: 16
+                            font.bold: true
+                            Layout.alignment: Qt.AlignHCenter
+                        }
+
+                        Text {
+                            text: (model.channelCount !== undefined ? model.channelCount : 0) + " Channels"
+                            color: "#AAAAAA"
+                            font.pixelSize: 12
+                            Layout.alignment: Qt.AlignHCenter
+                        }
                     }
 
-                    Rectangle {
-                        visible: model.id === -200
-                        width: 46; height: 46
-                        radius: 8
-                        color: "#2A2A2A"
-                        Layout.alignment: Qt.AlignHCenter
-                        Text { anchors.centerIn: parent; text: "★"; color: "#FFD54F"; font.pixelSize: 24 }
-                    }
-
-                    Text {
-                        text: model.name ? model.name : ("Category " + (index + 1))
-                        color: "#FFFFFF"
-                        font.pixelSize: 16
-                        font.bold: true
-                        Layout.alignment: Qt.AlignHCenter
-                    }
-
-                    Text {
-                        text: (model.channelCount !== undefined ? model.channelCount : 0) + " Channels"
-                        color: "#AAAAAA"
-                        font.pixelSize: 12
-                        Layout.alignment: Qt.AlignHCenter
-                    }
-                }
-
-                MouseArea {
-                    anchors.fill: parent
-                    hoverEnabled: true
-                    onEntered: parent.border.color = "#FFD54F"
-                    onExited: parent.border.color = "#333333"
-                    onClicked: {
-                        var gId = model.id !== undefined ? model.id : -1;
-                        var gName = model.name !== undefined ? model.name : ("Category " + (index + 1));
-                        if (gId === -100) {
-                            allChannelsOpened();
-                        } else if (gId === -200) {
-                            favoritesOpened();
-                        } else {
-                            groupOpened(gId, gName);
+                    MouseArea {
+                        id: hoverArea
+                        anchors.fill: parent
+                        hoverEnabled: true
+                        onClicked: {
+                            var gId = model.id !== undefined ? model.id : -1;
+                            var gName = model.name !== undefined ? model.name : ("Category " + (index + 1));
+                            if (gId === -100) {
+                                allChannelsOpened();
+                            } else if (gId === -200) {
+                                favoritesOpened();
+                            } else {
+                                groupOpened(gId, gName);
+                            }
                         }
                     }
                 }
@@ -153,6 +187,28 @@ Rectangle {
             Layout.fillHeight: true
             clip: true
             spacing: 10
+
+            add: Transition {
+                ParallelAnimation {
+                    NumberAnimation { property: "opacity"; from: 0; to: 1; duration: 400; easing.type: Easing.OutQuart }
+                    NumberAnimation { property: "scale"; from: 0.001; to: 1.0; duration: 400; easing.type: Easing.OutQuart }
+                }
+            }
+            remove: Transition {
+                ParallelAnimation {
+                    NumberAnimation { property: "opacity"; to: 0; duration: 400; easing.type: Easing.OutQuart }
+                    NumberAnimation { property: "scale"; to: 0.001; duration: 400; easing.type: Easing.OutQuart }
+                }
+            }
+            displaced: Transition {
+                NumberAnimation { properties: "x,y"; duration: 400; easing.type: Easing.OutQuart }
+            }
+            populate: Transition {
+                ParallelAnimation {
+                    NumberAnimation { property: "opacity"; from: 0; to: 1; duration: 400; easing.type: Easing.OutQuart }
+                    NumberAnimation { property: "scale"; from: 0.001; to: 1.0; duration: 400; easing.type: Easing.OutQuart }
+                }
+            }
 
             model: AppController.groupViewModel
 

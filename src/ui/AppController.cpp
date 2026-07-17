@@ -1,5 +1,7 @@
 #include "AppController.h"
 #include <QDebug>
+#include <QGuiApplication>
+#include <QWindow>
 #include "../infrastructure/TrustedTimeSource.h"
 #include "PlaylistViewModel.h"
 #include "GroupViewModel.h"
@@ -68,6 +70,16 @@ void AppController::init() {
 }
 
 void AppController::triggerBackgroundSync() {
+    onSyncTimerFired();
+}
+
+void AppController::restoreMaximized() {
+    if (QWindow *win = QGuiApplication::focusWindow()) {
+        win->setWindowState(Qt::WindowMaximized);
+    }
+}
+
+void AppController::onSyncTimerFired() {
     qDebug() << "Triggering background sync...";
     emit syncStarted();
     
@@ -86,9 +98,5 @@ void AppController::triggerBackgroundSync() {
         qDebug() << "Background sync finished.";
         emit syncFinished(true);
     });
-}
-
-void AppController::onSyncTimerFired() {
-    triggerBackgroundSync();
 }
 

@@ -5,8 +5,11 @@ import QtQuick.Layouts
 Button {
     id: control
     property string iconName: ""
+    property bool isCollapsed: false
     
     height: 45
+    
+    padding: 0
     
     background: Rectangle {
         color: control.hovered ? "#222222" : "transparent"
@@ -40,26 +43,35 @@ Button {
         }
     }
     
-    contentItem: RowLayout {
-        spacing: 12
-        
+    contentItem: Item {
         Text {
+            id: iconText
             text: getIconChar(control.iconName)
             color: control.hovered ? "#FFFFFF" : "#AAAAAA"
             font.pixelSize: 18
-            Layout.leftMargin: 10
+            anchors.verticalCenter: parent.verticalCenter
+            x: control.isCollapsed ? (parent.width - width) / 2 : 10
             
             Behavior on color {
                 ColorAnimation { duration: 150 }
             }
+            
+            Behavior on x {
+                NumberAnimation { duration: 200; easing.type: Easing.InOutQuad }
+            }
         }
         
         Text {
+            visible: !control.isCollapsed
             text: control.text
             color: control.hovered ? "#FFFFFF" : "#AAAAAA"
             font.pixelSize: 16
             font.bold: control.hovered
-            Layout.fillWidth: true
+            anchors.verticalCenter: parent.verticalCenter
+            anchors.left: iconText.right
+            anchors.leftMargin: 12
+            anchors.right: parent.right
+            elide: Text.ElideRight
             
             Behavior on color {
                 ColorAnimation { duration: 150 }

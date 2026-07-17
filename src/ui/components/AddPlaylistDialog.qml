@@ -1,20 +1,21 @@
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
+import QtQuick.Dialogs
 import M3uVideoPlayer
 
 Popup {
     id: dialog
     width: 500
-    height: 480
+    height: 540
     modal: true
     focus: true
     anchors.centerIn: parent
     
     background: Rectangle {
-        color: "#1E1E1E"
+        color: "#0d141d"
         radius: 12
-        border.color: "#333333"
+        border.color: "#2C313A"
         border.width: 1
     }
     
@@ -22,143 +23,263 @@ Popup {
     
     ColumnLayout {
         anchors.fill: parent
-        anchors.margins: 25
-        spacing: 20
+        spacing: 0
         
-        Text {
-            text: "Add New Playlist"
-            color: "#FFFFFF"
-            font.pixelSize: 22
-            font.bold: true
-        }
-        
-        // Tab Headers
+        // Header
         RowLayout {
-            spacing: 10
+            Layout.fillWidth: true
+            Layout.margins: 24
+            Layout.bottomMargin: 16
             
-            Button {
-                text: "M3U Link / File"
+            Text {
+                text: "Add New Playlist"
+                color: "#dce3f0"
+                font.pixelSize: 20
+                font.bold: true
                 Layout.fillWidth: true
-                background: Rectangle {
-                    color: dialog.currentTab === 0 ? "#FFD54F" : "#2A2A2A"
-                    radius: 6
-                    implicitHeight: 40
-                }
-                contentItem: Text {
-                    text: parent.text
-                    color: dialog.currentTab === 0 ? "#121212" : "#FFFFFF"
-                    font.bold: true
-                    horizontalAlignment: Text.AlignHCenter
-                    verticalAlignment: Text.AlignVCenter
-                }
-                onClicked: dialog.currentTab = 0
             }
             
             Button {
-                text: "Xtream Codes API"
-                Layout.fillWidth: true
-                background: Rectangle {
-                    color: dialog.currentTab === 1 ? "#FFD54F" : "#2A2A2A"
-                    radius: 6
-                    implicitHeight: 40
-                }
+                text: "✕"
+                background: null
                 contentItem: Text {
                     text: parent.text
-                    color: dialog.currentTab === 1 ? "#121212" : "#FFFFFF"
-                    font.bold: true
-                    horizontalAlignment: Text.AlignHCenter
-                    verticalAlignment: Text.AlignVCenter
+                    color: parent.hovered ? "#ffb781" : "#dec1ae"
+                    font.pixelSize: 18
+                    horizontalAlignment: Text.AlignRight
                 }
-                onClicked: dialog.currentTab = 1
+                onClicked: dialog.close()
             }
         }
         
-        // Form Fields (Dynamic based on Tab)
+        // Tabs
         ColumnLayout {
             Layout.fillWidth: true
-            spacing: 15
+            Layout.leftMargin: 24
+            Layout.rightMargin: 24
+            spacing: 0
+            
+            RowLayout {
+                Layout.fillWidth: true
+                spacing: 0
+                
+                Button {
+                    text: "M3U Link / File"
+                    Layout.fillWidth: true
+                    background: Rectangle {
+                        color: "transparent"
+                        Rectangle {
+                            anchors.bottom: parent.bottom
+                            width: parent.width
+                            height: 2
+                            color: dialog.currentTab === 0 ? "#ff8800" : "transparent"
+                        }
+                    }
+                    contentItem: Text {
+                        text: parent.text
+                        color: dialog.currentTab === 0 ? "#ffb781" : "#dec1ae"
+                        font.bold: true
+                        horizontalAlignment: Text.AlignHCenter
+                        verticalAlignment: Text.AlignVCenter
+                        font.pixelSize: 14
+                    }
+                    onClicked: dialog.currentTab = 0
+                }
+                
+                Button {
+                    text: "Xtream Codes API"
+                    Layout.fillWidth: true
+                    background: Rectangle {
+                        color: "transparent"
+                        Rectangle {
+                            anchors.bottom: parent.bottom
+                            width: parent.width
+                            height: 2
+                            color: dialog.currentTab === 1 ? "#ff8800" : "transparent"
+                        }
+                    }
+                    contentItem: Text {
+                        text: parent.text
+                        color: dialog.currentTab === 1 ? "#ffb781" : "#dec1ae"
+                        font.bold: true
+                        horizontalAlignment: Text.AlignHCenter
+                        verticalAlignment: Text.AlignVCenter
+                        font.pixelSize: 14
+                    }
+                    onClicked: dialog.currentTab = 1
+                }
+            }
+            
+            Rectangle {
+                Layout.fillWidth: true
+                height: 1
+                color: "#2C313A"
+            }
+        }
+        
+        // Form Fields
+        ColumnLayout {
+            Layout.fillWidth: true
+            Layout.margins: 24
+            spacing: 16
             
             // Common Name Field
-            TextField {
-                id: nameField
+            ColumnLayout {
+                spacing: 6
                 Layout.fillWidth: true
-                placeholderText: "Playlist Name"
-                color: "#FFFFFF"
-                background: Rectangle { color: "#121212"; radius: 6; implicitHeight: 40; border.color: nameField.activeFocus ? "#FFD54F" : "#333333" }
-                leftPadding: 10
+                Text { text: "Playlist Name"; color: "#dec1ae"; font.pixelSize: 13; font.weight: Font.Medium }
+                TextField {
+                    id: nameField
+                    Layout.fillWidth: true
+                    placeholderText: "e.g. My Favorite Channels"
+                    placeholderTextColor: "#43474d"
+                    color: "#dce3f0"
+                    background: Rectangle { color: "#151c26"; radius: 8; implicitHeight: 44; border.color: nameField.activeFocus ? "#ff8800" : "#2C313A" }
+                    leftPadding: 16
+                }
             }
             
             // M3U Tab Specific
-            TextField {
-                id: urlField
+            ColumnLayout {
                 visible: dialog.currentTab === 0
                 Layout.fillWidth: true
-                placeholderText: "M3U URL or local file path"
-                color: "#FFFFFF"
-                background: Rectangle { color: "#121212"; radius: 6; implicitHeight: 40; border.color: urlField.activeFocus ? "#FFD54F" : "#333333" }
-                leftPadding: 10
+                spacing: 6
+                Text { text: "M3U URL or Path"; color: "#dec1ae"; font.pixelSize: 13; font.weight: Font.Medium }
+                RowLayout {
+                    Layout.fillWidth: true
+                    spacing: 8
+                    TextField {
+                        id: urlField
+                        Layout.fillWidth: true
+                        placeholderText: "http://example.com/playlist.m3u"
+                        placeholderTextColor: "#43474d"
+                        color: "#dce3f0"
+                        background: Rectangle { color: "#151c26"; radius: 8; implicitHeight: 44; border.color: urlField.activeFocus ? "#ff8800" : "#2C313A" }
+                        leftPadding: 16
+                    }
+                    Button {
+                        text: "Browse"
+                        implicitHeight: 44
+                        background: Rectangle { color: parent.hovered ? "#333a44" : "#2e3540"; radius: 8; border.color: "#2C313A"; border.width: 1 }
+                        contentItem: Text { text: parent.text; color: "#dce3f0"; horizontalAlignment: Text.AlignHCenter; verticalAlignment: Text.AlignVCenter; font.pixelSize: 14 }
+                        onClicked: fileDialog.open()
+                    }
+                }
+                Text { text: "Paste a URL or browse for a local .m3u file."; color: "#dec1ae"; font.pixelSize: 12; opacity: 0.7 }
             }
             
             // Xtream Tab Specific
-            TextField {
-                id: xtreamUrlField
+            ColumnLayout {
                 visible: dialog.currentTab === 1
                 Layout.fillWidth: true
-                placeholderText: "Server URL (e.g. http://server:port)"
-                color: "#FFFFFF"
-                background: Rectangle { color: "#121212"; radius: 6; implicitHeight: 40; border.color: xtreamUrlField.activeFocus ? "#FFD54F" : "#333333" }
-                leftPadding: 10
+                spacing: 6
+                Text { text: "Server URL"; color: "#dec1ae"; font.pixelSize: 13; font.weight: Font.Medium }
+                TextField {
+                    id: xtreamUrlField
+                    Layout.fillWidth: true
+                    placeholderText: "e.g. http://server:port"
+                    placeholderTextColor: "#43474d"
+                    color: "#dce3f0"
+                    background: Rectangle { color: "#151c26"; radius: 8; implicitHeight: 44; border.color: xtreamUrlField.activeFocus ? "#ff8800" : "#2C313A" }
+                    leftPadding: 16
+                }
             }
-            TextField {
-                id: usernameField
+            RowLayout {
                 visible: dialog.currentTab === 1
                 Layout.fillWidth: true
-                placeholderText: "Username"
-                color: "#FFFFFF"
-                background: Rectangle { color: "#121212"; radius: 6; implicitHeight: 40; border.color: usernameField.activeFocus ? "#FFD54F" : "#333333" }
-                leftPadding: 10
-            }
-            TextField {
-                id: passwordField
-                visible: dialog.currentTab === 1
-                Layout.fillWidth: true
-                placeholderText: "Password"
-                echoMode: TextInput.Password
-                color: "#FFFFFF"
-                background: Rectangle { color: "#121212"; radius: 6; implicitHeight: 40; border.color: passwordField.activeFocus ? "#FFD54F" : "#333333" }
-                leftPadding: 10
+                spacing: 16
+                ColumnLayout {
+                    Layout.fillWidth: true
+                    spacing: 6
+                    Text { text: "Username"; color: "#dec1ae"; font.pixelSize: 13; font.weight: Font.Medium }
+                    TextField {
+                        id: usernameField
+                        Layout.fillWidth: true
+                        placeholderText: "Username"
+                        placeholderTextColor: "#43474d"
+                        color: "#dce3f0"
+                        background: Rectangle { color: "#151c26"; radius: 8; implicitHeight: 44; border.color: usernameField.activeFocus ? "#ff8800" : "#2C313A" }
+                        leftPadding: 16
+                    }
+                }
+                ColumnLayout {
+                    Layout.fillWidth: true
+                    spacing: 6
+                    Text { text: "Password"; color: "#dec1ae"; font.pixelSize: 13; font.weight: Font.Medium }
+                    TextField {
+                        id: passwordField
+                        Layout.fillWidth: true
+                        placeholderText: "Password"
+                        placeholderTextColor: "#43474d"
+                        echoMode: TextInput.Password
+                        color: "#dce3f0"
+                        background: Rectangle { color: "#151c26"; radius: 8; implicitHeight: 44; border.color: passwordField.activeFocus ? "#ff8800" : "#2C313A" }
+                        leftPadding: 16
+                    }
+                }
             }
         }
         
         Item { Layout.fillHeight: true } // Spacer
         
-        // Action Buttons
-        RowLayout {
+        // Footer (Action Buttons)
+        Rectangle {
             Layout.fillWidth: true
-            Layout.alignment: Qt.AlignRight
-            spacing: 15
+            height: 1
+            color: "#2C313A"
+        }
+        
+        Rectangle {
+            Layout.fillWidth: true
+            height: 72
+            color: "#111721" // Slightly different background for footer like surface-container/30
+            radius: 12
+            // Hide top corners radius by overlaying a rectangle or just rely on clipping (parent doesn't clip, so just don't set top radius)
             
-            Button {
-                text: "Cancel"
-                background: Rectangle { color: "transparent"; border.color: "#555555"; radius: 6; implicitHeight: 40; implicitWidth: 100 }
-                contentItem: Text { text: parent.text; color: "#FFFFFF"; horizontalAlignment: Text.AlignHCenter; verticalAlignment: Text.AlignVCenter }
-                onClicked: dialog.close()
-            }
-            
-            Button {
-                text: "Add Playlist"
-                background: Rectangle { color: "#FFD54F"; radius: 6; implicitHeight: 40; implicitWidth: 120 }
-                contentItem: Text { text: parent.text; color: "#121212"; font.bold: true; horizontalAlignment: Text.AlignHCenter; verticalAlignment: Text.AlignVCenter }
-                onClicked: {
-                    var name = nameField.text;
-                    if (dialog.currentTab === 0) {
-                        AppController.playlistViewModel.addPlaylistAsync(name, urlField.text, false, "", "");
-                    } else {
-                        AppController.playlistViewModel.addPlaylistAsync(name, xtreamUrlField.text, true, usernameField.text, passwordField.text);
+            RowLayout {
+                anchors.fill: parent
+                anchors.margins: 16
+                anchors.rightMargin: 24
+                Layout.alignment: Qt.AlignRight
+                spacing: 16
+                
+                Item { Layout.fillWidth: true } // push buttons to right
+                
+                Button {
+                    text: "Cancel"
+                    background: Rectangle { color: "transparent"; radius: 4; implicitHeight: 40; implicitWidth: 100 }
+                    contentItem: Text { text: parent.text; color: parent.hovered ? "#dce3f0" : "#dec1ae"; font.pixelSize: 14; horizontalAlignment: Text.AlignHCenter; verticalAlignment: Text.AlignVCenter }
+                    onClicked: dialog.close()
+                }
+                
+                Button {
+                    text: "Add Playlist"
+                    background: Rectangle { color: "#FF8800"; radius: 4; implicitHeight: 40; implicitWidth: 120; opacity: parent.hovered ? 0.9 : 1.0 }
+                    contentItem: Text { text: parent.text; color: "#000000"; font.bold: true; font.pixelSize: 14; horizontalAlignment: Text.AlignHCenter; verticalAlignment: Text.AlignVCenter }
+                    onClicked: {
+                        var name = nameField.text;
+                        if (dialog.currentTab === 0) {
+                            var url = urlField.text;
+                            if (url.startsWith("file:///")) {
+                                url = url.replace("file:///", "");
+                            }
+                            AppController.playlistViewModel.addPlaylistAsync(name, url, false, "", "");
+                        } else {
+                            AppController.playlistViewModel.addPlaylistAsync(name, xtreamUrlField.text, true, usernameField.text, passwordField.text);
+                        }
+                        dialog.close()
                     }
-                    dialog.close()
                 }
             }
+        }
+    }
+    
+    FileDialog {
+        id: fileDialog
+        title: "Please choose an M3U file"
+        nameFilters: ["M3U files (*.m3u *.m3u8)", "All files (*)"]
+        onAccepted: {
+            urlField.text = fileDialog.selectedFile
         }
     }
 }

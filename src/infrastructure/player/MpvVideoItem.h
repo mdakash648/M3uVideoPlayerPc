@@ -4,6 +4,18 @@
 #include <QString>
 #include <QVariantList>
 #include <mpv/client.h>
+#include <memory>
+#include <mutex>
+
+class MpvVideoItem;
+
+// Thread-safe context shared between MpvVideoItem and MpvRenderer.
+// The mutex protects the item pointer so mpv's render callback thread
+// never accesses a destroyed MpvVideoItem.
+struct MpvCallbackCtx {
+    std::mutex mutex;
+    MpvVideoItem *item = nullptr;
+};
 
 class MpvVideoItem : public QQuickFramebufferObject {
     Q_OBJECT
@@ -48,7 +60,8 @@ public:
     QVariantList audioTracks() const;
     QVariantList subtitleTracks() const;
 
-    mpv_handle* mpvHandle() const { return m_mpv; }
+    std::shared_ptr<mpv_handle> mpvHandle() const { return m_mpv_shared; }
+    std::shared_ptr<MpvCallbackCtx> callbackCtx() const { return m_callbackCtx; }
 
 public slots:
     void command(const QVariantList &args);
@@ -77,7 +90,9 @@ private:
     void processMpvEvents();
     void updateTrackList();
 
+    std::shared_ptr<mpv_handle> m_mpv_shared;
     mpv_handle *m_mpv = nullptr;
+    std::shared_ptr<MpvCallbackCtx> m_callbackCtx;
     QString m_mediaUrl;
     bool m_playing = false;
     int m_duration = 0;

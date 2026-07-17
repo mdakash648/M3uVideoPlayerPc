@@ -24,6 +24,7 @@ public:
 
     Q_INVOKABLE void init();
     Q_INVOKABLE void triggerBackgroundSync();
+    Q_INVOKABLE void restoreMaximized();
 
     PlaylistViewModel* playlistViewModel() const { return m_playlistViewModel; }
     GroupViewModel* groupViewModel() const { return m_groupViewModel; }

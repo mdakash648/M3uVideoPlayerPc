@@ -38,6 +38,11 @@ public:
     Q_INVOKABLE void setSortMode(int mode);
     Q_INVOKABLE int sortMode() const { return m_sortMode; }
 
+    // Helpers for in-player playlist navigation
+    Q_INVOKABLE int findIndexByUrl(const QString& url) const;
+    Q_INVOKABLE QString channelName(int index) const;
+    Q_INVOKABLE QString channelStreamUrl(int index) const;
+
 private:
     void applyFilterAndSort();
 

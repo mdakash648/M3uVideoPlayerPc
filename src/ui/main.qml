@@ -8,9 +8,13 @@ ApplicationWindow {
     id: mainWindow
     width: 1280
     height: 720
+    minimumWidth: 850
+    minimumHeight: 450
     visible: true
     title: qsTr("M3U Video Player Desktop")
     color: "#121212"
+
+    property bool isPlayerActive: stackView.currentItem instanceof PlayerView
 
     RowLayout {
         anchors.fill: parent
@@ -20,7 +24,8 @@ ApplicationWindow {
         Sidebar {
             id: sidebar
             Layout.fillHeight: true
-            Layout.preferredWidth: 250
+            Layout.preferredWidth: mainWindow.isPlayerActive ? 0 : width
+            visible: !mainWindow.isPlayerActive
             
             onNavigationRequested: (page) => {
                 if (page === "Playlists") {
@@ -126,7 +131,7 @@ ApplicationWindow {
         ChannelListView {
             onBackRequested: stackView.pop()
             onChannelOpened: function(streamUrl, channelName) {
-                stackView.push(playerViewComponent, { "streamUrl": streamUrl })
+                stackView.push(playerViewComponent, { "streamUrl": streamUrl, "streamTitle": channelName })
             }
         }
     }

@@ -22,7 +22,9 @@ void *get_proc_address_mpv(void *fn_ctx, const char *name) {
 class MpvRenderer : public QQuickFramebufferObject::Renderer {
 public:
     MpvRenderer(MpvVideoItem *item)
-        : m_item(item)
+        : m_window(item->window())
+        , m_mpv_shared(item->mpvHandle())
+        , m_callbackCtx(item->callbackCtx())
         , m_mpv_gl(nullptr)
     {
         mpv_opengl_init_params gl_init_params{get_proc_address_mpv, nullptr};
@@ -34,11 +36,13 @@ public:
             {MPV_RENDER_PARAM_INVALID, nullptr}
         };
 
-        if (mpv_render_context_create(&m_mpv_gl, item->mpvHandle(), params) < 0) {
+        if (mpv_render_context_create(&m_mpv_gl, m_mpv_shared.get(), params) < 0) {
             std::cerr << "Failed to initialize mpv GL context" << std::endl;
         }
 
-        mpv_render_context_set_update_callback(m_mpv_gl, MpvVideoItem::on_mpv_update, item);
+        // The update callback fires from mpv's render thread.
+        // We pass the shared MpvCallbackCtx which is protected by a mutex.
+        mpv_render_context_set_update_callback(m_mpv_gl, MpvVideoItem::on_mpv_update, m_callbackCtx.get());
     }
 
     ~MpvRenderer() override {
@@ -53,7 +57,7 @@ public:
         QOpenGLFramebufferObject *fbo = framebufferObject();
         if (!fbo) return;
 
-        m_item->window()->beginExternalCommands();
+        m_window->beginExternalCommands();
 
         mpv_opengl_fbo mpfbo;
         mpfbo.fbo = fbo->handle();
@@ -61,7 +65,7 @@ public:
         mpfbo.h = fbo->height();
         mpfbo.internal_format = 0;
 
-        int flip_y = 1;
+        int flip_y = 0;
         mpv_render_param params[] = {
             {MPV_RENDER_PARAM_OPENGL_FBO, &mpfbo},
             {MPV_RENDER_PARAM_FLIP_Y, &flip_y},
@@ -69,7 +73,7 @@ public:
         };
 
         mpv_render_context_render(m_mpv_gl, params);
-        m_item->window()->endExternalCommands();
+        m_window->endExternalCommands();
     }
 
     QOpenGLFramebufferObject *createFramebufferObject(const QSize &size) override {
@@ -79,17 +83,27 @@ public:
     }
 
 private:
-    MpvVideoItem *m_item;
+    QQuickWindow *m_window;
+    std::shared_ptr<mpv_handle> m_mpv_shared;
+    std::shared_ptr<MpvCallbackCtx> m_callbackCtx;
     mpv_render_context *m_mpv_gl;
 };
 
 MpvVideoItem::MpvVideoItem(QQuickItem *parent)
     : QQuickFramebufferObject(parent)
 {
-    m_mpv = mpv_create();
-    if (!m_mpv) {
+    mpv_handle *mpv = mpv_create();
+    if (!mpv) {
         throw std::runtime_error("could not create mpv context");
     }
+    m_mpv_shared = std::shared_ptr<mpv_handle>(mpv, [](mpv_handle *h) {
+        mpv_terminate_destroy(h);
+    });
+    m_mpv = m_mpv_shared.get();
+
+    // Create the thread-safe callback context
+    m_callbackCtx = std::make_shared<MpvCallbackCtx>();
+    m_callbackCtx->item = this;
 
     // Default configuration for better performance and Qt compatibility
     mpv_set_option_string(m_mpv, "hwdec", "auto");
@@ -115,9 +129,29 @@ MpvVideoItem::MpvVideoItem(QQuickItem *parent)
 }
 
 MpvVideoItem::~MpvVideoItem() {
+    // FIRST: Atomically invalidate the callback context so mpv's render thread
+    // can never touch 'this' again after this lock is released.
+    {
+        std::lock_guard<std::mutex> lock(m_callbackCtx->mutex);
+        m_callbackCtx->item = nullptr;
+    }
+
     if (m_mpv) {
+        // Stop the wakeup callback
         mpv_set_wakeup_callback(m_mpv, nullptr, nullptr);
-        mpv_terminate_destroy(m_mpv);
+
+        // Stop playback so mpv stops generating new events/frames
+        const char *cmd[] = {"stop", nullptr};
+        mpv_command(m_mpv, cmd);
+
+        // Drain any already-queued mpv events
+        while (true) {
+            mpv_event *ev = mpv_wait_event(m_mpv, 0);
+            if (ev->event_id == MPV_EVENT_NONE)
+                break;
+        }
+
+        m_mpv = nullptr;
     }
 }
 
@@ -130,9 +164,14 @@ void MpvVideoItem::on_mpv_events(void *ctx) {
     QMetaObject::invokeMethod(static_cast<MpvVideoItem *>(ctx), "handleMpvEvent", Qt::QueuedConnection);
 }
 
+// Called from mpv's render thread. Uses mutex-protected context to safely
+// emit the onUpdate signal only if the MpvVideoItem is still alive.
 void MpvVideoItem::on_mpv_update(void *ctx) {
-    auto *item = static_cast<MpvVideoItem *>(ctx);
-    emit item->onUpdate();
+    auto *cbCtx = static_cast<MpvCallbackCtx *>(ctx);
+    std::lock_guard<std::mutex> lock(cbCtx->mutex);
+    if (cbCtx->item) {
+        emit cbCtx->item->onUpdate();
+    }
 }
 
 void MpvVideoItem::handleMpvEvent() {

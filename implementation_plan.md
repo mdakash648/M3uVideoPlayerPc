@@ -24,5 +24,11 @@ I will create `ChannelViewModel` inheriting from `QAbstractListModel`.
   - Add an `onGroupIdChanged` handler to automatically call `AppController.channelViewModel.loadChannels(groupId)`.
   - Update the UI to show the actual channel name.
 
+### 4. Video Player Favorite Feature
+- **Player UI (QML)**: Add a 'Favorite' (Heart/Star) toggle button directly on the video player overlay.
+- **ViewModel (C++)**: Add a `Q_INVOKABLE void toggleFavorite(int channelId, bool isFavorite)` method in the player or channel ViewModel to handle the toggle action.
+- **Data Layer (SQLite)**: Ensure the `Channels` table has an `is_favorite` boolean column (or use a dedicated `Favorites` table). When the button is clicked, update this flag in the database.
+- **Favorites Folder**: In the Group/Category view, provide a dedicated "Favorites" folder that queries and displays only the items where `is_favorite = true`.
+
 ## User Review Required
 Please review this plan and click **Proceed** if you want me to write the C++ and QML code to connect the channels to the database and fix the navigation!

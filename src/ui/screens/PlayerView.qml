@@ -1,4 +1,5 @@
 import QtQuick
+import QtQuick.Window
 import QtQuick.Controls.Basic
 import QtQuick.Layouts
 import M3uVideoPlayer
@@ -7,147 +8,749 @@ Item {
     id: root
     
     property string streamUrl: ""
+    property string streamTitle: "" // Allows dynamic titles
+    property bool playlistOpen: false
     signal backRequested()
+
+    // Keyboard control state
+    property int seekStep: 10          // Current seek increment (accelerates on hold)
+    property bool seekingLeft: false
+    property bool seekingRight: false
+    property int savedVolume: 100      // For mute toggle
+    property int prevVisibility: Window.Windowed
+
+    focus: true  // Enable keyboard input
+
+    function toggleFullscreen() {
+        var win = root.Window.window;
+        if (win.visibility === Window.FullScreen) {
+            if (root.prevVisibility === Window.Maximized) {
+                // Use C++ native QWindow::setWindowState to bypass QML's glitchy state machine
+                // which causes the "minimize then maximize" flicker on Windows.
+                AppController.restoreMaximized();
+            } else {
+                win.showNormal();
+            }
+        } else {
+            root.prevVisibility = win.visibility;
+            win.showFullScreen();
+        }
+    }
+
+    // OSD (On-Screen Display) for seek/volume feedback
+    Rectangle {
+        id: osdOverlay
+        anchors.centerIn: parent
+        width: osdText.implicitWidth + 48
+        height: 52
+        radius: 26
+        color: "#CC0d141d"
+        border.color: "#33c2c6d2"
+        border.width: 1
+        z: 100
+        opacity: 0
+        visible: opacity > 0
+
+        Text {
+            id: osdText
+            anchors.centerIn: parent
+            color: "#ffb781"
+            font.pixelSize: 18
+            font.bold: true
+        }
+
+        Behavior on opacity { NumberAnimation { duration: 200 } }
+
+        Timer {
+            id: osdHideTimer
+            interval: 800
+            onTriggered: osdOverlay.opacity = 0
+        }
+
+        function show(msg) {
+            osdText.text = msg;
+            osdOverlay.opacity = 1;
+            osdHideTimer.restart();
+        }
+    }
+
+    // Seek acceleration timer (fires repeatedly while arrow key is held)
+    Timer {
+        id: seekTimer
+        interval: 300
+        repeat: true
+        onTriggered: {
+            if (root.seekingRight) {
+                root.seekStep = Math.min(root.seekStep + 10, 120);
+                videoPlayer.command(["seek", root.seekStep.toString()]);
+                osdOverlay.show("▶▶ +" + root.seekStep + "s");
+            } else if (root.seekingLeft) {
+                root.seekStep = Math.min(root.seekStep + 10, 120);
+                videoPlayer.command(["seek", "-" + root.seekStep.toString()]);
+                osdOverlay.show("◀◀ -" + root.seekStep + "s");
+            }
+        }
+    }
+
+    // Keyboard handler
+    Keys.onPressed: function(event) {
+        if (event.isAutoRepeat) {
+            // Arrow keys held — start accelerated seeking
+            if (event.key === Qt.Key_Right && !root.seekingRight) {
+                root.seekingRight = true;
+                root.seekStep = 10;
+                seekTimer.start();
+            } else if (event.key === Qt.Key_Left && !root.seekingLeft) {
+                root.seekingLeft = true;
+                root.seekStep = 10;
+                seekTimer.start();
+            }
+            event.accepted = true;
+            return;
+        }
+
+        switch (event.key) {
+        case Qt.Key_Space:
+            videoPlayer.playing = !videoPlayer.playing;
+            osdOverlay.show(videoPlayer.playing ? "▶ Play" : "⏸ Paused");
+            break;
+
+        case Qt.Key_Right:
+            videoPlayer.command(["seek", "10"]);
+            osdOverlay.show("▶▶ +10s");
+            break;
+
+        case Qt.Key_Left:
+            videoPlayer.command(["seek", "-10"]);
+            osdOverlay.show("◀◀ -10s");
+            break;
+
+        case Qt.Key_Up:
+            videoPlayer.volume = Math.min(videoPlayer.volume + 5, 130);
+            osdOverlay.show("🔊 " + videoPlayer.volume + "%");
+            break;
+
+        case Qt.Key_Down:
+            videoPlayer.volume = Math.max(videoPlayer.volume - 5, 0);
+            osdOverlay.show("🔊 " + videoPlayer.volume + "%");
+            break;
+
+        case Qt.Key_F:
+            root.toggleFullscreen();
+            break;
+
+        case Qt.Key_Escape:
+            if (root.Window.window.visibility === Window.FullScreen) {
+                root.toggleFullscreen();
+            } else if (root.playlistOpen) {
+                root.playlistOpen = false;
+            }
+            break;
+
+        case Qt.Key_M:
+            if (videoPlayer.volume > 0) {
+                root.savedVolume = videoPlayer.volume;
+                videoPlayer.volume = 0;
+                osdOverlay.show("🔇 Muted");
+            } else {
+                videoPlayer.volume = root.savedVolume;
+                osdOverlay.show("🔊 " + videoPlayer.volume + "%");
+            }
+            break;
+
+        case Qt.Key_N:
+            root.playNext();
+            osdOverlay.show("⏭ Next");
+            break;
+
+        case Qt.Key_P:
+            root.playPrevious();
+            osdOverlay.show("⏮ Previous");
+            break;
+
+        case Qt.Key_L:
+            root.playlistOpen = !root.playlistOpen;
+            break;
+
+        default:
+            return; // Don't accept unhandled keys
+        }
+        event.accepted = true;
+    }
+
+    Keys.onReleased: function(event) {
+        if (event.isAutoRepeat) {
+            event.accepted = true;
+            return;
+        }
+
+        // Stop accelerated seeking when arrow key is released
+        if (event.key === Qt.Key_Right) {
+            root.seekingRight = false;
+            root.seekStep = 10;
+            if (!root.seekingLeft) seekTimer.stop();
+        } else if (event.key === Qt.Key_Left) {
+            root.seekingLeft = false;
+            root.seekStep = 10;
+            if (!root.seekingRight) seekTimer.stop();
+        }
+    }
+
+    // Helper functions for navigation
+    function playChannel(index) {
+
+        var url = AppController.channelViewModel.channelStreamUrl(index);
+        var name = AppController.channelViewModel.channelName(index);
+        if (url !== "") {
+            root.streamUrl = url;
+            root.streamTitle = name;
+            videoPlayer.mediaUrl = url;
+            videoPlayer.playing = true;
+        }
+    }
+
+    function playPrevious() {
+        var idx = AppController.channelViewModel.findIndexByUrl(root.streamUrl);
+        if (idx > 0) {
+            playChannel(idx - 1);
+        }
+    }
+
+    function playNext() {
+        var idx = AppController.channelViewModel.findIndexByUrl(root.streamUrl);
+        var total = AppController.channelViewModel.rowCount();
+        if (idx >= 0 && idx < total - 1) {
+            playChannel(idx + 1);
+        }
+    }
 
     MpvVideoItem {
         id: videoPlayer
         anchors.fill: parent
-        
         mediaUrl: root.streamUrl
         
         MouseArea {
             anchors.fill: parent
             onClicked: {
                 videoPlayer.playing = !videoPlayer.playing
+                root.forceActiveFocus()
             }
         }
     }
     
-    // Bottom Control Bar
-    Rectangle {
-        id: bottomBar
+    // Title Overlay
+    Text {
+        anchors.top: parent.top
+        anchors.topMargin: 32
+        anchors.horizontalCenter: parent.horizontalCenter
+        text: root.streamTitle !== "" ? root.streamTitle.toUpperCase() : "NOW PLAYING"
+        color: "#ffb781" // text-primary
+        font.pixelSize: 14 // label-lg
+        font.bold: true
+        font.letterSpacing: 2.0
+        z: 20
+        style: Text.Outline; styleColor: "#80000000"
+    }
+    
+    // Top Bar Floating
+    RowLayout {
+        anchors.top: parent.top
         anchors.left: parent.left
         anchors.right: parent.right
-        anchors.bottom: parent.bottom
-        height: 60
-        color: "#AA121212"
+        anchors.margins: 24
+        z: 20
         
-        RowLayout {
-            anchors.fill: parent
-            anchors.margins: 10
-            
-            Button {
-                text: "← Back"
-                onClicked: root.backRequested()
-
-                contentItem: Text {
-                    text: parent.text
-                    color: "#FFD54F"
-                    font.bold: true
-                    horizontalAlignment: Text.AlignHCenter
-                    verticalAlignment: Text.AlignVCenter
-                }
-                background: Rectangle { color: "transparent" }
+        // Back Button
+        Button {
+            id: backBtn
+            implicitWidth: 48
+            implicitHeight: 48
+            background: Rectangle {
+                color: backBtn.hovered ? "#2e3540" : "#992e3540" // bg-surface-container-highest/60
+                radius: 24
+                border.color: "#33c2c6d2"
+                border.width: 1
             }
-
-            Button {
-                text: videoPlayer.playing ? "Pause" : "Play"
-                onClicked: videoPlayer.playing = !videoPlayer.playing
-                
-                contentItem: Text {
-                    text: parent.text
-                    color: "white"
-                    horizontalAlignment: Text.AlignHCenter
-                    verticalAlignment: Text.AlignVCenter
-                }
-                background: Rectangle {
-                    color: parent.pressed ? "#555" : "transparent"
-                    radius: 4
-                }
+            contentItem: Text {
+                text: "←"
+                color: backBtn.hovered ? "#ffb781" : "#dce3f0"
+                font.pixelSize: 24
+                horizontalAlignment: Text.AlignHCenter
+                verticalAlignment: Text.AlignVCenter
             }
-            
-            Text {
-                text: {
-                    let p = videoPlayer.position;
-                    let d = videoPlayer.duration;
-                    
-                    let fmt = function(s) {
-                        let m = Math.floor(s / 60);
-                        let sc = Math.floor(s % 60);
-                        return m + ":" + (sc < 10 ? "0" : "") + sc;
-                    }
-                    
-                    return fmt(p) + " / " + fmt(d);
-                }
-                color: "white"
-                Layout.alignment: Qt.AlignVCenter
+            onClicked: root.backRequested()
+        }
+        
+        Item { Layout.fillWidth: true } // Spacer
+        
+        // Playlist Button
+        Button {
+            id: playlistBtn
+            implicitHeight: 48
+            background: Rectangle {
+                color: root.playlistOpen ? "#ff8800" : (playlistBtn.hovered ? "#2e3540" : "#992e3540")
+                radius: 24
+                border.color: root.playlistOpen ? "#ff8800" : "#33c2c6d2"
+                border.width: 1
             }
-            
-            Slider {
-                Layout.fillWidth: true
-                from: 0
-                to: videoPlayer.duration > 0 ? videoPlayer.duration : 1
-                value: videoPlayer.position
-                
-                onMoved: {
-                    videoPlayer.position = value
-                }
-            }
-            
-            Text {
-                text: "Vol: " + Math.round(videoPlayer.volume) + "%"
-                color: "white"
-                Layout.alignment: Qt.AlignVCenter
-            }
-            
-            Slider {
-                from: 0
-                to: 130
-                value: videoPlayer.volume
-                onMoved: {
-                    videoPlayer.volume = value
-                }
-            }
-            
-            Button {
-                text: "⚙"
-                onClicked: qualityMenu.open()
-                contentItem: Text {
-                    text: parent.text
-                    color: "white"
+            contentItem: RowLayout {
+                spacing: 8
+                Text {
+                    text: "≡"
+                    color: root.playlistOpen ? "#2f1400" : (playlistBtn.hovered ? "#ffb781" : "#dce3f0")
                     font.pixelSize: 20
-                    horizontalAlignment: Text.AlignHCenter
-                    verticalAlignment: Text.AlignVCenter
                 }
-                background: Rectangle { color: "transparent" }
-                
-                Menu {
-                    id: qualityMenu
-                    y: -height
-                    
-                    MenuItem {
-                        text: "--- Video Quality ---"
-                        enabled: false
+                Text {
+                    text: "PLAYLIST"
+                    color: root.playlistOpen ? "#2f1400" : (playlistBtn.hovered ? "#ffb781" : "#dce3f0")
+                    font.pixelSize: 14
+                    font.bold: true
+                    font.letterSpacing: 1.0
+                }
+            }
+            leftPadding: 16
+            rightPadding: 20
+            onClicked: root.playlistOpen = !root.playlistOpen
+        }
+    }
+
+    // ========== PLAYLIST PANEL (slide from right) ==========
+    Rectangle {
+        id: playlistPanel
+        anchors.top: parent.top
+        anchors.bottom: parent.bottom
+        anchors.right: parent.right
+        width: 360
+        color: "#E60d141d"
+        border.color: "#33c2c6d2"
+        border.width: 1
+        z: 50
+        visible: playlistPanelX.running || root.playlistOpen
+
+        // Slide animation
+        x: root.playlistOpen ? (root.width - 360) : root.width
+        Behavior on x {
+            NumberAnimation {
+                id: playlistPanelX
+                duration: 280
+                easing.type: Easing.OutCubic
+            }
+        }
+
+        // Panel Header
+        ColumnLayout {
+            anchors.fill: parent
+            anchors.topMargin: 16
+            spacing: 0
+
+            // Header Row
+            RowLayout {
+                Layout.fillWidth: true
+                Layout.leftMargin: 20
+                Layout.rightMargin: 12
+                Layout.bottomMargin: 12
+
+                Text {
+                    text: "PLAYLIST"
+                    color: "#ffb781"
+                    font.pixelSize: 14
+                    font.bold: true
+                    font.letterSpacing: 2.0
+                    Layout.fillWidth: true
+                }
+
+                Text {
+                    text: {
+                        var idx = AppController.channelViewModel.findIndexByUrl(root.streamUrl);
+                        var total = AppController.channelViewModel.rowCount();
+                        if (idx >= 0) {
+                            return (idx + 1) + " / " + total;
+                        }
+                        return total + " items";
                     }
+                    color: "#7a8a9e"
+                    font.pixelSize: 12
+                }
+
+                Button {
+                    id: closePanelBtn
+                    implicitWidth: 36
+                    implicitHeight: 36
+                    background: Rectangle { color: closePanelBtn.hovered ? "#2e3540" : "transparent"; radius: 18 }
+                    contentItem: Text { text: "✕"; color: closePanelBtn.hovered ? "#ffb781" : "#7a8a9e"; font.pixelSize: 16; horizontalAlignment: Text.AlignHCenter; verticalAlignment: Text.AlignVCenter }
+                    onClicked: root.playlistOpen = false
+                }
+            }
+
+            // Separator
+            Rectangle {
+                Layout.fillWidth: true
+                height: 1
+                color: "#33c2c6d2"
+            }
+
+            // Channel List
+            ListView {
+                id: playlistListView
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+                clip: true
+                model: AppController.channelViewModel
+
+                // Auto-scroll to current channel when panel opens
+                onVisibleChanged: {
+                    if (visible) {
+                        var idx = AppController.channelViewModel.findIndexByUrl(root.streamUrl);
+                        if (idx >= 0) {
+                            playlistListView.positionViewAtIndex(idx, ListView.Center);
+                        }
+                    }
+                }
+
+                delegate: Rectangle {
+                    id: channelDelegate
+                    width: playlistListView.width
+                    height: 56
+                    property bool isCurrent: model.streamUrl === root.streamUrl
+                    color: isCurrent ? "#33ff8800" : (channelMouse.containsMouse ? "#1Ac2c6d2" : "transparent")
+
+                    RowLayout {
+                        anchors.fill: parent
+                        anchors.leftMargin: 20
+                        anchors.rightMargin: 20
+                        spacing: 12
+
+                        // Playing indicator or index number
+                        Rectangle {
+                            implicitWidth: 28
+                            implicitHeight: 28
+                            radius: 14
+                            color: channelDelegate.isCurrent ? "#ff8800" : "transparent"
+                            border.color: channelDelegate.isCurrent ? "#ff8800" : "#33c2c6d2"
+                            border.width: channelDelegate.isCurrent ? 0 : 1
+
+                            Text {
+                                anchors.centerIn: parent
+                                text: channelDelegate.isCurrent ? "▶" : (index + 1)
+                                color: channelDelegate.isCurrent ? "#2f1400" : "#7a8a9e"
+                                font.pixelSize: channelDelegate.isCurrent ? 12 : 11
+                                font.bold: channelDelegate.isCurrent
+                            }
+                        }
+
+                        // Channel name
+                        Text {
+                            text: model.name
+                            color: channelDelegate.isCurrent ? "#ffb781" : "#dce3f0"
+                            font.pixelSize: 14
+                            font.bold: channelDelegate.isCurrent
+                            elide: Text.ElideRight
+                            Layout.fillWidth: true
+                        }
+                    }
+
+                    // Bottom border
+                    Rectangle {
+                        anchors.bottom: parent.bottom
+                        anchors.left: parent.left
+                        anchors.right: parent.right
+                        anchors.leftMargin: 20
+                        anchors.rightMargin: 20
+                        height: 1
+                        color: "#1Ac2c6d2"
+                    }
+
+                    MouseArea {
+                        id: channelMouse
+                        anchors.fill: parent
+                        hoverEnabled: true
+                        cursorShape: Qt.PointingHandCursor
+                        onClicked: {
+                            root.playChannel(index);
+                        }
+                    }
+                }
+
+                ScrollBar.vertical: ScrollBar {
+                    policy: ScrollBar.AsNeeded
+                    width: 6
+                    contentItem: Rectangle {
+                        implicitWidth: 6
+                        radius: 3
+                        color: "#55c2c6d2"
+                    }
+                }
+            }
+        }
+    }
+
+    // Bottom Controls Layer
+    Item {
+        anchors.bottom: parent.bottom
+        anchors.left: parent.left
+        anchors.right: parent.right
+        anchors.bottomMargin: 24
+        height: 100
+        z: 30
+        
+        // Glassmorphic Panel
+        Rectangle {
+            anchors.centerIn: parent
+            width: Math.min(parent.width - 48, 1152) // max-w-6xl
+            height: 96
+            color: "#B30d141d" // bg-surface/70 (slightly more opaque for readability)
+            radius: 12
+            border.color: "#33c2c6d2" // border-tertiary/20
+            border.width: 1
+            
+            RowLayout {
+                anchors.fill: parent
+                anchors.leftMargin: 24
+                anchors.rightMargin: 24
+                spacing: 20
+                
+                // --- Left: Secondary Controls ---
+                RowLayout {
+                    spacing: 8
                     
-                    Repeater {
-                        model: videoPlayer.videoTracks
-                        MenuItem {
-                            text: modelData.title ? modelData.title : ("Track " + modelData.id)
-                            onTriggered: videoPlayer.setTrack("video", modelData.id)
+                    // Subtitles Button
+                    Button {
+                        id: subBtn
+                        implicitWidth: 40
+                        implicitHeight: 40
+                        background: Rectangle { color: subBtn.hovered ? "#232a35" : "transparent"; radius: 20 }
+                        contentItem: Text { text: "💬"; color: subBtn.hovered ? "#dce3f0" : "#dec1ae"; font.pixelSize: 18; horizontalAlignment: Text.AlignHCenter; verticalAlignment: Text.AlignVCenter }
+                        onClicked: subMenu.open()
+                        Menu {
+                            id: subMenu
+                            y: -height - 10
+                            MenuItem { text: "Subtitles"; enabled: false }
+                            MenuItem { text: "Off" }
                         }
                     }
                     
-                    MenuItem {
-                        text: "--- Audio Tracks ---"
-                        enabled: false
+                    // Audio Tracks Button
+                    Button {
+                        id: audioBtn
+                        implicitWidth: 40
+                        implicitHeight: 40
+                        background: Rectangle { color: audioBtn.hovered ? "#232a35" : "transparent"; radius: 20 }
+                        contentItem: Text { text: "🎵"; color: audioBtn.hovered ? "#dce3f0" : "#dec1ae"; font.pixelSize: 18; horizontalAlignment: Text.AlignHCenter; verticalAlignment: Text.AlignVCenter }
+                        onClicked: audioMenu.open()
+                        Menu {
+                            id: audioMenu
+                            y: -height - 10
+                            MenuItem { text: "Audio Tracks"; enabled: false }
+                            Repeater {
+                                model: videoPlayer.audioTracks
+                                MenuItem {
+                                    text: (modelData.lang ? "[" + modelData.lang + "] " : "") + (modelData.title ? modelData.title : ("Track " + modelData.id))
+                                    onTriggered: videoPlayer.setTrack("audio", modelData.id)
+                                }
+                            }
+                        }
+                    }
+                }
+                
+                // --- Center: Playback Controls & Progress ---
+                ColumnLayout {
+                    Layout.fillWidth: true
+                    spacing: 4
+                    
+                    RowLayout {
+                        Layout.alignment: Qt.AlignCenter
+                        spacing: 16
+                        
+                        // Prev
+                        Button {
+                            id: prevBtn
+                            implicitWidth: 40
+                            implicitHeight: 40
+                            background: Rectangle { color: prevBtn.hovered ? "#232a35" : "transparent"; radius: 20 }
+                            contentItem: Item {
+                                anchors.fill: parent
+                                Image {
+                                    anchors.centerIn: parent
+                                    sourceSize: Qt.size(24, 24)
+                                    source: "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' width='24' height='24' fill='" + (prevBtn.hovered ? "%23dce3f0" : "%23dec1ae") + "'><path d='M6 6h2v12H6zm3.5 6l8.5 6V6z'/></svg>"
+                                }
+                            }
+                            onClicked: root.playPrevious()
+                        }
+                        
+                        // Play/Pause (Primary)
+                        Button {
+                            id: playBtn
+                            implicitWidth: 52
+                            implicitHeight: 52
+                            background: Rectangle {
+                                color: playBtn.hovered ? "#ffb781" : "#FF8800"
+                                radius: 26
+                            }
+                            contentItem: Item {
+                                anchors.fill: parent
+                                Image {
+                                    anchors.centerIn: parent
+                                    sourceSize: Qt.size(28, 28)
+                                    source: {
+                                        let c = "%232f1400";
+                                        if (videoPlayer.playing) {
+                                            return "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' width='28' height='28' fill='" + c + "'><path d='M6 19h4V5H6v14zm8-14v14h4V5h-4z'/></svg>";
+                                        } else {
+                                            return "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' width='28' height='28' fill='" + c + "'><path d='M8 5v14l11-7z'/></svg>";
+                                        }
+                                    }
+                                }
+                            }
+                            onClicked: videoPlayer.playing = !videoPlayer.playing
+                        }
+                        
+                        // Next
+                        Button {
+                            id: nextBtn
+                            implicitWidth: 40
+                            implicitHeight: 40
+                            background: Rectangle { color: nextBtn.hovered ? "#232a35" : "transparent"; radius: 20 }
+                            contentItem: Item {
+                                anchors.fill: parent
+                                Image {
+                                    anchors.centerIn: parent
+                                    sourceSize: Qt.size(24, 24)
+                                    source: "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' width='24' height='24' fill='" + (nextBtn.hovered ? "%23dce3f0" : "%23dec1ae") + "'><path d='M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z'/></svg>"
+                                }
+                            }
+                            onClicked: root.playNext()
+                        }
                     }
                     
-                    Repeater {
-                        model: videoPlayer.audioTracks
-                        MenuItem {
-                            text: (modelData.lang ? "[" + modelData.lang + "] " : "") + (modelData.title ? modelData.title : ("Track " + modelData.id))
-                            onTriggered: videoPlayer.setTrack("audio", modelData.id)
+                    // Simplified Progress Bar
+                    RowLayout {
+                        Layout.fillWidth: true
+                        spacing: 12
+                        
+                        Text {
+                            text: {
+                                let p = videoPlayer.position;
+                                let fmt = function(s) {
+                                    let m = Math.floor(s / 60);
+                                    let sc = Math.floor(s % 60);
+                                    return m + ":" + (sc < 10 ? "0" : "") + sc;
+                                }
+                                return fmt(p);
+                            }
+                            color: "#dec1ae"
+                            font.pixelSize: 11
+                        }
+                        
+                        Slider {
+                            id: progressSlider
+                            Layout.fillWidth: true
+                            Layout.preferredHeight: 12
+                            
+                            from: 0
+                            to: videoPlayer.duration > 0 ? videoPlayer.duration : 1
+                            value: videoPlayer.position
+                            
+                            onMoved: videoPlayer.position = value
+                            
+                            background: Rectangle {
+                                id: progBg
+                                x: progressSlider.leftPadding
+                                y: progressSlider.topPadding + progressSlider.availableHeight / 2 - height / 2
+                                width: progressSlider.availableWidth
+                                height: 4
+                                radius: 2
+                                color: "#2e3540" // surface-container-highest
+                                
+                                Rectangle {
+                                    width: progressSlider.visualPosition * progBg.width
+                                    height: progBg.height
+                                    color: "#ffb781" // primary
+                                    radius: 2
+                                }
+                            }
+                            handle: Rectangle {
+                                x: progressSlider.leftPadding + progressSlider.visualPosition * (progressSlider.availableWidth - width) - width/2
+                                y: progressSlider.topPadding + progressSlider.availableHeight / 2 - height / 2
+                                implicitWidth: 10
+                                implicitHeight: 10
+                                radius: 5
+                                color: "#ffb781"
+                                opacity: progressSlider.pressed || progressSlider.hovered ? 1.0 : 0.0
+                                Behavior on opacity { NumberAnimation { duration: 150 } }
+                            }
+                        }
+                        
+                        Text {
+                            text: {
+                                let d = videoPlayer.duration;
+                                let fmt = function(s) {
+                                    let m = Math.floor(s / 60);
+                                    let sc = Math.floor(s % 60);
+                                    return m + ":" + (sc < 10 ? "0" : "") + sc;
+                                }
+                                return fmt(d);
+                            }
+                            color: "#dec1ae"
+                            font.pixelSize: 11
+                        }
+                    }
+                }
+                
+                // --- Right: Volume / Settings ---
+                RowLayout {
+                    spacing: 8
+                    
+                    Text {
+                        text: "🔊"
+                        color: "#dec1ae"
+                        font.pixelSize: 16
+                    }
+                    
+                    Slider {
+                        id: volSlider
+                        from: 0
+                        to: 130
+                        value: videoPlayer.volume
+                        Layout.preferredWidth: 80
+                        onMoved: {
+                            videoPlayer.volume = value
+                        }
+                        background: Rectangle {
+                            id: volBg
+                            x: volSlider.leftPadding
+                            y: volSlider.topPadding + volSlider.availableHeight / 2 - height / 2
+                            width: volSlider.availableWidth
+                            height: 4
+                            radius: 2
+                            color: "#2e3540"
+                            Rectangle {
+                                width: volSlider.visualPosition * volBg.width
+                                height: volBg.height
+                                color: "#ffb781"
+                                radius: 2
+                            }
+                        }
+                        handle: Rectangle {
+                            x: volSlider.leftPadding + volSlider.visualPosition * (volSlider.availableWidth - width) - width/2
+                            y: volSlider.topPadding + volSlider.availableHeight / 2 - height / 2
+                            implicitWidth: 10
+                            implicitHeight: 10
+                            radius: 5
+                            color: "#ffb781"
+                            opacity: volSlider.pressed || volSlider.hovered ? 1.0 : 0.0
+                            Behavior on opacity { NumberAnimation { duration: 150 } }
+                        }
+                    }
+                    
+                    Button {
+                        id: fullscreenBtn
+                        implicitWidth: 40
+                        implicitHeight: 40
+                        background: Rectangle { color: fullscreenBtn.hovered ? "#232a35" : "transparent"; radius: 20 }
+                        contentItem: Text { text: "⛶"; color: fullscreenBtn.hovered ? "#dce3f0" : "#dec1ae"; font.pixelSize: 18; horizontalAlignment: Text.AlignHCenter; verticalAlignment: Text.AlignVCenter }
+                        onClicked: {
+                            root.toggleFullscreen();
                         }
                     }
                 }
@@ -157,5 +760,6 @@ Item {
     
     Component.onCompleted: {
         videoPlayer.playing = true
+        root.forceActiveFocus()
     }
 }
