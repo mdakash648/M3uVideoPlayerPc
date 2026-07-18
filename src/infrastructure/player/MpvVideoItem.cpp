@@ -9,6 +9,7 @@
 #include <iostream>
 #include <vector>
 #include <QVariantMap>
+#include <QSet>
 
 namespace {
 // Fallback UA for playlist entries that don't specify one. Many CDNs return
@@ -495,6 +496,18 @@ void MpvVideoItem::command(const QVariantList &args) {
 }
 
 void MpvVideoItem::setProperty(const QString &name, const QVariant &value) {
+    // mpv properties that are always double-typed, even when QML hands us a
+    // whole number (e.g. speed=2.0 arrives as QMetaType::Int since it has no
+    // fractional part). Sending those as MPV_FORMAT_INT64 is a type mismatch
+    // that mpv rejects, so the call silently does nothing.
+    static const QSet<QString> doubleOnlyProps = { "speed", "volume", "time-pos" };
+
+    if (doubleOnlyProps.contains(name)) {
+        double val = value.toDouble();
+        mpv_set_property(m_mpv, name.toUtf8().constData(), MPV_FORMAT_DOUBLE, &val);
+        return;
+    }
+
     if (value.typeId() == QMetaType::Bool) {
         int val = value.toBool() ? 1 : 0;
         mpv_set_property(m_mpv, name.toUtf8().constData(), MPV_FORMAT_FLAG, &val);

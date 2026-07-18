@@ -4,6 +4,7 @@
 #include <QtSql/QSqlDatabase>
 #include <QDebug>
 #include <QFileInfo>
+#include <QIcon>
 #include <QSettings>
 #include <QDir>
 #include <QTimer>
@@ -55,6 +56,7 @@ int main(int argc, char *argv[])
     QQuickWindow::setGraphicsApi(QSGRendererInterface::OpenGL);
 
     QGuiApplication app(argc, argv);
+    app.setWindowIcon(QIcon(":/M3uVideoPlayer/src/assets/icon-512.png"));
 
     // Application Info
     app.setOrganizationName("M3UPlayerTeam");

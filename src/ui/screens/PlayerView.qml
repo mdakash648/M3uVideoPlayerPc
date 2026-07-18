@@ -38,6 +38,16 @@ Item {
     property real prevHeight: 0
     property bool isFullscreen: false
 
+    // ===== Playback speed =====
+    property real playbackSpeed: 1.0       // Persistent user-selected speed
+    property bool spaceHoldTriggered: false // True once hold-to-2x has kicked in
+
+    function setPlaybackSpeed(value) {
+        root.playbackSpeed = value;
+        videoPlayer.command(["set", "speed", value.toString()]);
+        osdOverlay.show(value + "x Speed");
+    }
+
     // ===== Quality switching =====
     // Detects a "1080P/720p/480P" token in the URL and rewrites it to switch
     // quality. triedUrls tracks what's been attempted for auto-fallback.
@@ -223,6 +233,20 @@ Item {
         }
     }
 
+    // Space-bar hold timer: fires once space is held past the threshold,
+    // boosting playback to 2x. A quick tap (release before this fires)
+    // falls through to normal play/pause toggling instead.
+    Timer {
+        id: spaceHoldTimer
+        interval: 350
+        repeat: false
+        onTriggered: {
+            root.spaceHoldTriggered = true;
+            videoPlayer.command(["set", "speed", "2.0"]);
+            osdOverlay.show("⏩ 2x Speed");
+        }
+    }
+
     // Keyboard handler
     Keys.onPressed: function(event) {
         if (event.isAutoRepeat) {
@@ -242,8 +266,8 @@ Item {
 
         switch (event.key) {
         case Qt.Key_Space:
-            videoPlayer.playing = !videoPlayer.playing;
-            osdOverlay.show(videoPlayer.playing ? "▶ Play" : "⏸ Paused");
+            root.spaceHoldTriggered = false;
+            spaceHoldTimer.restart();
             break;
 
         case Qt.Key_Right:
@@ -326,6 +350,18 @@ Item {
             root.seekingLeft = false;
             root.seekStep = 10;
             if (!root.seekingRight) seekTimer.stop();
+        } else if (event.key === Qt.Key_Space) {
+            if (spaceHoldTimer.running) {
+                // Released before the hold threshold — treat as a normal tap
+                spaceHoldTimer.stop();
+                videoPlayer.playing = !videoPlayer.playing;
+                osdOverlay.show(videoPlayer.playing ? "▶ Play" : "⏸ Paused");
+            } else if (root.spaceHoldTriggered) {
+                // Was boosted to 2x — restore the user's selected speed
+                root.spaceHoldTriggered = false;
+                videoPlayer.command(["set", "speed", root.playbackSpeed.toString()]);
+                osdOverlay.show(root.playbackSpeed + "x");
+            }
         }
     }
 
@@ -352,6 +388,9 @@ Item {
             var resume = root.isVod ? AppController.getMovieResume(url) : { found: false };
             videoPlayer.startPosition = resume.found ? Math.floor(resume.positionMs / 1000) : 0;
             root.triedUrls = [url];
+            root.spaceHoldTriggered = false;
+            root.playbackSpeed = 1.0;
+            videoPlayer.command(["set", "speed", "1.0"]);
             root.startStream(url);
         }
     }
@@ -840,6 +879,41 @@ Item {
                                 MenuItem {
                                     text: modelData + "p" + (root.detectQuality(root.streamUrl) === modelData ? "   ✓" : "")
                                     onTriggered: root.setQuality(modelData)
+                                }
+                            }
+                        }
+                    }
+
+                    // Playback Speed Button
+                    Button {
+                        id: speedBtn
+                        implicitHeight: 40
+                        leftPadding: 12
+                        rightPadding: 12
+                        background: Rectangle {
+                            color: speedBtn.hovered ? "#232a35" : "transparent"
+                            radius: 20
+                            border.color: "#33c2c6d2"
+                            border.width: 1
+                        }
+                        contentItem: Text {
+                            text: root.playbackSpeed + "x ▾"
+                            color: speedBtn.hovered ? "#dce3f0" : "#dec1ae"
+                            font.pixelSize: 13
+                            font.bold: true
+                            horizontalAlignment: Text.AlignHCenter
+                            verticalAlignment: Text.AlignVCenter
+                        }
+                        onClicked: speedMenu.open()
+                        Menu {
+                            id: speedMenu
+                            y: -height - 10
+                            MenuItem { text: "Playback Speed"; enabled: false }
+                            Repeater {
+                                model: [0.25, 0.5, 0.75, 1.0, 1.25, 1.5, 1.75, 2.0]
+                                MenuItem {
+                                    text: modelData + "x" + (root.playbackSpeed === modelData ? "   ✓" : "")
+                                    onTriggered: root.setPlaybackSpeed(modelData)
                                 }
                             }
                         }

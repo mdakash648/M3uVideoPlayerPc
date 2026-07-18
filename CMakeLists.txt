@@ -108,6 +108,8 @@ qt_add_qml_module(${PROJECT_NAME}
         src/ui/components/TimeZoneDialog.qml
         src/ui/components/ResumeDialog.qml
         src/ui/components/ResumeFab.qml
+    RESOURCES
+        src/assets/icon-512.png
 )
 
 target_include_directories(${PROJECT_NAME} PRIVATE
