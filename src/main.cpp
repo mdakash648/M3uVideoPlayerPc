@@ -15,6 +15,7 @@
 #include <QQuickStyle>
 #include "infrastructure/player/MpvVideoItem.h"
 #include "ui/AppController.h"
+#include "ui/ChannelViewModel.h"
 
 // Name of the local socket used for single-instance detection: a second
 // launch (e.g. double-clicking another .m3u file) forwards its file path to
@@ -54,10 +55,31 @@ static void registerM3uFileAssociation()
     
     // Set the open command for the application itself
     classes.setValue("Applications/M3uVideoPlayerPc.exe/shell/open/command/.", "\"" + appPath + "\" \"%1\"");
-    
+
     // Set FriendlyAppName and Icon so the "Open With" dialog looks nice
     classes.setValue("Applications/M3uVideoPlayerPc.exe/FriendlyAppName", "M3U Video Player PC");
     classes.setValue("Applications/M3uVideoPlayerPc.exe/DefaultIcon/.", "\"" + appPath + "\",0");
+}
+
+// Add the app to the "Open with" list for local video files (mkv/mp4/...).
+// Unlike .m3u, we never claim the extension's default handler — we only
+// register under OpenWithProgids/SupportedTypes so the user can pick us.
+static void registerVideoFileAssociation()
+{
+    const QString appPath = QDir::toNativeSeparators(QCoreApplication::applicationFilePath());
+    const QString progId = "M3uVideoPlayer.Video";
+
+    QSettings classes("HKEY_CURRENT_USER\\Software\\Classes", QSettings::NativeFormat);
+
+    classes.setValue(progId + "/.", "Video File");
+    classes.setValue(progId + "/DefaultIcon/.", "\"" + appPath + "\",0");
+    classes.setValue(progId + "/shell/open/command/.", "\"" + appPath + "\" \"%1\"");
+
+    for (const QString& extName : ChannelViewModel::videoFileExtensions()) {
+        const QString ext = "." + extName;
+        classes.setValue(ext + "/OpenWithProgids/" + progId, "");
+        classes.setValue("Applications/M3uVideoPlayerPc.exe/SupportedTypes/" + ext, "");
+    }
 }
 #endif
 
@@ -77,13 +99,15 @@ int main(int argc, char *argv[])
     app.setApplicationName("M3U Video Player Desktop");
     app.setApplicationVersion("1.0.0");
 
-    // Extract an .m3u/.m3u8 path passed on the command line (double-click /
-    // "Open with"), if any.
+    // Extract a playable file path passed on the command line (double-click /
+    // "Open with"), if any: either an .m3u/.m3u8 playlist or a local video.
     QString fileToOpen;
     const QStringList args = app.arguments();
     for (int i = 1; i < args.size(); ++i) {
         const QString arg = args.at(i);
-        if (arg.endsWith(".m3u", Qt::CaseInsensitive) || arg.endsWith(".m3u8", Qt::CaseInsensitive)) {
+        const bool isM3u = arg.endsWith(".m3u", Qt::CaseInsensitive)
+                        || arg.endsWith(".m3u8", Qt::CaseInsensitive);
+        if (isM3u || ChannelViewModel::isVideoFile(arg)) {
             if (QFileInfo::exists(arg)) {
                 fileToOpen = QFileInfo(arg).absoluteFilePath();
             }
@@ -107,6 +131,7 @@ int main(int argc, char *argv[])
 
 #ifdef Q_OS_WIN
     registerM3uFileAssociation();
+    registerVideoFileAssociation();
 #endif
 
     // Init AppController
@@ -124,7 +149,11 @@ int main(int argc, char *argv[])
             QObject::connect(client, &QLocalSocket::readyRead, &appController, [&appController, client]() {
                 const QString path = QString::fromUtf8(client->readAll()).trimmed();
                 if (!path.isEmpty()) {
-                    appController.openM3uFile(path);
+                    if (ChannelViewModel::isVideoFile(path)) {
+                        appController.openLocalVideo(path);
+                    } else {
+                        appController.openM3uFile(path);
+                    }
                 }
                 // Raise the existing window either way
                 const auto windows = QGuiApplication::topLevelWindows();
@@ -162,11 +191,16 @@ int main(int argc, char *argv[])
         Qt::QueuedConnection);
     engine.load(url);
 
-    // If launched with an .m3u/.m3u8 file (double-click / "Open with"),
-    // import it once the UI is up.
+    // If launched with a playable file (double-click / "Open with"), open it
+    // once the UI is up: .m3u/.m3u8 imports into History, local videos play
+    // directly without touching History.
     if (!fileToOpen.isEmpty()) {
         QTimer::singleShot(0, &appController, [&appController, fileToOpen]() {
-            appController.openM3uFile(fileToOpen);
+            if (ChannelViewModel::isVideoFile(fileToOpen)) {
+                appController.openLocalVideo(fileToOpen);
+            } else {
+                appController.openM3uFile(fileToOpen);
+            }
         });
     }
 

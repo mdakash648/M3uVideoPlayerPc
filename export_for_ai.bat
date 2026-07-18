@@ -11,7 +11,7 @@ if exist "%EXPORT_FILE%" del "%EXPORT_FILE%"
 
 :: Use PowerShell to zip only the important source files and config
 :: This deliberately ignores the build folder, .user files, etc.
-powershell -Command "Compress-Archive -Path 'src', 'CMakeLists.txt', 'implementation_plan.md' -DestinationPath '%EXPORT_FILE%' -Force"
+powershell -Command "Compress-Archive -Path 'src', 'CMakeLists.txt' -DestinationPath '%EXPORT_FILE%' -Force"
 
 echo.
 echo [Success] Export complete! 

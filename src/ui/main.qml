@@ -411,6 +411,23 @@ ApplicationWindow {
         }
     }
 
+    // Local video file opened (double-click / "Open with"): play it WITHOUT
+    // saving to History (playlistId 0 disables progress/history writes).
+    // AppController already loaded the file's folder into channelViewModel,
+    // so the player's playlist panel / Next / Previous cover the folder.
+    Connections {
+        target: AppController
+        function onLocalVideoReady(filePath, name) {
+            doPush(playerViewComponent, {
+                "streamUrl": filePath,
+                "streamTitle": name,
+                "channelType": 1, // MOVIE: VOD seek behavior + folder auto-next
+                "playlistId": 0,
+                "groupId": 0
+            })
+        }
+    }
+
     // When an .m3u/.m3u8 file is imported (file picker or double-clicked
     // file), jump to the Playlists page so the user sees it appear.
     Connections {

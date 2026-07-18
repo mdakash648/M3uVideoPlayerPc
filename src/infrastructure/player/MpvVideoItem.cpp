@@ -51,6 +51,15 @@ public:
         // The update callback fires from mpv's render thread.
         // We pass the shared MpvCallbackCtx which is protected by a mutex.
         mpv_render_context_set_update_callback(m_mpv_gl, MpvVideoItem::on_mpv_update, m_callbackCtx.get());
+
+        // Tell the item (on the GUI thread) that the render context now
+        // exists, so a deferred loadfile can be issued. Starting playback
+        // BEFORE this point makes mpv's VO init fail ("No render context
+        // set") and the file plays audio-only with a black screen.
+        std::lock_guard<std::mutex> lock(m_callbackCtx->mutex);
+        if (m_callbackCtx->item) {
+            QMetaObject::invokeMethod(m_callbackCtx->item, "onRenderContextReady", Qt::QueuedConnection);
+        }
     }
 
     ~MpvRenderer() override {
@@ -113,8 +122,15 @@ MpvVideoItem::MpvVideoItem(QQuickItem *parent)
     m_callbackCtx = std::make_shared<MpvCallbackCtx>();
     m_callbackCtx->item = this;
 
-    // Default configuration for better performance and Qt compatibility
-    mpv_set_option_string(m_mpv, "hwdec", "auto");
+    // Default configuration for better performance and Qt compatibility.
+    // hwdec MUST be a copy-back mode ("auto-copy-safe"), not "auto": plain
+    // auto picks D3D11VA on Windows, whose frames can't be shown through the
+    // desktop-OpenGL mpv_render_context we use — decoding "works" but the
+    // video stays black (audio only, and subtitles die with the video since
+    // they're drawn onto the frames). Copy-back decodes on the GPU, then
+    // copies frames to system memory where the GL renderer can always use
+    // them.
+    mpv_set_option_string(m_mpv, "hwdec", "auto-copy-safe");
     mpv_set_option_string(m_mpv, "vo", "libmpv");
     mpv_set_option_string(m_mpv, "audio-channels", "auto-safe");
 
@@ -290,13 +306,37 @@ void MpvVideoItem::setMediaUrl(const QString &url) {
         // contain commas which break the options list syntax.
         updateHttpHeaders();
 
-        // Keep the QByteArray alive for the duration of the command —
-        // url.toUtf8().constData() inline would leave a dangling pointer.
-        const QByteArray urlUtf8 = url.toUtf8();
-        const char *args[] = {"loadfile", urlUtf8.constData(), nullptr};
-        mpv_command(m_mpv, args);
+        if (m_renderContextReady) {
+            loadCurrentUrl();
+        } else {
+            // The QML scene graph hasn't created the MpvRenderer (and thus
+            // the mpv_render_context) yet. Issuing loadfile now would make
+            // vo=libmpv fail to initialize ("No render context set") and the
+            // whole file would play audio-only on a black screen. This bites
+            // local files (mkv especially) because they open faster than the
+            // first render pass; the load is flushed in onRenderContextReady.
+            m_pendingLoad = true;
+        }
 
         emit mediaUrlChanged();
+    }
+}
+
+void MpvVideoItem::loadCurrentUrl() {
+    // Keep the QByteArray alive for the duration of the command —
+    // url.toUtf8().constData() inline would leave a dangling pointer.
+    const QByteArray urlUtf8 = m_mediaUrl.toUtf8();
+    const char *args[] = {"loadfile", urlUtf8.constData(), nullptr};
+    mpv_command(m_mpv, args);
+}
+
+void MpvVideoItem::onRenderContextReady() {
+    m_renderContextReady = true;
+    if (m_pendingLoad) {
+        m_pendingLoad = false;
+        if (!m_mediaUrl.isEmpty()) {
+            loadCurrentUrl();
+        }
     }
 }
 

@@ -38,6 +38,15 @@ Item {
     property real prevHeight: 0
     property bool isFullscreen: false
 
+    // ===== Always on top (VLC-style) =====
+    property bool alwaysOnTop: false
+
+    function toggleAlwaysOnTop() {
+        root.alwaysOnTop = !root.alwaysOnTop;
+        AppController.setAlwaysOnTop(root.alwaysOnTop);
+        osdOverlay.show(root.alwaysOnTop ? "📌 Always on Top: ON" : "📌 Always on Top: OFF");
+    }
+
     // ===== Playback speed =====
     property real playbackSpeed: 1.0       // Persistent user-selected speed
     property bool spaceHoldTriggered: false // True once hold-to-2x has kicked in
@@ -51,9 +60,16 @@ Item {
     // ===== Quality switching =====
     // Detects a "1080P/720p/480P" token in the URL and rewrites it to switch
     // quality. triedUrls tracks what's been attempted for auto-fallback.
+    // Local files are excluded: "Movie 1080p.mkv" is a filename, not a
+    // quality variant — rewriting the path would just point at nothing.
     property var triedUrls: []
 
+    function isLocalFile(url) {
+        return url !== "" && !/^https?:\/\//i.test(url);
+    }
+
     function detectQuality(url) {
+        if (isLocalFile(url)) return "";
         var m = url.match(/(1080|720|480)[pP]/);
         return m ? m[1] : "";
     }
@@ -323,6 +339,10 @@ Item {
         case Qt.Key_P:
             root.playPrevious();
             osdOverlay.show("⏮ Previous");
+            break;
+
+        case Qt.Key_T:
+            root.toggleAlwaysOnTop();
             break;
 
         case Qt.Key_L:
@@ -612,9 +632,10 @@ Item {
         z: 50
         visible: playlistPanelX.running || root.playlistOpen
 
-        // Slide animation
-        x: root.playlistOpen ? (root.width - 360) : root.width
-        Behavior on x {
+        // Slide animation — driven by rightMargin (not x) so a window resize
+        // doesn't retrigger the animation and flash the panel open/closed.
+        anchors.rightMargin: root.playlistOpen ? 0 : -width
+        Behavior on anchors.rightMargin {
             NumberAnimation {
                 id: playlistPanelX
                 duration: 280
@@ -1130,6 +1151,31 @@ Item {
                         }
                     }
                     
+                    // Always on Top (pin) — VLC-style: keeps the app window
+                    // above every other application while enabled.
+                    Button {
+                        id: pinBtn
+                        implicitWidth: 40
+                        implicitHeight: 40
+                        background: Rectangle {
+                            color: root.alwaysOnTop ? "#ff8800" : (pinBtn.hovered ? "#232a35" : "transparent")
+                            radius: 20
+                            border.color: root.alwaysOnTop ? "#ff8800" : "transparent"
+                            border.width: 1
+                        }
+                        contentItem: Text {
+                            text: "📌"
+                            color: root.alwaysOnTop ? "#2f1400" : (pinBtn.hovered ? "#dce3f0" : "#dec1ae")
+                            font.pixelSize: 16
+                            horizontalAlignment: Text.AlignHCenter
+                            verticalAlignment: Text.AlignVCenter
+                        }
+                        ToolTip.visible: pinBtn.hovered
+                        ToolTip.delay: 600
+                        ToolTip.text: "Always on Top (T)"
+                        onClicked: root.toggleAlwaysOnTop()
+                    }
+
                     Button {
                         id: fullscreenBtn
                         implicitWidth: 40
@@ -1160,5 +1206,8 @@ Item {
     Component.onDestruction: {
         // Final position save when leaving the player
         root.saveResumeProgress();
+        // Release always-on-top — the toggle lives in this view, so leaving
+        // the player must not leave the window stuck topmost.
+        if (root.alwaysOnTop) AppController.setAlwaysOnTop(false);
     }
 }

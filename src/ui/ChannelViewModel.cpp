@@ -1,4 +1,7 @@
 #include "ChannelViewModel.h"
+#include <QDir>
+#include <QFileInfo>
+#include <QUrl>
 #include <algorithm>
 
 ChannelViewModel::ChannelViewModel(Data::ChannelRepository* channelRepo, QObject *parent)
@@ -77,6 +80,49 @@ void ChannelViewModel::loadFavorites() {
         m_sourceChannels.clear();
         for (const auto& c : stdList) {
             m_sourceChannels.append(c);
+        }
+    }
+    applyFilterAndSort();
+}
+
+const QStringList& ChannelViewModel::videoFileExtensions() {
+    static const QStringList exts = {
+        "mkv", "mp4", "m4v", "avi", "mov", "wmv", "flv", "webm",
+        "ts", "m2ts", "mts", "mpg", "mpeg", "vob", "3gp", "ogv"
+    };
+    return exts;
+}
+
+bool ChannelViewModel::isVideoFile(const QString& path) {
+    const QString suffix = QFileInfo(path).suffix().toLower();
+    return !suffix.isEmpty() && videoFileExtensions().contains(suffix);
+}
+
+void ChannelViewModel::loadLocalFolder(const QString& filePath) {
+    m_favoritesMode = false;
+    m_sourceChannels.clear();
+
+    const QFileInfo openedFile(filePath);
+    const QDir dir = openedFile.dir();
+    if (dir.exists()) {
+        QStringList nameFilters;
+        for (const QString& ext : videoFileExtensions()) {
+            nameFilters << ("*." + ext);
+        }
+        // Natural name order so "E01, E02, ... E10" sort like episodes
+        const auto entries = dir.entryInfoList(nameFilters, QDir::Files | QDir::Readable,
+                                               QDir::Name | QDir::LocaleAware);
+        int order = 0;
+        for (const QFileInfo& fi : entries) {
+            Domain::Channel channel;
+            channel.id = 0;          // ephemeral — never stored in the database
+            channel.playlistId = 0;  // playlistId 0 disables history/resume saving
+            channel.groupId = 0;
+            channel.name = fi.completeBaseName();
+            channel.streamUrl = fi.absoluteFilePath();
+            channel.type = Domain::ContentType::MOVIE; // VOD behavior (seek, auto-next)
+            channel.orderIndex = order++;
+            m_sourceChannels.append(channel);
         }
     }
     applyFilterAndSort();

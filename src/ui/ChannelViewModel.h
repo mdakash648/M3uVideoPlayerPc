@@ -38,6 +38,14 @@ public:
     Q_INVOKABLE void loadChannels(int groupId);
     Q_INVOKABLE void loadAllChannels(int playlistId);
     Q_INVOKABLE void loadFavorites();
+    // Fills the model with every video file in the given local video's folder
+    // (ephemeral — nothing is written to the database). Powers the in-player
+    // playlist panel for local playback.
+    Q_INVOKABLE void loadLocalFolder(const QString& filePath);
+
+    // Local playback support: recognized video file extensions.
+    static const QStringList& videoFileExtensions();
+    static bool isVideoFile(const QString& path);
     Q_INVOKABLE void toggleFavorite(int channelId);
     // Permanently removes a channel (used by the History delete buttons).
     Q_INVOKABLE void deleteChannel(int channelId);

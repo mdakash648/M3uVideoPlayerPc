@@ -98,6 +98,9 @@ public:
     static void on_mpv_update(void *ctx);
 private slots:
     void handleMpvEvent();
+    // Invoked (queued) by MpvRenderer once the mpv GL render context exists.
+    // Flushes a deferred loadfile — see setMediaUrl().
+    void onRenderContextReady();
 
 private:
     static void on_mpv_events(void *ctx);
@@ -105,11 +108,16 @@ private:
     void processMpvEvents();
     void updateTrackList();
     void updateHttpHeaders();
+    void loadCurrentUrl();
 
     std::shared_ptr<mpv_handle> m_mpv_shared;
     mpv_handle *m_mpv = nullptr;
     std::shared_ptr<MpvCallbackCtx> m_callbackCtx;
     QString m_mediaUrl;
+    // vo=libmpv can't initialize until MpvRenderer creates the render
+    // context; loads requested before that are deferred (see setMediaUrl).
+    bool m_renderContextReady = false;
+    bool m_pendingLoad = false;
     bool m_playing = false;
     bool m_loading = false;
     int m_duration = 0;

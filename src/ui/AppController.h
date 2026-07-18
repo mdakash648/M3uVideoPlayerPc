@@ -34,6 +34,8 @@ public:
     Q_INVOKABLE void triggerBackgroundSync();
     Q_INVOKABLE void enterFullscreen();
     Q_INVOKABLE void exitFullscreen(bool wasMaximized, qreal x, qreal y, qreal width, qreal height);
+    // Keeps the app window above every other window (VLC's "Always on top").
+    Q_INVOKABLE void setAlwaysOnTop(bool enabled);
     // Saves a direct-link stream into the auto-created "History" playlist
     // (group "Movie"). Returns the display name derived from the URL.
     Q_INVOKABLE QString addToHistory(const QString& url, const QString& referer, const QString& userAgent);
@@ -45,6 +47,13 @@ public:
     // Imports a local .m3u/.m3u8 file into the "History" playlist (used by
     // the file picker and double-clicked files).
     Q_INVOKABLE void openM3uFile(const QString& fileUrlOrPath);
+    // Plays a local video file (mkv/mp4/...) WITHOUT saving it to History.
+    // Loads every video in the file's folder into channelViewModel so the
+    // in-player playlist panel can navigate the folder. Answers via
+    // localVideoReady().
+    Q_INVOKABLE void openLocalVideo(const QString& fileUrlOrPath);
+    // True if the path/URL has a recognized video file extension.
+    Q_INVOKABLE bool isLocalVideoFile(const QString& fileUrlOrPath) const;
 
     // ===== Settings page actions =====
     // Refresh every refreshable playlist now (skips the internal History
@@ -101,6 +110,9 @@ signals:
     void directLinkReady(const QString& streamUrl, const QString& name,
                          const QString& referer, const QString& userAgent);
     void directLinkFailed(const QString& message);
+    // Result of openLocalVideo(): a local file ready to play. The folder's
+    // videos are already loaded into channelViewModel. Never touches History.
+    void localVideoReady(const QString& filePath, const QString& name);
     // Update-all from Settings: emitted per playlist and once at the end.
     void refreshAllProgress(int done, int total, const QString& playlistName);
     void refreshAllFinished(int succeeded, int failed);

@@ -28,6 +28,9 @@
 #include "../data/ResumeRepository.h"
 #include "../data/ContentTypeDetector.h"
 #include <QSettings>
+#ifdef Q_OS_WIN
+#include <windows.h>
+#endif
 
 static AppController *s_instance = nullptr;
 
@@ -179,6 +182,31 @@ void AppController::exitFullscreen(bool wasMaximized, qreal x, qreal y, qreal wi
         win->setWindowState(Qt::WindowNoState);
         win->setGeometry(int(x), int(y), int(width), int(height));
     }
+}
+
+void AppController::setAlwaysOnTop(bool enabled) {
+    QWindow *win = QGuiApplication::focusWindow();
+    if (!win) {
+        // Fall back to the first top-level window (e.g. when triggered
+        // while the window doesn't have keyboard focus).
+        const auto windows = QGuiApplication::topLevelWindows();
+        if (windows.isEmpty()) return;
+        win = windows.first();
+    }
+
+#ifdef Q_OS_WIN
+    // Same technique VLC uses on Windows: flip the TOPMOST band directly
+    // via SetWindowPos. Unlike toggling Qt::WindowStaysOnTopHint (which
+    // changes window flags and can briefly recreate/flash the native
+    // window), this is a single instant operation with no visual glitch.
+    HWND hwnd = reinterpret_cast<HWND>(win->winId());
+    SetWindowPos(hwnd,
+                 enabled ? HWND_TOPMOST : HWND_NOTOPMOST,
+                 0, 0, 0, 0,
+                 SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE);
+#else
+    win->setFlag(Qt::WindowStaysOnTopHint, enabled);
+#endif
 }
 
 int AppController::ensureHistoryPlaylist() {
@@ -412,6 +440,38 @@ void AppController::openM3uFile(const QString& fileUrlOrPath) {
     } else {
         emit m3uFileOpened(QStringLiteral("History"));
     }
+}
+
+bool AppController::isLocalVideoFile(const QString& fileUrlOrPath) const {
+    QString localPath = fileUrlOrPath;
+    if (localPath.startsWith("file:", Qt::CaseInsensitive)) {
+        localPath = QUrl(localPath).toLocalFile();
+    }
+    return ChannelViewModel::isVideoFile(localPath);
+}
+
+void AppController::openLocalVideo(const QString& fileUrlOrPath) {
+    // Accept both file:/// URLs (FileDialog / drag&drop) and plain paths
+    // (double-clicked file passed on the command line).
+    QString localPath = fileUrlOrPath;
+    if (localPath.startsWith("file:", Qt::CaseInsensitive)) {
+        localPath = QUrl(localPath).toLocalFile();
+    }
+
+    QFileInfo info(localPath);
+    if (!info.exists() || !ChannelViewModel::isVideoFile(localPath)) {
+        qWarning() << "Local video not found or unsupported:" << localPath;
+        return;
+    }
+
+    // Local videos are deliberately NOT saved to History — only m3u entries
+    // and direct links belong there. Instead, load the sibling videos of the
+    // file's folder into the shared channel model so the player's playlist
+    // panel / Next / Previous navigate within that folder.
+    if (m_channelViewModel) {
+        m_channelViewModel->loadLocalFolder(info.absoluteFilePath());
+    }
+    emit localVideoReady(info.absoluteFilePath(), info.completeBaseName());
 }
 
 void AppController::onSyncTimerFired() {
