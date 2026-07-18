@@ -332,6 +332,14 @@ Rectangle {
                 contentItem: Text { text: parent.text; color: "#FFFFFF"; font.pixelSize: 14; padding: 12 }
                 onClicked: { backupMenu.close(); importBackupDialog.open(); }
             }
+            
+            Button {
+                Layout.fillWidth: true
+                text: "Load Demo Data"
+                background: Rectangle { color: parent.hovered ? "#333333" : "#2A2A2A"; radius: 8 }
+                contentItem: Text { text: parent.text; color: "#FFFFFF"; font.pixelSize: 14; padding: 12 }
+                onClicked: { backupMenu.close(); AppController.loadDemoData(); }
+            }
 
             Text {
                 text: "Restoring replaces all current playlists and settings."

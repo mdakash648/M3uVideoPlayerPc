@@ -112,6 +112,7 @@ qt_add_qml_module(${PROJECT_NAME}
         src/ui/components/ResumeFab.qml
     RESOURCES
         src/assets/icon-512.png
+        src/assets/demo_data.json
 )
 
 target_include_directories(${PROJECT_NAME} PRIVATE

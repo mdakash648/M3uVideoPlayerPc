@@ -754,6 +754,25 @@ bool AppController::clearHistory() {
     return true;
 }
 
+bool AppController::getAndSetDemoPromptShown() {
+    QSettings store;
+    bool shown = store.value("App/demoPromptShown", false).toBool();
+    if (!shown) {
+        store.setValue("App/demoPromptShown", true);
+    }
+    return shown;
+}
+
+bool AppController::loadDemoData() {
+    // Pass the QRC path directly to importBackup.
+    // The toLocalPath helper handles "file:" urls but leaves ":/" paths untouched.
+    bool success = importBackup(":/M3uVideoPlayer/src/assets/demo_data.json");
+    if (success) {
+        emit restoreFinished(true, QStringLiteral("Demo data loaded"));
+    }
+    return success;
+}
+
 // ===== Playback resume =====
 
 void AppController::backfillContentTypes() {

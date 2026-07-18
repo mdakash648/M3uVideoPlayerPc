@@ -60,6 +60,10 @@ public:
     // Deletes everything inside the History playlist (groups + channels).
     // The playlist row itself stays — it's recreated on demand anyway.
     Q_INVOKABLE bool clearHistory();
+    
+    // ===== Demo Data =====
+    Q_INVOKABLE bool loadDemoData();
+    Q_INVOKABLE bool getAndSetDemoPromptShown();
 
     // ===== Playback resume =====
     // Movie/series resume point for the Continue / Start Over dialog.
