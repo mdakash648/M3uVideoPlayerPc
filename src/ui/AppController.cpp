@@ -2,6 +2,7 @@
 #include <QDebug>
 #include <QGuiApplication>
 #include <QWindow>
+#include <QClipboard>
 #include <QScreen>
 #include <QUrl>
 #include <QFileInfo>
@@ -45,6 +46,7 @@ AppController::AppController(QObject *parent)
 }
 
 AppController::~AppController() {
+    if (m_posterFetchService) delete m_posterFetchService;
     if (m_channelViewModel) delete m_channelViewModel;
     if (m_groupViewModel) delete m_groupViewModel;
     if (m_playlistViewModel) delete m_playlistViewModel;
@@ -79,6 +81,12 @@ void AppController::init() {
         m_playlistViewModel = new PlaylistViewModel(m_playlistRepo, m_channelRepo, this);
         m_groupViewModel = new GroupViewModel(m_channelRepo, this);
         m_channelViewModel = new ChannelViewModel(m_channelRepo, this);
+
+        // Auto Movie Poster (OMDb): fetches missing tvg-logo/poster images
+        // for movie/series entries. On by default; only actually runs once
+        // the user pastes an OMDb API key into Settings.
+        m_posterFetchService = new Infrastructure::PosterFetchService(m_settings, m_channelRepo, this);
+        m_playlistViewModel->setPosterFetching(m_posterFetchService, m_settings);
 
         // Old databases have everything typed LIVE — re-detect once so the
         // resume logic can tell movies/series from live TV.
@@ -119,6 +127,13 @@ void AppController::init() {
 
     // Start periodic timer
     m_syncTimer->start();
+}
+
+QString AppController::getClipboardText() const {
+    if (auto clip = QGuiApplication::clipboard()) {
+        return clip->text();
+    }
+    return QString();
 }
 
 void AppController::triggerBackgroundSync() {
@@ -255,6 +270,11 @@ std::optional<Domain::Channel> AppController::importIntoHistory(const Data::Pars
         }
     }
 
+    if (m_posterFetchService && m_settings && m_settings->autoPosterFetchEnabled()
+        && !m_settings->omdbApiKey().trimmed().isEmpty()) {
+        m_posterFetchService->fetchPostersForPlaylist(historyId, /*onlyMissing=*/true);
+    }
+
     return first;
 }
 
@@ -386,8 +406,12 @@ void AppController::openM3uFile(const QString& fileUrlOrPath) {
         qWarning() << "No channels found in" << localPath;
         return;
     }
-    importIntoHistory(parsed);
-    emit m3uFileOpened(QStringLiteral("History"));
+    const auto first = importIntoHistory(parsed);
+    if (first) {
+        emit directLinkReady(first->streamUrl, first->name, first->referer, first->userAgent);
+    } else {
+        emit m3uFileOpened(QStringLiteral("History"));
+    }
 }
 
 void AppController::onSyncTimerFired() {
@@ -443,6 +467,13 @@ QString toLocalPath(const QString& fileUrlOrPath) {
     }
     return fileUrlOrPath;
 }
+}
+
+void AppController::fetchPostersForAllPlaylists() {
+    if (!m_posterFetchService || !m_playlistRepo) return;
+    for (const auto& p : m_playlistRepo->getAllPlaylists()) {
+        m_posterFetchService->fetchPostersForPlaylist(p.id, /*onlyMissing=*/true);
+    }
 }
 
 void AppController::refreshAllPlaylists() {

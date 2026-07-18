@@ -74,6 +74,11 @@ void PlaylistViewModel::loadPlaylists() {
     endResetModel();
 }
 
+void PlaylistViewModel::setPosterFetching(Infrastructure::PosterFetchService* posterFetcher, Infrastructure::SettingsManager* settings) {
+    m_posterFetcher = posterFetcher;
+    m_settings = settings;
+}
+
 void PlaylistViewModel::deletePlaylist(int id) {
     if (m_playlistRepo) {
         if (m_playlistRepo->deletePlaylist(id)) {
@@ -184,6 +189,14 @@ void PlaylistViewModel::fetchAndStoreAsync(int playlistId, const QString& url, b
             if (auto p = m_playlistRepo->getPlaylistById(playlistId)) {
                 p->lastUpdated = QDateTime::currentDateTime();
                 m_playlistRepo->updatePlaylist(*p);
+            }
+
+            // Auto Movie Poster: fetch missing tvg-logo/poster for any new
+            // movie/series entries from OMDb, if the user has it turned on
+            // and has set an API key in Settings.
+            if (m_posterFetcher && m_settings && m_settings->autoPosterFetchEnabled()
+                && !m_settings->omdbApiKey().trimmed().isEmpty()) {
+                m_posterFetcher->fetchPostersForPlaylist(playlistId, /*onlyMissing=*/true);
             }
         } else if (deleteOnFailure) {
             // Don't leave an empty playlist behind on a failed initial add

@@ -83,6 +83,8 @@ Rectangle {
                 ListElement { icon: "↥";  title: "Export History Playlist"; subtitle: "Save your direct links history as an m3u file";              type: "exportHistory" }
                 ListElement { icon: "↧";  title: "Import History Playlist"; subtitle: "Load a modified history m3u file";                           type: "importHistory" }
                 ListElement { icon: "🕒"; title: "Time Zone";               subtitle: "";                                                           type: "timezone" }
+                ListElement { icon: "🎬"; title: "Auto Movie Poster";       subtitle: "Automatically fetch missing movie/series posters from OMDb"; type: "posterAuto" }
+                ListElement { icon: "🔑"; title: "OMDb API Key";            subtitle: "Required for Auto Movie Poster — free key at omdbapi.com";   type: "omdbKey" }
                 ListElement { icon: "▦";  title: "Grid View Columns";       subtitle: "Items per row in grid view folders and channels";            type: "gridColumns" }
                 ListElement { icon: "▤";  title: "Poster View Columns";     subtitle: "Items per row in poster view";                               type: "posterColumns" }
                 ListElement { icon: "⏱";  title: "Controller Timeout";      subtitle: "How long the player controls stay on screen before hiding";  type: "timeout" }
@@ -102,6 +104,11 @@ Rectangle {
                     importHistoryDialog.open();
                 } else if (rowType === "timezone") {
                     timeZoneDialog.open();
+                } else if (rowType === "posterAuto") {
+                    posterAutoMenu.open();
+                } else if (rowType === "omdbKey") {
+                    omdbKeyField.text = AppController.settings.omdbApiKey;
+                    omdbKeyMenu.open();
                 }
             }
 
@@ -189,7 +196,11 @@ Rectangle {
                         Text {
                             text: model.type === "timezone"
                                   ? AppController.settings.timeZoneLabel
-                                  : model.subtitle
+                                  : model.type === "posterAuto"
+                                    ? (AppController.settings.autoPosterFetchEnabled ? "ON — fetching automatically" : "OFF")
+                                    : model.type === "omdbKey"
+                                      ? (AppController.settings.omdbApiKey.length > 0 ? "Key saved ✓" : model.subtitle)
+                                      : model.subtitle
                             color: "#AAAAAA"
                             font.pixelSize: 12
                             elide: Text.ElideRight
@@ -328,6 +339,171 @@ Rectangle {
                 font.pixelSize: 11
                 Layout.margins: 8
             }
+        }
+    }
+
+    // ===== Auto Movie Poster =====
+    Popup {
+        id: posterAutoMenu
+        anchors.centerIn: parent
+        width: 380
+        modal: true
+        focus: true
+        background: Rectangle { color: "#1E1E1E"; radius: 12; border.color: "#333333" }
+
+        ColumnLayout {
+            anchors.fill: parent
+            anchors.margins: 16
+            spacing: 12
+
+            Text {
+                text: "Auto Movie Poster"
+                color: "#FFD54F"
+                font.pixelSize: 17
+                font.bold: true
+            }
+
+            Text {
+                text: "নতুন প্লেলিস্ট যোগ করলে, movie/series-এর মধ্যে যেগুলোর poster (tvg-logo) নেই, সেগুলোর জন্য OMDb থেকে অটো poster খুঁজে বসিয়ে দেওয়া হবে।"
+                color: "#AAAAAA"
+                font.pixelSize: 12
+                wrapMode: Text.WordWrap
+                Layout.fillWidth: true
+            }
+
+            RowLayout {
+                Layout.fillWidth: true
+                Text {
+                    text: "Auto-fetch on/off"
+                    color: "#FFFFFF"
+                    font.pixelSize: 14
+                    Layout.fillWidth: true
+                }
+                Switch {
+                    checked: AppController.settings.autoPosterFetchEnabled
+                    onToggled: AppController.settings.autoPosterFetchEnabled = checked
+                }
+            }
+
+            Text {
+                visible: AppController.settings.omdbApiKey.length === 0
+                text: "⚠️ আগে OMDb API Key বসান, তা না হলে poster fetch হবে না।"
+                color: "#FFB74D"
+                font.pixelSize: 11
+                wrapMode: Text.WordWrap
+                Layout.fillWidth: true
+            }
+
+            Text {
+                visible: AppController.posterFetcher.running
+                text: AppController.posterFetcher.statusText
+                color: "#4FC3F7"
+                font.pixelSize: 12
+                wrapMode: Text.WordWrap
+                Layout.fillWidth: true
+            }
+
+            Button {
+                Layout.fillWidth: true
+                enabled: AppController.settings.omdbApiKey.length > 0 && !AppController.posterFetcher.running
+                text: AppController.posterFetcher.running ? "Fetching…" : "🖼️ Fetch Missing Posters Now"
+                background: Rectangle { color: parent.hovered ? "#333333" : "#2A2A2A"; radius: 8 }
+                contentItem: Text {
+                    text: parent.text; color: parent.enabled ? "#FFFFFF" : "#777777"
+                    font.pixelSize: 14; padding: 12
+                    horizontalAlignment: Text.AlignHCenter
+                }
+                onClicked: {
+                    root.showToast("Fetching missing posters from OMDb…");
+                    AppController.fetchPostersForAllPlaylists();
+                }
+            }
+
+            Button {
+                Layout.fillWidth: true
+                visible: AppController.posterFetcher.running
+                text: "⏹️ Stop"
+                background: Rectangle { color: parent.hovered ? "#442222" : "#331A1A"; radius: 8 }
+                contentItem: Text { text: parent.text; color: "#FF8A80"; font.pixelSize: 14; padding: 12; horizontalAlignment: Text.AlignHCenter }
+                onClicked: AppController.posterFetcher.stop()
+            }
+        }
+    }
+
+    // ===== OMDb API Key =====
+    Popup {
+        id: omdbKeyMenu
+        anchors.centerIn: parent
+        width: 380
+        modal: true
+        focus: true
+        background: Rectangle { color: "#1E1E1E"; radius: 12; border.color: "#333333" }
+
+        ColumnLayout {
+            anchors.fill: parent
+            anchors.margins: 16
+            spacing: 10
+
+            Text {
+                text: "OMDb API Key"
+                color: "#FFD54F"
+                font.pixelSize: 17
+                font.bold: true
+            }
+
+            Text {
+                text: "<a href=\"https://www.omdbapi.com/apikey.aspx\" style=\"color: #4FC3F7;\">www.omdbapi.com/apikey.aspx</a> থেকে একটা ফ্রি key নিয়ে এখানে বসান।"
+                color: "#AAAAAA"
+                font.pixelSize: 12
+                wrapMode: Text.WordWrap
+                Layout.fillWidth: true
+                textFormat: Text.RichText
+                onLinkActivated: function(link) { Qt.openUrlExternally(link) }
+                
+                MouseArea {
+                    anchors.fill: parent
+                    acceptedButtons: Qt.NoButton
+                    cursorShape: parent.hoveredLink ? Qt.PointingHandCursor : Qt.ArrowCursor
+                }
+            }
+
+            TextField {
+                id: omdbKeyField
+                Layout.fillWidth: true
+                placeholderText: "OMDb API key"
+                color: "#FFFFFF"
+                background: Rectangle { color: "#2A2A2A"; radius: 6; border.color: "#444444" }
+            }
+
+            RowLayout {
+                Layout.fillWidth: true
+                spacing: 8
+                Button {
+                    Layout.fillWidth: true
+                    text: "Save"
+                    background: Rectangle { color: parent.hovered ? "#FFCA28" : "#FFD54F"; radius: 8 }
+                    contentItem: Text { text: parent.text; color: "#121212"; font.pixelSize: 14; font.bold: true; padding: 12; horizontalAlignment: Text.AlignHCenter }
+                    onClicked: {
+                        AppController.settings.omdbApiKey = omdbKeyField.text;
+                        omdbKeyMenu.close();
+                        root.showToast("OMDb API key saved");
+                    }
+                }
+                Button {
+                    Layout.fillWidth: true
+                    text: "Cancel"
+                    background: Rectangle { color: parent.hovered ? "#333333" : "#2A2A2A"; radius: 8 }
+                    contentItem: Text { text: parent.text; color: "#FFFFFF"; font.pixelSize: 14; padding: 12; horizontalAlignment: Text.AlignHCenter }
+                    onClicked: omdbKeyMenu.close()
+                }
+            }
+        }
+    }
+
+    Connections {
+        target: AppController.posterFetcher
+        function onBatchFinished(playlistId, found, total) {
+            root.showToast("Poster fetch: " + found + "/" + total + " এ poster পাওয়া গেছে");
         }
     }
 

@@ -9,6 +9,16 @@ Rectangle {
 
     signal playRequested(string streamUrl, string referer, string userAgent)
 
+    Component.onCompleted: checkClipboard()
+    onVisibleChanged: if (visible) checkClipboard()
+
+    function checkClipboard() {
+        var text = AppController.getClipboardText().trim();
+        if ((text.startsWith("http://") || text.startsWith("https://")) && urlInput.text === "") {
+            urlInput.text = text;
+        }
+    }
+
     ColumnLayout {
         anchors.centerIn: parent
         width: Math.min(600, parent.width * 0.8)

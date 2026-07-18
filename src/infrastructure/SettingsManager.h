@@ -26,6 +26,10 @@ class SettingsManager : public QObject {
     Q_PROPERTY(QString timeZoneId READ timeZoneId WRITE setTimeZoneId NOTIFY timeZoneChanged)
     // Human readable label of the effective zone, e.g. "UTC+06:00 — Asia/Dhaka"
     Q_PROPERTY(QString timeZoneLabel READ timeZoneLabel NOTIFY timeZoneChanged)
+    // User's own OMDb API key (https://www.omdbapi.com/apikey.aspx), used for auto poster fetch
+    Q_PROPERTY(QString omdbApiKey READ omdbApiKey WRITE setOmdbApiKey NOTIFY omdbApiKeyChanged)
+    // Master on/off switch for automatically fetching missing movie/series posters from OMDb
+    Q_PROPERTY(bool autoPosterFetchEnabled READ autoPosterFetchEnabled WRITE setAutoPosterFetchEnabled NOTIFY autoPosterFetchEnabledChanged)
 
 public:
     explicit SettingsManager(QObject *parent = nullptr);
@@ -46,6 +50,12 @@ public:
     void setTimeZoneId(const QString& ianaId);
 
     QString timeZoneLabel() const;
+
+    QString omdbApiKey() const { return m_omdbApiKey; }
+    void setOmdbApiKey(const QString& key);
+
+    bool autoPosterFetchEnabled() const { return m_autoPosterFetchEnabled; }
+    void setAutoPosterFetchEnabled(bool enabled);
 
     // The zone all app time calculations should use (manual pick, or the
     // system zone while in auto mode).
@@ -69,6 +79,8 @@ signals:
     void controllerTimeoutChanged();
     void timeZoneChanged();
     void autoDetectFinished(bool success, const QString& zoneId);
+    void omdbApiKeyChanged();
+    void autoPosterFetchEnabledChanged();
 
 private:
     static QString offsetLabel(const QTimeZone& tz);
@@ -81,6 +93,8 @@ private:
     double m_controllerTimeout = 3.0;
     bool m_timeZoneAuto = true;
     QString m_timeZoneId;
+    QString m_omdbApiKey;
+    bool m_autoPosterFetchEnabled = true;
 };
 
 } // namespace Infrastructure

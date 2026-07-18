@@ -622,6 +622,15 @@ Item {
             }
         }
 
+        // Block mouse/wheel events from falling through to the video player
+        MouseArea {
+            anchors.fill: parent
+            hoverEnabled: true
+            onWheel: function(wheel) { wheel.accepted = true; }
+            onClicked: function(mouse) { mouse.accepted = true; }
+            onPressed: function(mouse) { mouse.accepted = true; }
+        }
+
         // Panel Header
         ColumnLayout {
             anchors.fill: parent
@@ -821,7 +830,17 @@ Item {
                             id: subMenu
                             y: -height - 10
                             MenuItem { text: "Subtitles"; enabled: false }
-                            MenuItem { text: "Off" }
+                            MenuItem {
+                                text: "Off"
+                                onTriggered: videoPlayer.setTrack("sub", -1)
+                            }
+                            Repeater {
+                                model: videoPlayer.subtitleTracks
+                                MenuItem {
+                                    text: (modelData.lang ? "[" + modelData.lang + "] " : "") + (modelData.title ? modelData.title : ("Track " + modelData.id))
+                                    onTriggered: videoPlayer.setTrack("sub", modelData.id)
+                                }
+                            }
                         }
                     }
                     

@@ -1,4 +1,5 @@
 #include "SettingsManager.h"
+#include <QRegularExpression>
 #include <QNetworkRequest>
 #include <QNetworkReply>
 #include <QJsonDocument>
@@ -19,6 +20,8 @@ SettingsManager::SettingsManager(QObject *parent)
     m_controllerTimeout = m_store.value("Player/controllerTimeout", 3.0).toDouble();
     m_timeZoneAuto = m_store.value("TimeZone/auto", true).toBool();
     m_timeZoneId = m_store.value("TimeZone/id", QString()).toString();
+    m_omdbApiKey = m_store.value("Poster/omdbApiKey", QString()).toString();
+    m_autoPosterFetchEnabled = m_store.value("Poster/autoFetchEnabled", true).toBool();
 }
 
 void SettingsManager::setGridColumns(int columns) {
@@ -60,6 +63,27 @@ void SettingsManager::setTimeZoneId(const QString& ianaId) {
     m_timeZoneId = ianaId;
     m_store.setValue("TimeZone/id", ianaId);
     emit timeZoneChanged();
+}
+
+void SettingsManager::setOmdbApiKey(const QString& key) {
+    // Users sometimes paste the full OMDb URL instead of just the key.
+    QString cleaned = key.trimmed();
+    const QRegularExpression re("[?&]apikey=([^&\\s]+)", QRegularExpression::CaseInsensitiveOption);
+    const auto match = re.match(cleaned);
+    if (match.hasMatch()) cleaned = match.captured(1);
+    cleaned = cleaned.trimmed();
+
+    if (cleaned == m_omdbApiKey) return;
+    m_omdbApiKey = cleaned;
+    m_store.setValue("Poster/omdbApiKey", cleaned);
+    emit omdbApiKeyChanged();
+}
+
+void SettingsManager::setAutoPosterFetchEnabled(bool enabled) {
+    if (enabled == m_autoPosterFetchEnabled) return;
+    m_autoPosterFetchEnabled = enabled;
+    m_store.setValue("Poster/autoFetchEnabled", enabled);
+    emit autoPosterFetchEnabledChanged();
 }
 
 QTimeZone SettingsManager::effectiveTimeZone() const {
@@ -150,6 +174,7 @@ QVariantMap SettingsManager::toMap() const {
     m["controllerTimeout"] = m_controllerTimeout;
     m["timeZoneAuto"] = m_timeZoneAuto;
     m["timeZoneId"] = m_timeZoneId;
+    m["autoPosterFetchEnabled"] = m_autoPosterFetchEnabled;
     return m;
 }
 
@@ -159,6 +184,7 @@ void SettingsManager::applyMap(const QVariantMap& map) {
     if (map.contains("controllerTimeout")) setControllerTimeout(map["controllerTimeout"].toDouble());
     if (map.contains("timeZoneId")) setTimeZoneId(map["timeZoneId"].toString());
     if (map.contains("timeZoneAuto")) setTimeZoneAuto(map["timeZoneAuto"].toBool());
+    if (map.contains("autoPosterFetchEnabled")) setAutoPosterFetchEnabled(map["autoPosterFetchEnabled"].toBool());
 }
 
 } // namespace Infrastructure

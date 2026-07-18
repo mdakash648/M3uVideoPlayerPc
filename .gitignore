@@ -41,6 +41,8 @@ _deps/
 
 # Build Directories
 build/
+M3uVideoPlayerPc_Release/
+Installer/
 build-*/
 out/
 bin/

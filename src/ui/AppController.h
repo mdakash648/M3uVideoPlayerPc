@@ -6,6 +6,7 @@
 #include <optional>
 #include "../infrastructure/TrustedTimeSource.h"
 #include "../infrastructure/SettingsManager.h"
+#include "../infrastructure/PosterFetchService.h"
 #include "../data/DatabaseManager.h"
 #include "../data/M3uParser.h"
 #include "../data/ResumeRepository.h"
@@ -20,6 +21,7 @@ class AppController : public QObject {
     Q_PROPERTY(GroupViewModel* groupViewModel READ groupViewModel CONSTANT)
     Q_PROPERTY(ChannelViewModel* channelViewModel READ channelViewModel CONSTANT)
     Q_PROPERTY(Infrastructure::SettingsManager* settings READ settings CONSTANT)
+    Q_PROPERTY(Infrastructure::PosterFetchService* posterFetcher READ posterFetcher CONSTANT)
 
 public:
     explicit AppController(QObject *parent = nullptr);
@@ -28,6 +30,7 @@ public:
     static AppController* create(QQmlEngine *qmlEngine, QJSEngine *jsEngine);
 
     Q_INVOKABLE void init();
+    Q_INVOKABLE QString getClipboardText() const;
     Q_INVOKABLE void triggerBackgroundSync();
     Q_INVOKABLE void enterFullscreen();
     Q_INVOKABLE void exitFullscreen(bool wasMaximized, qreal x, qreal y, qreal width, qreal height);
@@ -78,6 +81,11 @@ public:
     GroupViewModel* groupViewModel() const { return m_groupViewModel; }
     ChannelViewModel* channelViewModel() const { return m_channelViewModel; }
     Infrastructure::SettingsManager* settings() const { return m_settings; }
+    Infrastructure::PosterFetchService* posterFetcher() const { return m_posterFetchService; }
+
+    // Manual "Fetch Posters Now" action for the Settings page — queues a
+    // poster-fetch pass for every non-History playlist.
+    Q_INVOKABLE void fetchPostersForAllPlaylists();
 
 signals:
     void syncStarted();
@@ -119,6 +127,7 @@ private:
     Data::DatabaseManager* m_dbManager;
     Infrastructure::TrustedTimeSource* m_timeSource;
     Infrastructure::SettingsManager* m_settings;
+    Infrastructure::PosterFetchService* m_posterFetchService = nullptr;
     QTimer* m_syncTimer;
 
     Data::PlaylistRepository* m_playlistRepo = nullptr;

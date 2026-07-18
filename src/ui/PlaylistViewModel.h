@@ -7,6 +7,8 @@
 #include "../domain/Playlist.h"
 #include "../data/PlaylistRepository.h"
 #include "../data/ChannelRepository.h"
+#include "../infrastructure/SettingsManager.h"
+#include "../infrastructure/PosterFetchService.h"
 
 class PlaylistViewModel : public QAbstractListModel {
     Q_OBJECT
@@ -40,6 +42,12 @@ public:
                                         int updateFrequency,
                                         const QString& username, const QString& password);
 
+    // Called once from AppController::init() after both dependencies exist.
+    // When set, a successful add/refresh automatically queues a
+    // fetchPostersForPlaylist() pass (only if the user has turned the
+    // feature on and set an OMDb API key).
+    void setPosterFetching(Infrastructure::PosterFetchService* posterFetcher, Infrastructure::SettingsManager* settings);
+
 signals:
     void addPlaylistStarted();
     void addPlaylistFinished(bool success, const QString& message);
@@ -56,5 +64,7 @@ private:
 
     Data::PlaylistRepository* m_playlistRepo;
     Data::ChannelRepository* m_channelRepo;
+    Infrastructure::PosterFetchService* m_posterFetcher = nullptr;
+    Infrastructure::SettingsManager* m_settings = nullptr;
     QList<Domain::Playlist> m_playlists;
 };

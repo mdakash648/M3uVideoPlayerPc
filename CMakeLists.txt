@@ -66,6 +66,8 @@ set(SOURCES
     src/infrastructure/TrustedTimeSource.cpp
     src/infrastructure/TimeZoneManager.cpp
     src/infrastructure/SettingsManager.cpp
+    src/infrastructure/PosterFetchService.h
+    src/infrastructure/PosterFetchService.cpp
     src/infrastructure/player/MpvVideoItem.cpp
     src/ui/PlaylistViewModel.h
     src/ui/PlaylistViewModel.cpp
