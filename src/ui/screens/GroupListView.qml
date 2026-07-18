@@ -23,6 +23,8 @@ Rectangle {
     signal groupOpened(int groupId, string groupName)
     signal allChannelsOpened()
     signal favoritesOpened()
+    // Floating play button: resume the playlist's last-played video
+    signal resumeRequested(var resume)
 
     function focusHeader() {
         backBtn.forceActiveFocus();
@@ -40,7 +42,10 @@ Rectangle {
 
     Keys.onEscapePressed: root.backRequested()
 
-    StackView.onActivated: focusMain()
+    StackView.onActivated: {
+        focusMain();
+        resumeFab.refresh(); // a play session may have updated the resume row
+    }
 
     onPlaylistIdChanged: {
         if (playlistId !== -1) {
@@ -62,7 +67,9 @@ Rectangle {
                 text: "← Back"
                 focus: true
                 KeyNavigation.right: viewToggle
-                background: Rectangle { 
+                Keys.onReturnPressed: backBtn.clicked()
+                Keys.onEnterPressed: backBtn.clicked()
+                background: Rectangle {
                     color: "transparent"
                     implicitWidth: 60
                     implicitHeight: 30
@@ -133,7 +140,10 @@ Rectangle {
             focus: visible
             KeyNavigation.up: backBtn
 
-            cellWidth: Math.floor(width / 3)
+            // Settings → Grid View Columns (0 = Auto → 4 per row)
+            readonly property int settingsColumns: AppController.settings.gridColumns > 0
+                                                   ? AppController.settings.gridColumns : 4
+            cellWidth: Math.floor(width / settingsColumns)
             cellHeight: 140
 
             add: Transition {
@@ -357,5 +367,15 @@ Rectangle {
                 }
             }
         }
+    }
+
+    // MX-Player-style floating "resume last played" button
+    ResumeFab {
+        id: resumeFab
+        anchors.right: parent.right
+        anchors.bottom: parent.bottom
+        anchors.margins: 28
+        playlistId: root.playlistId
+        onPlayRequested: (resume) => root.resumeRequested(resume)
     }
 }

@@ -25,6 +25,7 @@ public:
     std::vector<Domain::Channel> getChannelsByPlaylistId(int playlistId) override;
     int getChannelCountByPlaylistId(int playlistId) override;
     std::vector<Domain::Channel> searchChannels(const QString& query) override;
+    bool deleteContentByPlaylistId(int playlistId) override;
     
     // Favorites
     bool setFavorite(int channelId, bool isFavorite) override;

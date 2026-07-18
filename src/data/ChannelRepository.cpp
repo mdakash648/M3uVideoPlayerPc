@@ -8,6 +8,23 @@ namespace Data {
 
 ChannelRepository::ChannelRepository(QSqlDatabase db) : m_db(db) {}
 
+bool ChannelRepository::deleteContentByPlaylistId(int playlistId) {
+    QSqlQuery query(m_db);
+    query.prepare("DELETE FROM Channels WHERE playlistId = :playlistId");
+    query.bindValue(":playlistId", playlistId);
+    if (!query.exec()) {
+        qWarning() << "Failed to delete channels for playlist:" << query.lastError().text();
+        return false;
+    }
+    query.prepare("DELETE FROM Groups WHERE playlistId = :playlistId");
+    query.bindValue(":playlistId", playlistId);
+    if (!query.exec()) {
+        qWarning() << "Failed to delete groups for playlist:" << query.lastError().text();
+        return false;
+    }
+    return true;
+}
+
 // Groups
 bool ChannelRepository::insertGroup(Domain::Group& group) {
     QSqlQuery query(m_db);

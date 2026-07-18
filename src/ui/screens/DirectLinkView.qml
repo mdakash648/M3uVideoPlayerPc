@@ -1,10 +1,12 @@
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
+import QtQuick.Dialogs
+import M3uVideoPlayer
 
 Rectangle {
     color: "#121212"
-    
+
     signal playRequested(string streamUrl, string referer, string userAgent)
 
     ColumnLayout {
@@ -87,7 +89,7 @@ Rectangle {
             text: "Play Stream"
             Layout.alignment: Qt.AlignHCenter
             Layout.topMargin: 10
-            
+
             background: Rectangle {
                 color: "#FFD54F"
                 radius: 8
@@ -102,12 +104,69 @@ Rectangle {
                 horizontalAlignment: Text.AlignHCenter
                 verticalAlignment: Text.AlignVCenter
             }
-            
+
             onClicked: {
                 if (urlInput.text.trim() !== "") {
                     playRequested(urlInput.text.trim(), refererInput.text.trim(), userAgentInput.text.trim());
                 }
             }
         }
+
+        // ----- Or import a local playlist file -----
+        RowLayout {
+            Layout.fillWidth: true
+            Layout.topMargin: 10
+            spacing: 12
+
+            Rectangle { Layout.fillWidth: true; height: 1; color: "#333333" }
+            Text {
+                text: qsTr("OR")
+                color: "#777777"
+                font.pixelSize: 12
+                font.bold: true
+            }
+            Rectangle { Layout.fillWidth: true; height: 1; color: "#333333" }
+        }
+
+        Button {
+            id: openFileBtn
+            text: qsTr("Open M3U / M3U8 File…")
+            Layout.alignment: Qt.AlignHCenter
+
+            background: Rectangle {
+                color: openFileBtn.hovered ? "#2A2A2A" : "#1E1E1E"
+                radius: 8
+                border.color: "#FFD54F"
+                border.width: 1
+                implicitWidth: 220
+                implicitHeight: 45
+            }
+            contentItem: Text {
+                text: openFileBtn.text
+                color: "#FFD54F"
+                font.bold: true
+                font.pixelSize: 15
+                horizontalAlignment: Text.AlignHCenter
+                verticalAlignment: Text.AlignVCenter
+            }
+
+            onClicked: m3uFileDialog.open()
+        }
+
+        Text {
+            text: qsTr("All videos from the file will be added to the \"History\" playlist (keeping their group, referer and user-agent).")
+            color: "#777777"
+            font.pixelSize: 12
+            wrapMode: Text.WordWrap
+            Layout.fillWidth: true
+            horizontalAlignment: Text.AlignHCenter
+        }
+    }
+
+    FileDialog {
+        id: m3uFileDialog
+        title: qsTr("Select an M3U playlist file")
+        nameFilters: ["M3U playlists (*.m3u *.m3u8)", "All files (*)"]
+        onAccepted: AppController.openM3uFile(selectedFile.toString())
     }
 }

@@ -48,6 +48,8 @@ Rectangle {
                     id: addPlaylistBtn
                     text: "Add Playlist"
                     focus: true
+                    Keys.onReturnPressed: addPlaylistBtn.clicked()
+                    Keys.onEnterPressed: addPlaylistBtn.clicked()
                     background: Rectangle {
                         color: "#FF8800"
                         radius: 4
@@ -192,27 +194,8 @@ Rectangle {
                                     font.pixelSize: 12
                                 }
                             }
-                            
-                            Button {
-                                id: deleteBtn
-                                implicitWidth: 32
-                                implicitHeight: 32
-                                background: Rectangle {
-                                    color: deleteBtn.hovered ? "#44FF0000" : "transparent"
-                                    radius: 16
-                                }
-                                contentItem: Text {
-                                    text: "✕"
-                                    color: deleteBtn.hovered ? "#FF6666" : "#dec1ae"
-                                    font.pixelSize: 16
-                                    font.bold: true
-                                    horizontalAlignment: Text.AlignHCenter
-                                    verticalAlignment: Text.AlignVCenter
-                                }
-                                onClicked: {
-                                    AppController.playlistViewModel.deletePlaylist(model.id);
-                                }
-                            }
+                            // Playlist deletion intentionally lives only in
+                            // Settings → Playlists — no delete button here.
                         }
                     }
                 }

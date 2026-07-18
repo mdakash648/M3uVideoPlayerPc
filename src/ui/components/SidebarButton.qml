@@ -6,10 +6,14 @@ Button {
     id: control
     property string iconName: ""
     property bool isCollapsed: false
-    
+
     height: 45
-    
+
     padding: 0
+
+    // QtQuick Button fires on Space by default; make Enter/Return work too.
+    Keys.onReturnPressed: control.clicked()
+    Keys.onEnterPressed: control.clicked()
     
     background: Rectangle {
         color: (control.hovered || control.activeFocus) ? "#222222" : "transparent"
@@ -39,7 +43,6 @@ Button {
         switch (name) {
             case "list": return "☰"
             case "link": return "∞"
-            case "history": return "⟲"
             case "settings": return "⚙"
             default: return "▪"
         }

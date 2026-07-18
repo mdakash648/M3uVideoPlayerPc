@@ -117,6 +117,20 @@ MpvVideoItem::MpvVideoItem(QQuickItem *parent)
     mpv_set_option_string(m_mpv, "vo", "libmpv");
     mpv_set_option_string(m_mpv, "audio-channels", "auto-safe");
 
+    // Precise seeking: without this, relative seeks (+10s) snap to the
+    // nearest keyframe, which in files with sparse keyframes can land right
+    // back at the pre-seek position ("+10s jumps back" bug).
+    mpv_set_option_string(m_mpv, "hr-seek", "yes");
+
+    // Network cache: lets mpv seek within already-downloaded data instantly
+    // and keeps recently played data for backwards seeks.
+    mpv_set_option_string(m_mpv, "cache", "yes");
+    mpv_set_option_string(m_mpv, "demuxer-max-bytes", "256MiB");
+    mpv_set_option_string(m_mpv, "demuxer-max-back-bytes", "128MiB");
+
+    // Allow volume up to 200% (default is 130)
+    mpv_set_option_string(m_mpv, "volume-max", "200");
+
     if (mpv_initialize(m_mpv) < 0) {
         throw std::runtime_error("could not initialize mpv context");
     }
@@ -222,10 +236,36 @@ void MpvVideoItem::handleMpvEvent() {
                 break;
             }
             case MPV_EVENT_FILE_LOADED:
+                // One-shot resume seek: applied only when the file is fully
+                // loaded (seeking earlier via time-pos is silently dropped).
+                if (m_startPosition > 0) {
+                    double val = m_startPosition;
+                    mpv_set_property(m_mpv, "time-pos", MPV_FORMAT_DOUBLE, &val);
+                    m_startPosition = 0;
+                    emit startPositionChanged();
+                }
+                Q_FALLTHROUGH();
             case MPV_EVENT_PLAYBACK_RESTART: {
                 if (m_loading) {
                     m_loading = false;
                     emit loadingChanged();
+                }
+                break;
+            }
+            case MPV_EVENT_END_FILE: {
+                mpv_event_end_file *ef = static_cast<mpv_event_end_file *>(event->data);
+                if (m_loading) {
+                    m_loading = false;
+                    emit loadingChanged();
+                }
+                // MPV_END_FILE_REASON_ERROR covers network failures (403,
+                // timeouts, unsupported format...). Let QML decide fallback.
+                if (ef && ef->reason == MPV_END_FILE_REASON_ERROR) {
+                    emit playbackFailed(QString::fromUtf8(mpv_error_string(ef->error)));
+                } else if (ef && ef->reason == MPV_END_FILE_REASON_EOF) {
+                    // Natural end of the video — used by the resume system to
+                    // clear the saved position and auto-play the next item.
+                    emit endReached();
                 }
                 break;
             }
@@ -294,6 +334,17 @@ int MpvVideoItem::volume() const {
 void MpvVideoItem::setVolume(int volume) {
     double val = volume;
     mpv_set_property(m_mpv, "volume", MPV_FORMAT_DOUBLE, &val);
+}
+
+int MpvVideoItem::startPosition() const {
+    return m_startPosition;
+}
+
+void MpvVideoItem::setStartPosition(int seconds) {
+    if (m_startPosition != seconds) {
+        m_startPosition = seconds > 0 ? seconds : 0;
+        emit startPositionChanged();
+    }
 }
 
 QString MpvVideoItem::userAgent() const {

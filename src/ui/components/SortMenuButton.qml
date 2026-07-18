@@ -33,6 +33,9 @@ Button {
 
     onClicked: sortMenu.open()
 
+    Keys.onReturnPressed: root.clicked()
+    Keys.onEnterPressed: root.clicked()
+
     Menu {
         id: sortMenu
         y: root.height

@@ -1,4 +1,5 @@
 #include "M3uParser.h"
+#include "ContentTypeDetector.h"
 #include <QFile>
 #include <QTextStream>
 #include <QRegularExpression>
@@ -19,6 +20,46 @@ ParseResult M3uParser::parseFile(const QString& filePath, int playlistId) {
     return parse(content, playlistId);
 }
 
+QString M3uParser::detectSeriesName(const QString& title) {
+    // Patterns that mark a series episode. The series name is whatever comes
+    // BEFORE the first episode marker:
+    //   "Loki S01E02"            -> "Loki"
+    //   "Loki S01 E02"           -> "Loki"
+    //   "Bachelor.Point.S05E101" -> "Bachelor Point"
+    //   "Dark Season 2 Episode 1"-> "Dark"
+    //   "Friends 5x12"           -> "Friends"
+    //   "Some Show EP 07"        -> "Some Show"
+    static const QRegularExpression markers[] = {
+        QRegularExpression(R"((.+?)[\s._-]+S\d{1,2}[\s._-]*E\d{1,4}\b)",
+                           QRegularExpression::CaseInsensitiveOption),
+        QRegularExpression(R"((.+?)[\s._-]+Season[\s._-]*\d{1,2}\b)",
+                           QRegularExpression::CaseInsensitiveOption),
+        QRegularExpression(R"((.+?)[\s._-]+\d{1,2}x\d{1,4}\b)",
+                           QRegularExpression::CaseInsensitiveOption),
+        QRegularExpression(R"((.+?)[\s._-]+EP?[\s._-]*\d{1,4}\b)",
+                           QRegularExpression::CaseInsensitiveOption),
+    };
+
+    for (const auto& re : markers) {
+        const auto m = re.match(title);
+        if (!m.hasMatch()) continue;
+
+        QString name = m.captured(1);
+        // Strip leading tags like "[Fibwatch.Com]" and normalize separators
+        static const QRegularExpression bracketTag(R"(^\s*[\[(][^\])]*[\])]\s*)");
+        name.remove(bracketTag);
+        name.replace(QRegularExpression(R"([._-]+)"), " ");
+        name = name.simplified();
+
+        // A plausible series name: non-empty and not itself just a number
+        static const QRegularExpression onlyDigits(R"(^\d+$)");
+        if (!name.isEmpty() && !onlyDigits.match(name).hasMatch()) {
+            return name;
+        }
+    }
+    return QString();
+}
+
 ParseResult M3uParser::parse(const QString& m3uContent, int playlistId) {
     ParseResult result;
     QMap<QString, int> groupMap; // map group name to groupId
@@ -28,6 +69,7 @@ ParseResult M3uParser::parse(const QString& m3uContent, int playlistId) {
     
     Domain::Channel currentChannel;
     currentChannel.playlistId = playlistId;
+    QString currentGroupName;
     bool inChannelInfo = false;
     
     // Regular expressions for attributes
@@ -47,7 +89,7 @@ ParseResult M3uParser::parse(const QString& m3uContent, int playlistId) {
             inChannelInfo = true;
             currentChannel = Domain::Channel();
             currentChannel.playlistId = playlistId;
-            currentChannel.type = Domain::ContentType::LIVE; // Default, could be derived from group or URL later
+            currentChannel.type = Domain::ContentType::UNKNOWN; // Resolved once the URL is known
             
             // Extract attributes
             auto match = tvgIdRegex.match(tline);
@@ -72,12 +114,31 @@ ParseResult M3uParser::parse(const QString& m3uContent, int playlistId) {
                 if (match.hasMatch()) currentChannel.userAgent = match.captured(1);
             }
             
-            QString groupName = "Uncategorized";
-            match = groupTitleRegex.match(tline);
-            if (match.hasMatch()) {
-                groupName = match.captured(1);
+            // Extract channel name (after the last comma) — needed below to
+            // derive a series group when the file has no group-title
+            int commaIndex = tline.lastIndexOf(',');
+            if (commaIndex != -1 && commaIndex + 1 < tline.length()) {
+                currentChannel.name = tline.mid(commaIndex + 1).trimmed();
+            } else {
+                currentChannel.name = "Unknown Channel";
             }
-            
+
+            QString groupName;
+            match = groupTitleRegex.match(tline);
+            if (match.hasMatch() && !match.captured(1).trimmed().isEmpty()) {
+                // Explicit group-title in the file wins
+                groupName = match.captured(1);
+            } else {
+                // No group-title: web-series episodes ("Loki S01E02") get
+                // their own group named after the series; everything else
+                // defaults to "Movie".
+                const QString series = detectSeriesName(currentChannel.name);
+                groupName = series.isEmpty() ? QStringLiteral("Movie") : series;
+                if (!series.isEmpty()) {
+                    currentChannel.type = Domain::ContentType::SERIES;
+                }
+            }
+
             // Handle group
             if (!groupMap.contains(groupName)) {
                 Domain::Group newGroup;
@@ -89,15 +150,8 @@ ParseResult M3uParser::parse(const QString& m3uContent, int playlistId) {
                 groupMap[groupName] = newGroup.id;
             }
             currentChannel.groupId = groupMap[groupName];
-            
-            // Extract channel name (after the last comma)
-            int commaIndex = tline.lastIndexOf(',');
-            if (commaIndex != -1 && commaIndex + 1 < tline.length()) {
-                currentChannel.name = tline.mid(commaIndex + 1).trimmed();
-            } else {
-                currentChannel.name = "Unknown Channel";
-            }
-        } 
+            currentGroupName = groupName;
+        }
         else if (tline.startsWith("#EXTVLCOPT:http-referrer=", Qt::CaseInsensitive)) {
             int idx = tline.indexOf('=');
             if (idx != -1) currentChannel.referer = tline.mid(idx + 1).trimmed();
@@ -109,6 +163,10 @@ ParseResult M3uParser::parse(const QString& m3uContent, int playlistId) {
         else if (!tline.startsWith("#") && inChannelInfo) {
             // This is likely the stream URL
             extractHttpHeaders(tline, currentChannel);
+            if (currentChannel.type != Domain::ContentType::SERIES) {
+                currentChannel.type = ContentTypeDetector::detect(
+                    currentChannel.name, currentChannel.streamUrl, currentGroupName);
+            }
             currentChannel.orderIndex = result.channels.size();
             result.channels.push_back(currentChannel);
             inChannelInfo = false;

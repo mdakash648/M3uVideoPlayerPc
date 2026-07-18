@@ -127,6 +127,48 @@ bool DatabaseManager::createTables() {
         success = false;
     }
 
+    // Per-movie resume points (Continue / Start Over). Keyed by streamUrl
+    // because channel ids are re-created on every playlist refresh.
+    QString createMovieResume = R"(
+        CREATE TABLE IF NOT EXISTS MovieResume (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            playlistId INTEGER NOT NULL,
+            groupId INTEGER,
+            groupTitle TEXT,
+            streamUrl TEXT NOT NULL UNIQUE,
+            title TEXT,
+            positionMs INTEGER DEFAULT 0,
+            durationMs INTEGER DEFAULT 0,
+            lastPlayedAt TEXT
+        )
+    )";
+    if (!query.exec(createMovieResume)) {
+        qWarning() << "Failed to create MovieResume table:" << query.lastError().text();
+        success = false;
+    }
+
+    // Last-played item per playlist for the floating play button.
+    // Live TV rows keep positionMs = 0 (channel-only resume, no time skip).
+    QString createPlaylistResume = R"(
+        CREATE TABLE IF NOT EXISTS PlaylistResume (
+            playlistId INTEGER PRIMARY KEY,
+            groupId INTEGER,
+            groupTitle TEXT,
+            streamUrl TEXT NOT NULL,
+            title TEXT,
+            referer TEXT,
+            userAgent TEXT,
+            contentType INTEGER DEFAULT 3,
+            positionMs INTEGER DEFAULT 0,
+            durationMs INTEGER DEFAULT 0,
+            lastPlayedAt TEXT
+        )
+    )";
+    if (!query.exec(createPlaylistResume)) {
+        qWarning() << "Failed to create PlaylistResume table:" << query.lastError().text();
+        success = false;
+    }
+
     // Enable foreign key constraints
     query.exec("PRAGMA foreign_keys = ON;");
 

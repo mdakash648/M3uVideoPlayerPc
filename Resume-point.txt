@@ -1,0 +1,18 @@
+add auto resume system.
+
+i want 2 palyback resume system. 
+-1. direct video resume (work only specific movie)
+-2. resume across palylist all movies
+
+
+আমি দুইটা reaume-এর জন্য দুইটা  database table চাই। একটা database-এর ভিতরে দুইটা resume-এর data রাখবে না। আর এই Resume-এর লজিক শুধুমাত্র movie এবং web series যেগুলো end point আছে বা fixed video, এই ধরনের ভিডিওর ক্ষেত্রে কাজ করবে। Live TV বা live show ইত্যাদির জন্য Resume লজিক কাজ করবে না। তবে "last channel" resume করার জন্য "without time skip system" অপশনটি ব্যবহার করবে। 
+
+Note: Live TV, movie এবং web series detect করার যদি কোন feature বা function না থাকে, আমি চাই এই function টি add করো, যাতে বিভিন্ন কাজে আমি এটি ব্যবহার করতে পারি। এবং এই data গুলো Channels টেবিলের ভেতরে store করবে। 
+
+১. প্রথম database table এর ভেতরে তুমি Movie এর Playlist ID, Movie URL এবং Folder বা Group Title, current position এবং end position ইত্যাদি সবগুলো ডেটা সেভ রাখবে। এতে করে, যখন user একটি movie একবার দেখার পর পুনরায় দেখার জন্য ক্লিক করবে, তখন user এর সামনে একটি model খুলবে। user ওই model থেকে "Start Over" অথবা "Continue" ক্লিক করে সেই movie টি প্রথম থেকে অথবা আগে যেখানে শেষ করে রেখেছিল, সেখান থেকে দেখতে পারবে। এই ফিচারটি শুধুমাত্র movie  বা Web series এর ক্ষেত্রে কাজে লাগবে। কোন প্রকার লাইভ টিভির ক্ষেত্রে এটি কাজে লাগবে না। 
+
+
+২. এই সিস্টেমের জন্য তুমি আলাদা একটি database table ব্যবহার করবে । এই playlist এর ভিতরে তুমি playlist ID, URL, folder, ইত্যাদি সবগুলো data store করে রাখবে। এই feature টি ব্যবহার করার জন্য folder এবং folder content বা channel page এর ভিতরে একটি floating play icon থাকবে। হুবহু MX Player এর মতন ওই floating play icon এর ভেতর click করলে automatic last play video with time skip open হয়ে যাবে। ধরো, ইউজার "Iron Man" মুভিটি 50.10 মিনিট দেখেছে। তারপর সে তার অ্যাপস ক্লোজ করে দিয়ে। তা পরবর্তীতে, যখন সে অ্যাপটি ওপেন করে flotimg play আইকনে ক্লিক করবে, তখন অটোমেটিক ওই মুভিটি 50.10 min  জায়গায় থেকে শুরু হবে। তবে একেবারে হুবহু সেকেন্ড অনুযায়ী মিল না হলেও চলবে। resume point পাঁচ থেকে দশ সেকেন্ড কম বা বেশি হলে সমস্যা নেই। তবে চেষ্টা করবে যাতে অ্যাপের পারফরম্যান্সও ঠিক থাকে এবং মিনিট ও সেকেন্ডগুলো যাতে ম্যাক্সিমাম একুরেট করা যায়। এই Resume Point-টি শুধু Movie মনে রাখবে না, বরং Movie-র সাথে কোন Folder থেকে Movie-টি Open করা হয়েছিল তাও মনে রাখবে। এতে করে User Movie-টি Open করার পর তার পরবর্তী Movie বা Previous Movieগুলো Next এবং Previous button ব্যবহার করে Open করতে পারবে।  আর live TV-র ক্ষেত্রে এই optionটি শুধুমাত্র channel open-এর জন্য কাজ করবে। যদি live TV হয়, তাহলে database-এর ভেতরে live TV-র কোনো resume point বা skip second minute store করবে না। Live TV সবসময় start থেকে play হবে। 
+
+
+আমি যদি কোনো information দিতে "miss" করে থাকি, তাহলে আমাকে প্রশ্ন করো। আমি বুঝিয়ে বলব।

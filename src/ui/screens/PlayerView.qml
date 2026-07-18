@@ -14,6 +14,18 @@ Item {
     property bool playlistOpen: false
     signal backRequested()
 
+    // ===== Playback resume =====
+    // Context pushed by the opener; playlistId <= 0 disables progress saving
+    // (e.g. direct links). channelType gates live-vs-VOD behavior.
+    property real resumePositionMs: 0
+    property int channelType: 3        // Domain::ContentType (LIVE=0/MOVIE=1/SERIES=2/UNKNOWN=3)
+    property int playlistId: 0
+    property int groupId: 0
+    property string groupTitle: ""
+    // The channel's own URL — quality switching rewrites streamUrl, but
+    // resume rows must stay keyed by the original playlist URL.
+    property string canonicalUrl: ""
+
     // Keyboard control state
     property int seekStep: 10          // Current seek increment (accelerates on hold)
     property bool seekingLeft: false
@@ -25,6 +37,107 @@ Item {
     property real prevWidth: 0
     property real prevHeight: 0
     property bool isFullscreen: false
+
+    // ===== Quality switching =====
+    // Detects a "1080P/720p/480P" token in the URL and rewrites it to switch
+    // quality. triedUrls tracks what's been attempted for auto-fallback.
+    property var triedUrls: []
+
+    function detectQuality(url) {
+        var m = url.match(/(1080|720|480)[pP]/);
+        return m ? m[1] : "";
+    }
+
+    function urlForQuality(url, q) {
+        return url.replace(/(1080|720|480)([pP])/, q + "$2");
+    }
+
+    function startStream(url) {
+        root.streamUrl = url;
+        videoPlayer.mediaUrl = url;
+        videoPlayer.playing = true;
+    }
+
+    // ===== Resume progress saving =====
+    // Live TV: only the channel is remembered (positionMs stays 0).
+    // Movies/series: position saved every 5s + on close/switch; cleared and
+    // auto-advanced once playback passes ~95% or hits the end of file.
+    property bool isVod: (root.channelType === 1 || root.channelType === 2) // MOVIE || SERIES
+
+    function saveResumeProgress() {
+        if (root.playlistId <= 0 || root.canonicalUrl === "") return;
+        var posMs = videoPlayer.position * 1000;
+        var durMs = videoPlayer.duration * 1000;
+        if (root.isVod && durMs > 0 && posMs / durMs >= 0.95) {
+            // Watched to the end — next open starts fresh
+            AppController.clearMovieResume(root.canonicalUrl);
+            AppController.saveProgress(root.playlistId, root.groupId, root.groupTitle,
+                                       root.canonicalUrl, root.streamTitle,
+                                       root.streamReferer, root.streamUserAgent,
+                                       root.channelType, 0, durMs);
+            return;
+        }
+        AppController.saveProgress(root.playlistId, root.groupId, root.groupTitle,
+                                   root.canonicalUrl, root.streamTitle,
+                                   root.streamReferer, root.streamUserAgent,
+                                   root.channelType, posMs, durMs);
+    }
+
+    Timer {
+        id: progressSaveTimer
+        interval: 5000
+        repeat: true
+        running: videoPlayer.playing && root.playlistId > 0
+        onTriggered: root.saveResumeProgress()
+    }
+
+    Connections {
+        target: videoPlayer
+        function onEndReached() {
+            if (!root.isVod) return; // live streams ending is a stall, not a finish
+            if (root.canonicalUrl !== "") {
+                AppController.clearMovieResume(root.canonicalUrl);
+            }
+            // Auto-play the next episode/movie in the folder, if any
+            var idx = AppController.channelViewModel.findIndexByUrl(root.canonicalUrl);
+            var total = AppController.channelViewModel.rowCount();
+            if (idx >= 0 && idx < total - 1) {
+                osdOverlay.show("⏭ Next");
+                root.playChannel(idx + 1);
+            }
+        }
+    }
+
+    function setQuality(q) {
+        var cand = urlForQuality(root.streamUrl, q);
+        if (cand === root.streamUrl) return;
+        root.triedUrls = [cand]; // manual pick restarts the fallback chain
+        osdOverlay.show(q + "p");
+        startStream(cand);
+    }
+
+    // Auto-fallback: if the current URL fails, try the other qualities
+    // (1080 → 720 → 480), skipping any URL already attempted.
+    Connections {
+        target: videoPlayer
+        function onPlaybackFailed(reason) {
+            if (root.detectQuality(root.streamUrl) === "") {
+                osdOverlay.show("⚠ Playback error");
+                return;
+            }
+            var order = ["1080", "720", "480"];
+            for (var i = 0; i < order.length; i++) {
+                var cand = root.urlForQuality(root.streamUrl, order[i]);
+                if (root.triedUrls.indexOf(cand) === -1) {
+                    root.triedUrls.push(cand);
+                    osdOverlay.show("⚠ Failed — trying " + order[i] + "p…");
+                    root.startStream(cand);
+                    return;
+                }
+            }
+            osdOverlay.show("⚠ All qualities failed");
+        }
+    }
 
     focus: true  // Enable keyboard input
 
@@ -144,7 +257,7 @@ Item {
             break;
 
         case Qt.Key_Up:
-            videoPlayer.volume = Math.min(videoPlayer.volume + 5, 130);
+            videoPlayer.volume = Math.min(videoPlayer.volume + 5, 200);
             osdOverlay.show("🔊 " + videoPlayer.volume + "%");
             break;
 
@@ -225,29 +338,60 @@ Item {
         var userAgent = AppController.channelViewModel.channelUserAgent(index);
 
         if (url !== "") {
+            // Persist the outgoing video's position before switching
+            root.saveResumeProgress();
+
             root.streamTitle = name;
             // Update root properties (the MpvVideoItem binds to these) BEFORE
             // the URL, so headers are already applied when loading starts.
             root.streamReferer = referer !== undefined ? referer : "";
             root.streamUserAgent = userAgent !== undefined ? userAgent : "";
-            root.streamUrl = url;
-            videoPlayer.mediaUrl = url;
-            videoPlayer.playing = true;
+            root.canonicalUrl = url;
+            root.channelType = AppController.channelViewModel.channelType(index);
+            // Movies/series resume from their saved point; live starts live.
+            var resume = root.isVod ? AppController.getMovieResume(url) : { found: false };
+            videoPlayer.startPosition = resume.found ? Math.floor(resume.positionMs / 1000) : 0;
+            root.triedUrls = [url];
+            root.startStream(url);
         }
     }
 
     function playPrevious() {
-        var idx = AppController.channelViewModel.findIndexByUrl(root.streamUrl);
+        var idx = AppController.channelViewModel.findIndexByUrl(root.canonicalUrl);
         if (idx > 0) {
             playChannel(idx - 1);
         }
     }
 
     function playNext() {
-        var idx = AppController.channelViewModel.findIndexByUrl(root.streamUrl);
+        var idx = AppController.channelViewModel.findIndexByUrl(root.canonicalUrl);
         var total = AppController.channelViewModel.rowCount();
         if (idx >= 0 && idx < total - 1) {
             playChannel(idx + 1);
+        }
+    }
+
+    // ===== Auto-hide controls =====
+    // Controls (top bar + bottom control center) hide after 3s of no mouse
+    // activity. Mouse movement shows them again; keyboard use does NOT.
+    property bool controlsVisible: true
+
+    function showControls() {
+        root.controlsVisible = true;
+        controlsHideTimer.restart();
+    }
+
+    Timer {
+        id: controlsHideTimer
+        // Settings → Controller Timeout (0.5s .. 10s)
+        interval: Math.round(AppController.settings.controllerTimeout * 1000)
+        onTriggered: {
+            // Don't hide while the cursor is resting on the controls
+            if (topBarHover.hovered || bottomBarHover.hovered) {
+                controlsHideTimer.restart();
+            } else {
+                root.controlsVisible = false;
+            }
         }
     }
 
@@ -256,12 +400,29 @@ Item {
         anchors.fill: parent
         referer: root.streamReferer
         userAgent: root.streamUserAgent
-        
+
         MouseArea {
             anchors.fill: parent
+            hoverEnabled: true
+            // Hide the cursor together with the controls (but keep it while
+            // hovering the playlist hot-zone, where only that button shows)
+            cursorShape: root.controlsVisible || playlistZoneHover.hovered ? Qt.ArrowCursor : Qt.BlankCursor
+            onPositionChanged: {
+                // Moving over the playlist hot-zone reveals only the playlist
+                // button — don't wake the full control set from there.
+                if (!playlistZoneHover.hovered)
+                    root.showControls();
+            }
             onClicked: {
+                root.showControls();
                 videoPlayer.playing = !videoPlayer.playing
                 root.forceActiveFocus()
+            }
+            // Mouse wheel = volume up/down
+            onWheel: function(wheel) {
+                var step = wheel.angleDelta.y > 0 ? 5 : -5;
+                videoPlayer.volume = Math.max(0, Math.min(videoPlayer.volume + step, 200));
+                osdOverlay.show("🔊 " + videoPlayer.volume + "%");
             }
         }
 
@@ -286,6 +447,9 @@ Item {
         font.letterSpacing: 2.0
         z: 20
         style: Text.Outline; styleColor: "#80000000"
+        opacity: root.controlsVisible ? 1.0 : 0.0
+        visible: opacity > 0
+        Behavior on opacity { NumberAnimation { duration: 250 } }
     }
 
     Text {
@@ -296,16 +460,30 @@ Item {
         color: "#88FFFFFF"
         font.pixelSize: 10
         z: 20
+        opacity: root.controlsVisible ? 1.0 : 0.0
+        visible: opacity > 0
+        Behavior on opacity { NumberAnimation { duration: 250 } }
     }
     
-    // Top Bar Floating
+    // Top Bar Floating (back button only — playlist button lives in its own
+    // layer below so it can appear without waking the full control set)
     RowLayout {
         anchors.top: parent.top
         anchors.left: parent.left
-        anchors.right: parent.right
         anchors.margins: 24
         z: 20
-        
+
+        // Auto-hide: fade with controlsVisible, ignore clicks when hidden
+        opacity: root.controlsVisible ? 1.0 : 0.0
+        visible: opacity > 0
+        enabled: root.controlsVisible
+        Behavior on opacity { NumberAnimation { duration: 250 } }
+
+        HoverHandler {
+            id: topBarHover
+            onHoveredChanged: if (hovered) root.showControls()
+        }
+
         // Back Button
         Button {
             id: backBtn
@@ -326,38 +504,60 @@ Item {
             }
             onClicked: root.backRequested()
         }
-        
-        Item { Layout.fillWidth: true } // Spacer
-        
-        // Playlist Button
-        Button {
-            id: playlistBtn
-            implicitHeight: 48
-            background: Rectangle {
-                color: root.playlistOpen ? "#ff8800" : (playlistBtn.hovered ? "#2e3540" : "#992e3540")
-                radius: 24
-                border.color: root.playlistOpen ? "#ff8800" : "#33c2c6d2"
-                border.width: 1
-            }
-            contentItem: RowLayout {
-                spacing: 8
-                Text {
-                    text: "≡"
-                    color: root.playlistOpen ? "#2f1400" : (playlistBtn.hovered ? "#ffb781" : "#dce3f0")
-                    font.pixelSize: 20
-                }
-                Text {
-                    text: "PLAYLIST"
-                    color: root.playlistOpen ? "#2f1400" : (playlistBtn.hovered ? "#ffb781" : "#dce3f0")
-                    font.pixelSize: 14
-                    font.bold: true
-                    font.letterSpacing: 1.0
-                }
-            }
-            leftPadding: 16
-            rightPadding: 20
-            onClicked: root.playlistOpen = !root.playlistOpen
+    }
+
+    // Playlist hot-zone: hovering the top-right corner reveals ONLY the
+    // playlist button, even while the rest of the controls stay hidden.
+    Item {
+        anchors.top: parent.top
+        anchors.right: parent.right
+        width: 240
+        height: 100
+        z: 20
+
+        HoverHandler {
+            id: playlistZoneHover
         }
+    }
+
+    // Playlist Button — own layer so it can show independently of the bars
+    Button {
+        id: playlistBtn
+        anchors.top: parent.top
+        anchors.right: parent.right
+        anchors.margins: 24
+        implicitHeight: 48
+        z: 21
+
+        opacity: (root.controlsVisible || playlistZoneHover.hovered) ? 1.0 : 0.0
+        visible: opacity > 0
+        enabled: root.controlsVisible || playlistZoneHover.hovered
+        Behavior on opacity { NumberAnimation { duration: 250 } }
+
+        background: Rectangle {
+            color: root.playlistOpen ? "#ff8800" : (playlistBtn.hovered ? "#2e3540" : "#992e3540")
+            radius: 24
+            border.color: root.playlistOpen ? "#ff8800" : "#33c2c6d2"
+            border.width: 1
+        }
+        contentItem: RowLayout {
+            spacing: 8
+            Text {
+                text: "≡"
+                color: root.playlistOpen ? "#2f1400" : (playlistBtn.hovered ? "#ffb781" : "#dce3f0")
+                font.pixelSize: 20
+            }
+            Text {
+                text: "PLAYLIST"
+                color: root.playlistOpen ? "#2f1400" : (playlistBtn.hovered ? "#ffb781" : "#dce3f0")
+                font.pixelSize: 14
+                font.bold: true
+                font.letterSpacing: 1.0
+            }
+        }
+        leftPadding: 16
+        rightPadding: 20
+        onClicked: root.playlistOpen = !root.playlistOpen
     }
 
     // ========== PLAYLIST PANEL (slide from right) ==========
@@ -407,7 +607,7 @@ Item {
 
                 Text {
                     text: {
-                        var idx = AppController.channelViewModel.findIndexByUrl(root.streamUrl);
+                        var idx = AppController.channelViewModel.findIndexByUrl(root.canonicalUrl);
                         var total = AppController.channelViewModel.rowCount();
                         if (idx >= 0) {
                             return (idx + 1) + " / " + total;
@@ -446,7 +646,7 @@ Item {
                 // Auto-scroll to current channel when panel opens
                 onVisibleChanged: {
                     if (visible) {
-                        var idx = AppController.channelViewModel.findIndexByUrl(root.streamUrl);
+                        var idx = AppController.channelViewModel.findIndexByUrl(root.canonicalUrl);
                         if (idx >= 0) {
                             playlistListView.positionViewAtIndex(idx, ListView.Center);
                         }
@@ -457,7 +657,7 @@ Item {
                     id: channelDelegate
                     width: playlistListView.width
                     height: 56
-                    property bool isCurrent: model.streamUrl === root.streamUrl
+                    property bool isCurrent: model.streamUrl === root.canonicalUrl
                     color: isCurrent ? "#33ff8800" : (channelMouse.containsMouse ? "#1Ac2c6d2" : "transparent")
 
                     RowLayout {
@@ -538,6 +738,17 @@ Item {
         anchors.bottomMargin: 24
         height: 100
         z: 30
+
+        // Auto-hide: fade with controlsVisible, ignore clicks when hidden
+        opacity: root.controlsVisible ? 1.0 : 0.0
+        visible: opacity > 0
+        enabled: root.controlsVisible
+        Behavior on opacity { NumberAnimation { duration: 250 } }
+
+        HoverHandler {
+            id: bottomBarHover
+            onHoveredChanged: if (hovered) root.showControls()
+        }
         
         // Glassmorphic Panel
         Rectangle {
@@ -592,6 +803,43 @@ Item {
                                 MenuItem {
                                     text: (modelData.lang ? "[" + modelData.lang + "] " : "") + (modelData.title ? modelData.title : ("Track " + modelData.id))
                                     onTriggered: videoPlayer.setTrack("audio", modelData.id)
+                                }
+                            }
+                        }
+                    }
+
+                    // Quality Button — only shown when the URL has a
+                    // recognizable 1080p/720p/480p token to rewrite.
+                    Button {
+                        id: qualityBtn
+                        visible: root.detectQuality(root.streamUrl) !== ""
+                        implicitHeight: 40
+                        leftPadding: 12
+                        rightPadding: 12
+                        background: Rectangle {
+                            color: qualityBtn.hovered ? "#232a35" : "transparent"
+                            radius: 20
+                            border.color: "#33c2c6d2"
+                            border.width: 1
+                        }
+                        contentItem: Text {
+                            text: root.detectQuality(root.streamUrl) + "p ▾"
+                            color: qualityBtn.hovered ? "#dce3f0" : "#dec1ae"
+                            font.pixelSize: 13
+                            font.bold: true
+                            horizontalAlignment: Text.AlignHCenter
+                            verticalAlignment: Text.AlignVCenter
+                        }
+                        onClicked: qualityMenu.open()
+                        Menu {
+                            id: qualityMenu
+                            y: -height - 10
+                            MenuItem { text: "Quality"; enabled: false }
+                            Repeater {
+                                model: ["1080", "720", "480"]
+                                MenuItem {
+                                    text: modelData + "p" + (root.detectQuality(root.streamUrl) === modelData ? "   ✓" : "")
+                                    onTriggered: root.setQuality(modelData)
                                 }
                             }
                         }
@@ -756,7 +1004,7 @@ Item {
                     Slider {
                         id: volSlider
                         from: 0
-                        to: 130
+                        to: 200
                         value: videoPlayer.volume
                         Layout.preferredWidth: 80
                         onMoved: {
@@ -805,8 +1053,19 @@ Item {
     }
     
     Component.onCompleted: {
+        if (root.canonicalUrl === "") root.canonicalUrl = root.streamUrl;
+        // Resume seek is applied by MpvVideoItem once the file has loaded
+        if (root.resumePositionMs > 0) {
+            videoPlayer.startPosition = Math.floor(root.resumePositionMs / 1000);
+        }
+        root.triedUrls = [root.streamUrl];
         videoPlayer.mediaUrl = root.streamUrl
         videoPlayer.playing = true
         root.forceActiveFocus()
+    }
+
+    Component.onDestruction: {
+        // Final position save when leaving the player
+        root.saveResumeProgress();
     }
 }

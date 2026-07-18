@@ -16,11 +16,12 @@ enum class ContentType {
 Q_ENUM_NS(ContentType)
 
 enum class UpdateFrequency {
-    NEVER,
-    EVERY_STARTUP,
-    HOURLY,
-    DAILY,
-    WEEKLY
+    NEVER = 0,
+    EVERY_STARTUP = 1,
+    EVERY_6_HOURS = 2,
+    EVERY_12_HOURS = 3,
+    EVERY_3_DAYS = 4,
+    WEEKLY = 5
 };
 Q_ENUM_NS(UpdateFrequency)
 

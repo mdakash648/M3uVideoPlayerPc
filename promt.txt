@@ -1,5 +1,3 @@
-ei app ar vitore direct link ar video paly hoay. but jei sokol link direct browser ar open korle 403 forbegain error ase oi sokol video paly hoay na. fix this problem i want you add htt-reffer and agent system.
+i want update my direct link view system. 
 
-https://raw.githubusercontent.com/mdakash648/MovieM3u/refs/heads/main/playlist.m3u
-
-this is my palylist. amar palylist ar vitore video ar sathe http-rffer and user agent ache. ami cai ei app video calanor somoay palylist ar http-rffer and user agent ar data use korbe. for paly video.
+আমি চাই, ইউজার যখন ডাইরেক্ট লিঙ্কের মাধ্যমে কোনো ভিডিও প্লে করবে, তখন ওই ভিডিওটি অটোমেটিক্যালি একটি প্লেলিস্টের ভিতরে সেভ হয়ে যাবে এবং ওই প্লেলিস্টটি অটোমেটিক তৈরি হবে। ওই প্লেলিস্টের নাম হবে "History"। যদি open করা playlist-এর ভেতরে কোন group title না থাকে, তাহলে automatic by default হিসেবে movie group title সেট হবে। যদি playlist-এর ভেতরে group title সেট করা থাকে, তাহলে ওই playlist-এর group title টি অটোমেটিক বসে যাবে। Play Direct Stream-এর ভেতরে m3u ফাইল অথবা m3u8 ফাইল যোগ করার অপশন যোগ করো। User যাতে যে কোন M3U file double-click করে সরাসরি এই অ্যাপের ভেতর খুলতে পারে, ওই সিস্টেমটি অ্যাড করো। 

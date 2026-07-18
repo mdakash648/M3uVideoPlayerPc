@@ -7,7 +7,7 @@ import M3uVideoPlayer
 Popup {
     id: dialog
     width: 500
-    height: 540
+    height: 630
     modal: true
     focus: true
     anchors.centerIn: parent
@@ -20,6 +20,20 @@ Popup {
     }
     
     property int currentTab: 0 // 0: M3U, 1: Xtream Codes
+
+    // Clear every input so a freshly opened dialog never shows the previous
+    // entry's name/url/credentials.
+    function resetFields() {
+        nameField.text = "";
+        urlField.text = "";
+        xtreamUrlField.text = "";
+        usernameField.text = "";
+        passwordField.text = "";
+        updateFreqCombo.currentIndex = 0;
+        currentTab = 0;
+    }
+
+    onClosed: resetFields()
     
     ColumnLayout {
         anchors.fill: parent
@@ -218,6 +232,81 @@ Popup {
                     }
                 }
             }
+
+            // Update frequency (applies to both tabs)
+            ColumnLayout {
+                spacing: 6
+                Layout.fillWidth: true
+                Text { text: "How Often to Update"; color: "#dec1ae"; font.pixelSize: 13; font.weight: Font.Medium }
+                ComboBox {
+                    id: updateFreqCombo
+                    Layout.fillWidth: true
+                    // Model order maps to Domain::UpdateFrequency values below
+                    model: ["On application start", "Every 6 hours", "Every 12 hours", "Every 3 days", "Every week", "Never"]
+                    // enum values: EVERY_STARTUP=1, EVERY_6_HOURS=2, EVERY_12_HOURS=3, EVERY_3_DAYS=4, WEEKLY=5, NEVER=0
+                    readonly property var freqValues: [1, 2, 3, 4, 5, 0]
+                    readonly property int selectedFrequency: freqValues[currentIndex]
+                    currentIndex: 0 // default: on application start
+
+                    background: Rectangle {
+                        color: "#151c26"
+                        radius: 8
+                        implicitHeight: 44
+                        border.color: updateFreqCombo.activeFocus ? "#ff8800" : "#2C313A"
+                    }
+                    contentItem: Text {
+                        text: updateFreqCombo.displayText
+                        color: "#dce3f0"
+                        font.pixelSize: 14
+                        verticalAlignment: Text.AlignVCenter
+                        leftPadding: 16
+                        elide: Text.ElideRight
+                    }
+                    indicator: Text {
+                        x: updateFreqCombo.width - width - 16
+                        y: updateFreqCombo.topPadding + (updateFreqCombo.availableHeight - height) / 2
+                        text: "▾"
+                        color: "#dec1ae"
+                        font.pixelSize: 14
+                    }
+                    delegate: ItemDelegate {
+                        id: freqDelegate
+                        required property int index
+                        required property string modelData
+                        width: updateFreqCombo.width
+                        height: 40
+                        highlighted: updateFreqCombo.highlightedIndex === index
+                        background: Rectangle {
+                            color: freqDelegate.highlighted ? "#2e3540" : "#151c26"
+                        }
+                        contentItem: Text {
+                            text: freqDelegate.modelData
+                            color: updateFreqCombo.currentIndex === freqDelegate.index ? "#ffb781" : "#dce3f0"
+                            font.pixelSize: 14
+                            verticalAlignment: Text.AlignVCenter
+                            leftPadding: 8
+                        }
+                    }
+                    popup: Popup {
+                        y: updateFreqCombo.height + 4
+                        width: updateFreqCombo.width
+                        implicitHeight: contentItem.implicitHeight + 2
+                        padding: 1
+                        background: Rectangle {
+                            color: "#151c26"
+                            radius: 8
+                            border.color: "#2C313A"
+                            border.width: 1
+                        }
+                        contentItem: ListView {
+                            clip: true
+                            implicitHeight: contentHeight
+                            model: updateFreqCombo.popup.visible ? updateFreqCombo.delegateModel : null
+                            currentIndex: updateFreqCombo.highlightedIndex
+                        }
+                    }
+                }
+            }
         }
         
         Item { Layout.fillHeight: true } // Spacer
@@ -258,14 +347,15 @@ Popup {
                     contentItem: Text { text: parent.text; color: "#000000"; font.bold: true; font.pixelSize: 14; horizontalAlignment: Text.AlignHCenter; verticalAlignment: Text.AlignVCenter }
                     onClicked: {
                         var name = nameField.text;
+                        var freq = updateFreqCombo.selectedFrequency;
                         if (dialog.currentTab === 0) {
                             var url = urlField.text;
                             if (url.startsWith("file:///")) {
                                 url = url.replace("file:///", "");
                             }
-                            AppController.playlistViewModel.addPlaylistAsync(name, url, false, "", "");
+                            AppController.playlistViewModel.addPlaylistAsync(name, url, false, "", "", freq);
                         } else {
-                            AppController.playlistViewModel.addPlaylistAsync(name, xtreamUrlField.text, true, usernameField.text, passwordField.text);
+                            AppController.playlistViewModel.addPlaylistAsync(name, xtreamUrlField.text, true, usernameField.text, passwordField.text, freq);
                         }
                         dialog.close()
                     }

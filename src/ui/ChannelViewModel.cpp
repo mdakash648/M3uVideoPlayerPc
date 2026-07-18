@@ -24,6 +24,9 @@ QVariant ChannelViewModel::data(const QModelIndex &index, int role) const {
         case IsFavoriteRole: return channel.isFavorite;
         case RefererRole: return channel.referer;
         case UserAgentRole: return channel.userAgent;
+        case TypeRole: return static_cast<int>(channel.type);
+        case PlaylistIdRole: return channel.playlistId;
+        case GroupIdRole: return channel.groupId;
         default: return QVariant();
     }
 }
@@ -37,6 +40,9 @@ QHash<int, QByteArray> ChannelViewModel::roleNames() const {
     roles[IsFavoriteRole] = "isFavorite";
     roles[RefererRole] = "referer";
     roles[UserAgentRole] = "userAgent";
+    roles[TypeRole] = "type";
+    roles[PlaylistIdRole] = "playlistId";
+    roles[GroupIdRole] = "groupId";
     return roles;
 }
 
@@ -103,6 +109,19 @@ void ChannelViewModel::toggleFavorite(int channelId) {
         }
     }
 
+    applyFilterAndSort();
+}
+
+void ChannelViewModel::deleteChannel(int channelId) {
+    if (!m_channelRepo) return;
+    if (!m_channelRepo->deleteChannel(channelId)) return;
+
+    for (int i = 0; i < m_sourceChannels.size(); ++i) {
+        if (m_sourceChannels[i].id == channelId) {
+            m_sourceChannels.removeAt(i);
+            break;
+        }
+    }
     applyFilterAndSort();
 }
 
@@ -173,4 +192,15 @@ QString ChannelViewModel::channelReferer(int index) const {
 QString ChannelViewModel::channelUserAgent(int index) const {
     if (index < 0 || index >= m_channels.size()) return QString();
     return m_channels[index].userAgent;
+}
+
+int ChannelViewModel::channelType(int index) const {
+    if (index < 0 || index >= m_channels.size())
+        return static_cast<int>(Domain::ContentType::UNKNOWN);
+    return static_cast<int>(m_channels[index].type);
+}
+
+int ChannelViewModel::channelPlaylistId(int index) const {
+    if (index < 0 || index >= m_channels.size()) return -1;
+    return m_channels[index].playlistId;
 }

@@ -16,7 +16,10 @@ public:
         LogoUrlRole,
         IsFavoriteRole,
         RefererRole,
-        UserAgentRole
+        UserAgentRole,
+        TypeRole,
+        PlaylistIdRole,
+        GroupIdRole
     };
 
     enum SortMode {
@@ -36,6 +39,8 @@ public:
     Q_INVOKABLE void loadAllChannels(int playlistId);
     Q_INVOKABLE void loadFavorites();
     Q_INVOKABLE void toggleFavorite(int channelId);
+    // Permanently removes a channel (used by the History delete buttons).
+    Q_INVOKABLE void deleteChannel(int channelId);
     Q_INVOKABLE void setSearchQuery(const QString& query);
     Q_INVOKABLE void setSortMode(int mode);
     Q_INVOKABLE int sortMode() const { return m_sortMode; }
@@ -46,6 +51,9 @@ public:
     Q_INVOKABLE QString channelStreamUrl(int index) const;
     Q_INVOKABLE QString channelReferer(int index) const;
     Q_INVOKABLE QString channelUserAgent(int index) const;
+    // Domain::ContentType as int (LIVE=0/MOVIE=1/SERIES=2/UNKNOWN=3)
+    Q_INVOKABLE int channelType(int index) const;
+    Q_INVOKABLE int channelPlaylistId(int index) const;
 
 private:
     void applyFilterAndSort();

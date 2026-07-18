@@ -26,6 +26,8 @@ public:
     virtual std::vector<Channel> getChannelsByPlaylistId(int playlistId) = 0;
     virtual int getChannelCountByPlaylistId(int playlistId) = 0;
     virtual std::vector<Channel> searchChannels(const QString& query) = 0;
+    // Remove all groups + channels of a playlist (used before re-import)
+    virtual bool deleteContentByPlaylistId(int playlistId) = 0;
     
     // Favorites
     virtual bool setFavorite(int channelId, bool isFavorite) = 0;

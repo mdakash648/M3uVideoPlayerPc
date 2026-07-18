@@ -42,6 +42,9 @@ QVariant PlaylistViewModel::data(const QModelIndex &index, int role) const {
         case UrlRole: return playlist.url;
         case TypeRole: return playlist.isXtream();
         case LastUpdatedRole: return QVariant::fromValue(playlist.lastUpdated);
+        case UpdateFrequencyRole: return static_cast<int>(playlist.updateFrequency);
+        case UsernameRole: return playlist.username;
+        case PasswordRole: return playlist.password;
         default: return QVariant();
     }
 }
@@ -53,6 +56,9 @@ QHash<int, QByteArray> PlaylistViewModel::roleNames() const {
     roles[UrlRole] = "url";
     roles[TypeRole] = "type";
     roles[LastUpdatedRole] = "lastUpdated";
+    roles[UpdateFrequencyRole] = "updateFrequency";
+    roles[UsernameRole] = "username";
+    roles[PasswordRole] = "password";
     return roles;
 }
 
@@ -72,11 +78,32 @@ void PlaylistViewModel::deletePlaylist(int id) {
     if (m_playlistRepo) {
         if (m_playlistRepo->deletePlaylist(id)) {
             loadPlaylists(); // Refresh the list
+            emit playlistDeleted(id);
         }
     }
 }
 
-void PlaylistViewModel::addPlaylistAsync(const QString& name, const QString& url, bool isXtream, const QString& username, const QString& password) {
+bool PlaylistViewModel::updatePlaylistMeta(int id, const QString& name, const QString& url,
+                                           int updateFrequency,
+                                           const QString& username, const QString& password) {
+    if (!m_playlistRepo) return false;
+    auto playlistOpt = m_playlistRepo->getPlaylistById(id);
+    if (!playlistOpt) return false;
+
+    Domain::Playlist p = *playlistOpt;
+    if (!name.trimmed().isEmpty()) p.name = name.trimmed();
+    if (!url.trimmed().isEmpty()) p.url = url.trimmed();
+    p.updateFrequency = static_cast<Domain::UpdateFrequency>(updateFrequency);
+    p.username = username;
+    p.password = password;
+
+    if (!m_playlistRepo->updatePlaylist(p)) return false;
+    loadPlaylists();
+    return true;
+}
+
+void PlaylistViewModel::addPlaylistAsync(const QString& name, const QString& url, bool isXtream, const QString& username, const QString& password,
+                                         int updateFrequency) {
     emit addPlaylistStarted();
 
     if (!m_playlistRepo || !m_channelRepo) {
@@ -97,22 +124,44 @@ void PlaylistViewModel::addPlaylistAsync(const QString& name, const QString& url
         playlist.username = username;
         playlist.password = password;
     }
-    playlist.updateFrequency = Domain::UpdateFrequency::DAILY;
+    playlist.updateFrequency = static_cast<Domain::UpdateFrequency>(updateFrequency);
 
     if (!m_playlistRepo->insertPlaylist(playlist)) {
         emit addPlaylistFinished(false, "Failed to save playlist to database");
         return;
     }
 
-    const int playlistId = playlist.id;
-    const QString effectiveUrl = playlist.url;
+    fetchAndStoreAsync(playlist.id, playlist.url, isXtream, username, password,
+                       /*deleteOnFailure=*/true);
+}
+
+void PlaylistViewModel::refreshPlaylistAsync(int playlistId) {
+    if (!m_playlistRepo || !m_channelRepo) return;
+
+    auto playlistOpt = m_playlistRepo->getPlaylistById(playlistId);
+    if (!playlistOpt) return;
+    const Domain::Playlist& p = *playlistOpt;
+
+    fetchAndStoreAsync(p.id, p.url, p.isXtream(), p.username, p.password,
+                       /*deleteOnFailure=*/false);
+}
+
+void PlaylistViewModel::fetchAndStoreAsync(int playlistId, const QString& url, bool isXtream,
+                                           const QString& username, const QString& password,
+                                           bool deleteOnFailure) {
+    const QString effectiveUrl = url;
 
     QFutureWatcher<AddPlaylistResult>* watcher = new QFutureWatcher<AddPlaylistResult>(this);
-    connect(watcher, &QFutureWatcher<AddPlaylistResult>::finished, this, [this, watcher, playlistId]() {
+    connect(watcher, &QFutureWatcher<AddPlaylistResult>::finished, this, [this, watcher, playlistId, deleteOnFailure]() {
         watcher->deleteLater();
         AddPlaylistResult result = watcher->result();
 
         if (result.success) {
+            // Refresh: drop old content only now that the new download
+            // succeeded, so a failed update never wipes existing channels.
+            if (!deleteOnFailure) {
+                m_channelRepo->deleteContentByPlaylistId(playlistId);
+            }
             // Insert groups first so channels can reference their real DB ids
             QHash<int, int> groupIdMap; // parser temp id -> DB id
             for (auto& g : result.parseResult.groups) {
@@ -130,13 +179,23 @@ void PlaylistViewModel::addPlaylistAsync(const QString& name, const QString& url
             }
         }
 
-        if (!result.success) {
-            // Don't leave an empty playlist behind on failure
+        if (result.success) {
+            // Stamp lastUpdated so the scheduler knows when to update next
+            if (auto p = m_playlistRepo->getPlaylistById(playlistId)) {
+                p->lastUpdated = QDateTime::currentDateTime();
+                m_playlistRepo->updatePlaylist(*p);
+            }
+        } else if (deleteOnFailure) {
+            // Don't leave an empty playlist behind on a failed initial add
             m_playlistRepo->deletePlaylist(playlistId);
         }
 
         loadPlaylists();
-        emit addPlaylistFinished(result.success, result.message);
+        if (deleteOnFailure) {
+            emit addPlaylistFinished(result.success, result.message);
+        } else {
+            emit refreshFinished(playlistId, result.success, result.message);
+        }
     });
 
     // Only download + parse in the background — no DB access here

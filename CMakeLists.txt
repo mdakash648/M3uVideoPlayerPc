@@ -60,9 +60,12 @@ set(SOURCES
     src/data/PlaylistRepository.cpp
     src/data/ChannelRepository.cpp
     src/data/M3uParser.cpp
+    src/data/ContentTypeDetector.cpp
+    src/data/ResumeRepository.cpp
     src/data/XtreamApiClient.cpp
     src/infrastructure/TrustedTimeSource.cpp
     src/infrastructure/TimeZoneManager.cpp
+    src/infrastructure/SettingsManager.cpp
     src/infrastructure/player/MpvVideoItem.cpp
     src/ui/PlaylistViewModel.h
     src/ui/PlaylistViewModel.cpp
@@ -99,6 +102,12 @@ qt_add_qml_module(${PROJECT_NAME}
         src/ui/screens/GroupListView.qml
         src/ui/screens/ChannelListView.qml
         src/ui/screens/PlayerView.qml
+        src/ui/screens/SettingsView.qml
+        src/ui/screens/SettingsPlaylistsView.qml
+        src/ui/components/EditPlaylistDialog.qml
+        src/ui/components/TimeZoneDialog.qml
+        src/ui/components/ResumeDialog.qml
+        src/ui/components/ResumeFab.qml
 )
 
 target_include_directories(${PROJECT_NAME} PRIVATE

@@ -25,6 +25,7 @@ class MpvVideoItem : public QQuickFramebufferObject {
     Q_PROPERTY(int duration READ duration NOTIFY durationChanged)
     Q_PROPERTY(int position READ position WRITE setPosition NOTIFY positionChanged)
     Q_PROPERTY(int volume READ volume WRITE setVolume NOTIFY volumeChanged)
+    Q_PROPERTY(int startPosition READ startPosition WRITE setStartPosition NOTIFY startPositionChanged)
     Q_PROPERTY(QString userAgent READ userAgent WRITE setUserAgent NOTIFY userAgentChanged)
     Q_PROPERTY(QString referer READ referer WRITE setReferer NOTIFY refererChanged)
     
@@ -53,6 +54,11 @@ public:
     int volume() const;
     void setVolume(int volume);
 
+    // Seconds to seek to once the next file is loaded (one-shot: applied on
+    // FILE_LOADED and then reset so later reloads start from the beginning).
+    int startPosition() const;
+    void setStartPosition(int seconds);
+
     QString userAgent() const;
     void setUserAgent(const QString &userAgent);
 
@@ -78,10 +84,15 @@ signals:
     void durationChanged();
     void positionChanged();
     void volumeChanged();
+    void startPositionChanged();
     void userAgentChanged();
     void refererChanged();
     void tracksChanged();
     void onUpdate();
+    // Emitted when a file fails to load/play (network error, 403, bad URL...).
+    void playbackFailed(const QString &reason);
+    // Emitted when playback reaches the natural end of the file.
+    void endReached();
 
 public:
     static void on_mpv_update(void *ctx);
@@ -104,6 +115,7 @@ private:
     int m_duration = 0;
     int m_position = 0;
     int m_volume = 100;
+    int m_startPosition = 0;
     QString m_userAgent;
     QString m_referer;
 

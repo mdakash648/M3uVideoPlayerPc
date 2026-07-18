@@ -40,6 +40,8 @@ Rectangle {
                 Layout.preferredHeight: 45
                 padding: 0
                 KeyNavigation.down: btnPlaylists
+                Keys.onReturnPressed: btnMenu.clicked()
+                Keys.onEnterPressed: btnMenu.clicked()
                 background: Rectangle { 
                     color: btnMenu.activeFocus ? "#333333" : "transparent"
                     radius: 8 
@@ -90,19 +92,8 @@ Rectangle {
             iconName: "link"
             isCollapsed: root.isCollapsed
             KeyNavigation.up: btnPlaylists
-            KeyNavigation.down: btnHistory
-            onClicked: root.navigationRequested("DirectLink")
-            Layout.fillWidth: true
-        }
-
-        SidebarButton {
-            id: btnHistory
-            text: "History"
-            iconName: "history"
-            isCollapsed: root.isCollapsed
-            KeyNavigation.up: btnDirectLink
             KeyNavigation.down: btnSettings
-            onClicked: root.navigationRequested("History")
+            onClicked: root.navigationRequested("DirectLink")
             Layout.fillWidth: true
         }
 
@@ -115,7 +106,7 @@ Rectangle {
             text: "Settings"
             iconName: "settings"
             isCollapsed: root.isCollapsed
-            KeyNavigation.up: btnHistory
+            KeyNavigation.up: btnDirectLink
             onClicked: root.navigationRequested("Settings")
             Layout.fillWidth: true
         }
