@@ -32,6 +32,9 @@ static void registerM3uFileAssociation()
 
     QSettings classes("HKEY_CURRENT_USER\\Software\\Classes", QSettings::NativeFormat);
 
+    QString appDir = QFileInfo(appPath).absolutePath();
+    QString iconPath = QDir::toNativeSeparators(appDir + "/favicon.ico");
+
     // ProgID with the open command
     classes.setValue(progId + "/.", "M3U Playlist");
     classes.setValue(progId + "/DefaultIcon/.", "\"" + appPath + "\",0");
@@ -44,7 +47,17 @@ static void registerM3uFileAssociation()
             classes.setValue(ext + "/.", progId);
         }
         classes.setValue(ext + "/OpenWithProgids/" + progId, "");
+        
+        // Register under Applications to explicitly tell Windows we support these extensions
+        classes.setValue("Applications/M3uVideoPlayerPc.exe/SupportedTypes/" + ext, "");
     }
+    
+    // Set the open command for the application itself
+    classes.setValue("Applications/M3uVideoPlayerPc.exe/shell/open/command/.", "\"" + appPath + "\" \"%1\"");
+    
+    // Set FriendlyAppName and Icon so the "Open With" dialog looks nice
+    classes.setValue("Applications/M3uVideoPlayerPc.exe/FriendlyAppName", "M3U Video Player PC");
+    classes.setValue("Applications/M3uVideoPlayerPc.exe/DefaultIcon/.", "\"" + appPath + "\",0");
 }
 #endif
 

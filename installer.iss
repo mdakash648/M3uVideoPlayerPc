@@ -31,3 +31,12 @@ Name: "{autodesktop}\M3u Video Player PC"; Filename: "{app}\M3uVideoPlayerPc.exe
 [Run]
 ; Option to launch the app immediately after installation
 Filename: "{app}\M3uVideoPlayerPc.exe"; Description: "{cm:LaunchProgram,M3u Video Player PC}"; Flags: nowait postinstall skipifsilent
+
+[Registry]
+; Register the application to be available in the "Open With" list
+Root: HKCU; Subkey: "Software\Classes\Applications\M3uVideoPlayerPc.exe\SupportedTypes"; ValueType: string; ValueName: ".m3u"; ValueData: ""; Flags: uninsdeletevalue
+Root: HKCU; Subkey: "Software\Classes\Applications\M3uVideoPlayerPc.exe\SupportedTypes"; ValueType: string; ValueName: ".m3u8"; ValueData: ""; Flags: uninsdeletevalue
+Root: HKCU; Subkey: "Software\Classes\Applications\M3uVideoPlayerPc.exe\shell\open\command"; ValueType: string; ValueName: ""; ValueData: """{app}\M3uVideoPlayerPc.exe"" ""%1"""; Flags: uninsdeletekey
+; Set FriendlyAppName and Icon so the "Open With" dialog looks nice
+Root: HKCU; Subkey: "Software\Classes\Applications\M3uVideoPlayerPc.exe"; ValueType: string; ValueName: "FriendlyAppName"; ValueData: "M3U Video Player PC"; Flags: uninsdeletevalue
+Root: HKCU; Subkey: "Software\Classes\Applications\M3uVideoPlayerPc.exe\DefaultIcon"; ValueType: string; ValueName: ""; ValueData: "{app}\M3uVideoPlayerPc.exe,0"; Flags: uninsdeletekey

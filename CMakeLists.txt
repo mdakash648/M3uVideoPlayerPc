@@ -79,11 +79,23 @@ set(SOURCES
     src/ui/AppController.cpp
 )
 
+# Custom command to compile RC file manually to avoid windres space path issues
+if(WIN32)
+    add_custom_command(
+        OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/app_icon.obj"
+        COMMAND windres -i "${CMAKE_CURRENT_SOURCE_DIR}/app_icon.rc" -o "${CMAKE_CURRENT_BINARY_DIR}/app_icon.obj"
+        DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/app_icon.rc"
+    )
+    set(RC_OBJ "${CMAKE_CURRENT_BINARY_DIR}/app_icon.obj")
+else()
+    set(RC_OBJ "")
+endif()
+
 # Application executable
 if(WIN32 AND NOT CMAKE_BUILD_TYPE STREQUAL "Debug")
-    add_executable(${PROJECT_NAME} WIN32 ${SOURCES})
+    add_executable(${PROJECT_NAME} WIN32 ${SOURCES} ${RC_OBJ})
 else()
-    add_executable(${PROJECT_NAME} ${SOURCES})
+    add_executable(${PROJECT_NAME} ${SOURCES} ${RC_OBJ})
 endif()
 
 # Qt QML resource
