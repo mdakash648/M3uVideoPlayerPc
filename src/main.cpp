@@ -117,7 +117,9 @@ int main(int argc, char *argv[])
 
     // Single-instance: if another instance is already running, hand the file
     // over to it and exit — don't open a second window.
-    {
+    // If no file was passed (e.g. middle-click on taskbar icon), start a new
+    // independent instance instead of just raising the existing one.
+    if (!fileToOpen.isEmpty()) {
         QLocalSocket probe;
         probe.connectToServer(kInstanceServerName);
         if (probe.waitForConnected(300)) {
@@ -142,31 +144,62 @@ int main(int argc, char *argv[])
     // later launches and import them into this running instance.
     QLocalServer instanceServer;
     QLocalServer::removeServer(kInstanceServerName); // clear stale socket after a crash
-    if (instanceServer.listen(kInstanceServerName)) {
-        QObject::connect(&instanceServer, &QLocalServer::newConnection, &appController, [&]() {
+    // Drives the named-pipe accept manually: the async notifier behind
+    // QLocalServer's newConnection signal proved unreliable on Windows here
+    // (the pipe connected at OS level but the signal never fired, so
+    // double-clicked files were silently lost). waitForNewConnection(0)
+    // checks the pending accept synchronously and emits newConnection when
+    // one completed — the timer makes forwarding work regardless.
+    QTimer instancePollTimer;
+    instancePollTimer.setInterval(300);
+    const bool siListening = instanceServer.listen(kInstanceServerName);
+    if (siListening) {
+        const auto raiseMainWindow = []() {
+            const auto windows = QGuiApplication::topLevelWindows();
+            if (!windows.isEmpty()) {
+                QWindow* win = windows.first();
+                win->show();
+                win->raise();
+                win->requestActivate();
+            }
+        };
+        // Reads the client's payload exactly once (guarded by the "handled"
+        // property): a video path opens via QML (which raises whichever
+        // window plays it — main or a new detached one), an .m3u imports and
+        // raises the main window, an empty payload just raises ("activate").
+        const auto handleClient = [&appController, raiseMainWindow](QLocalSocket* client) {
+            if (client->property("handled").toBool()) return;
+            const QString path = QString::fromUtf8(client->readAll()).trimmed();
+            if (path.isEmpty()) return; // wait for data; disconnect = activate ping
+            client->setProperty("handled", true);
+            if (ChannelViewModel::isVideoFile(path)) {
+                appController.openLocalVideo(path);
+            } else {
+                appController.openM3uFile(path);
+                raiseMainWindow();
+            }
+        };
+        QObject::connect(&instanceServer, &QLocalServer::newConnection, &appController,
+                         [&instanceServer, handleClient, raiseMainWindow]() {
             QLocalSocket* client = instanceServer.nextPendingConnection();
             if (!client) return;
-            QObject::connect(client, &QLocalSocket::readyRead, &appController, [&appController, client]() {
-                const QString path = QString::fromUtf8(client->readAll()).trimmed();
-                if (!path.isEmpty()) {
-                    if (ChannelViewModel::isVideoFile(path)) {
-                        appController.openLocalVideo(path);
-                    } else {
-                        appController.openM3uFile(path);
-                    }
-                }
-                // Raise the existing window either way
-                const auto windows = QGuiApplication::topLevelWindows();
-                if (!windows.isEmpty()) {
-                    QWindow* win = windows.first();
-                    win->show();
-                    win->raise();
-                    win->requestActivate();
-                }
-                client->deleteLater();
-            });
-            QObject::connect(client, &QLocalSocket::disconnected, client, &QObject::deleteLater);
+            // The client writes its payload immediately after connecting and
+            // exits — read it synchronously instead of relying on readyRead /
+            // disconnected (their async notifiers are as unreliable as the
+            // one behind newConnection on this setup).
+            if (client->bytesAvailable() == 0) {
+                client->waitForReadyRead(500);
+            }
+            handleClient(client);
+            if (!client->property("handled").toBool()) {
+                raiseMainWindow(); // empty payload = plain "activate" ping
+            }
+            client->deleteLater();
         });
+        QObject::connect(&instancePollTimer, &QTimer::timeout, &instanceServer, [&instanceServer]() {
+            instanceServer.waitForNewConnection(0);
+        });
+        instancePollTimer.start();
     } else {
         qWarning() << "Single-instance server failed to listen:" << instanceServer.errorString();
     }

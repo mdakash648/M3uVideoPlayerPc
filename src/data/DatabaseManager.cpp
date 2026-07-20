@@ -170,6 +170,8 @@ bool DatabaseManager::createTables() {
     }
 
     // Enable foreign key constraints
+    query.exec("PRAGMA journal_mode = WAL;");
+    query.exec("PRAGMA busy_timeout = 5000;");
     query.exec("PRAGMA foreign_keys = ON;");
 
     return success;

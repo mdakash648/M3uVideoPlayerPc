@@ -6,12 +6,17 @@ import M3uVideoPlayer
 
 Item {
     id: root
+    objectName: "playerView"
     
     property string streamUrl: ""
     property string streamTitle: "" // Allows dynamic titles
     property string streamReferer: ""
     property string streamUserAgent: ""
     property bool playlistOpen: false
+    // Channel list driving Next/Previous, the playlist panel and end-of-file
+    // auto-advance. Detached player windows inject their own folder model;
+    // the main window keeps the shared one via this default binding.
+    property var channelModel: AppController.channelViewModel
     signal backRequested()
 
     // ===== Playback resume =====
@@ -43,7 +48,7 @@ Item {
 
     function toggleAlwaysOnTop() {
         root.alwaysOnTop = !root.alwaysOnTop;
-        AppController.setAlwaysOnTop(root.alwaysOnTop);
+        AppController.setAlwaysOnTop(root.alwaysOnTop, root.Window.window);
         osdOverlay.show(root.alwaysOnTop ? "📌 Always on Top: ON" : "📌 Always on Top: OFF");
     }
 
@@ -82,6 +87,10 @@ Item {
         root.streamUrl = url;
         videoPlayer.mediaUrl = url;
         videoPlayer.playing = true;
+    }
+
+    function pause() {
+        videoPlayer.playing = false;
     }
 
     // ===== Resume progress saving =====
@@ -125,8 +134,8 @@ Item {
                 AppController.clearMovieResume(root.canonicalUrl);
             }
             // Auto-play the next episode/movie in the folder, if any
-            var idx = AppController.channelViewModel.findIndexByUrl(root.canonicalUrl);
-            var total = AppController.channelViewModel.rowCount();
+            var idx = root.channelModel.findIndexByUrl(root.canonicalUrl);
+            var total = root.channelModel.rowCount();
             if (idx >= 0 && idx < total - 1) {
                 osdOverlay.show("⏭ Next");
                 root.playChannel(idx + 1);
@@ -174,7 +183,8 @@ Item {
             // via C++ (single native call, no intermediate OS animation).
             AppController.exitFullscreen(
                 root.prevVisibility === Window.Maximized,
-                root.prevX, root.prevY, root.prevWidth, root.prevHeight
+                root.prevX, root.prevY, root.prevWidth, root.prevHeight,
+                win
             );
             root.isFullscreen = false;
         } else {
@@ -189,7 +199,7 @@ Item {
             // Windows never runs its exclusive-fullscreen enter/exit animation
             // (the thing that was causing the flicker) — same technique VLC /
             // MPC-HC use for instant, flicker-free fullscreen.
-            AppController.enterFullscreen();
+            AppController.enterFullscreen(win);
             root.isFullscreen = true;
         }
     }
@@ -388,10 +398,10 @@ Item {
     // Helper functions for navigation
     function playChannel(index) {
 
-        var url = AppController.channelViewModel.channelStreamUrl(index);
-        var name = AppController.channelViewModel.channelName(index);
-        var referer = AppController.channelViewModel.channelReferer(index);
-        var userAgent = AppController.channelViewModel.channelUserAgent(index);
+        var url = root.channelModel.channelStreamUrl(index);
+        var name = root.channelModel.channelName(index);
+        var referer = root.channelModel.channelReferer(index);
+        var userAgent = root.channelModel.channelUserAgent(index);
 
         if (url !== "") {
             // Persist the outgoing video's position before switching
@@ -403,7 +413,7 @@ Item {
             root.streamReferer = referer !== undefined ? referer : "";
             root.streamUserAgent = userAgent !== undefined ? userAgent : "";
             root.canonicalUrl = url;
-            root.channelType = AppController.channelViewModel.channelType(index);
+            root.channelType = root.channelModel.channelType(index);
             // Movies/series resume from their saved point; live starts live.
             var resume = root.isVod ? AppController.getMovieResume(url) : { found: false };
             videoPlayer.startPosition = resume.found ? Math.floor(resume.positionMs / 1000) : 0;
@@ -416,15 +426,15 @@ Item {
     }
 
     function playPrevious() {
-        var idx = AppController.channelViewModel.findIndexByUrl(root.canonicalUrl);
+        var idx = root.channelModel.findIndexByUrl(root.canonicalUrl);
         if (idx > 0) {
             playChannel(idx - 1);
         }
     }
 
     function playNext() {
-        var idx = AppController.channelViewModel.findIndexByUrl(root.canonicalUrl);
-        var total = AppController.channelViewModel.rowCount();
+        var idx = root.channelModel.findIndexByUrl(root.canonicalUrl);
+        var total = root.channelModel.rowCount();
         if (idx >= 0 && idx < total - 1) {
             playChannel(idx + 1);
         }
@@ -472,10 +482,29 @@ Item {
                 if (!playlistZoneHover.hovered)
                     root.showControls();
             }
+
+            // VLC-style click handling: single click = play/pause,
+            // double click = fullscreen toggle. The single-click action is
+            // deferred slightly so a double click can cancel it — otherwise
+            // every double click would also pause/resume the video.
+            Timer {
+                id: singleClickTimer
+                interval: 220
+                repeat: false
+                onTriggered: {
+                    videoPlayer.playing = !videoPlayer.playing;
+                    osdOverlay.show(videoPlayer.playing ? "▶ Play" : "⏸ Paused");
+                }
+            }
+
             onClicked: {
                 root.showControls();
-                videoPlayer.playing = !videoPlayer.playing
-                root.forceActiveFocus()
+                root.forceActiveFocus();
+                singleClickTimer.restart();
+            }
+            onDoubleClicked: {
+                singleClickTimer.stop(); // cancel the pending play/pause
+                root.toggleFullscreen();
             }
             // Mouse wheel = volume up/down
             onWheel: function(wheel) {
@@ -676,8 +705,8 @@ Item {
 
                 Text {
                     text: {
-                        var idx = AppController.channelViewModel.findIndexByUrl(root.canonicalUrl);
-                        var total = AppController.channelViewModel.rowCount();
+                        var idx = root.channelModel.findIndexByUrl(root.canonicalUrl);
+                        var total = root.channelModel.rowCount();
                         if (idx >= 0) {
                             return (idx + 1) + " / " + total;
                         }
@@ -710,12 +739,12 @@ Item {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
                 clip: true
-                model: AppController.channelViewModel
+                model: root.channelModel
 
                 // Auto-scroll to current channel when panel opens
                 onVisibleChanged: {
                     if (visible) {
-                        var idx = AppController.channelViewModel.findIndexByUrl(root.canonicalUrl);
+                        var idx = root.channelModel.findIndexByUrl(root.canonicalUrl);
                         if (idx >= 0) {
                             playlistListView.positionViewAtIndex(idx, ListView.Center);
                         }
@@ -799,13 +828,15 @@ Item {
         }
     }
 
-    // Bottom Controls Layer
+    // Bottom Controls Layer — full-width professional bar (YouTube/VLC
+    // style): gradient scrim, edge-to-edge seekbar, transport cluster on
+    // the left, tools cluster on the right.
     Item {
+        id: bottomControls
         anchors.bottom: parent.bottom
         anchors.left: parent.left
         anchors.right: parent.right
-        anchors.bottomMargin: 24
-        height: 100
+        height: 132
         z: 30
 
         // Auto-hide: fade with controlsVisible, ignore clicks when hidden
@@ -818,374 +849,381 @@ Item {
             id: bottomBarHover
             onHoveredChanged: if (hovered) root.showControls()
         }
-        
-        // Glassmorphic Panel
+
+        // hh:mm:ss when over an hour, m:ss otherwise
+        function formatTime(s) {
+            s = Math.max(0, Math.floor(s));
+            var h = Math.floor(s / 3600);
+            var m = Math.floor((s % 3600) / 60);
+            var sec = s % 60;
+            var ss = (sec < 10 ? "0" : "") + sec;
+            if (h > 0) {
+                var mm = (m < 10 ? "0" : "") + m;
+                return h + ":" + mm + ":" + ss;
+            }
+            return m + ":" + ss;
+        }
+
+        // Gradient scrim so controls stay readable over any video frame
         Rectangle {
-            anchors.centerIn: parent
-            width: Math.min(parent.width - 48, 1152) // max-w-6xl
-            height: 96
-            color: "#B30d141d" // bg-surface/70 (slightly more opaque for readability)
-            radius: 12
-            border.color: "#33c2c6d2" // border-tertiary/20
-            border.width: 1
-            
+            anchors.fill: parent
+            gradient: Gradient {
+                GradientStop { position: 0.0; color: "#000d141d" }
+                GradientStop { position: 0.5; color: "#A60d141d" }
+                GradientStop { position: 1.0; color: "#F20d141d" }
+            }
+        }
+
+        ColumnLayout {
+            anchors.left: parent.left
+            anchors.right: parent.right
+            anchors.bottom: parent.bottom
+            anchors.leftMargin: 16
+            anchors.rightMargin: 16
+            anchors.bottomMargin: 6
+            spacing: 0
+
+            // ===== Seekbar (edge to edge) =====
+            Slider {
+                id: progressSlider
+                Layout.fillWidth: true
+                Layout.preferredHeight: 20
+
+                from: 0
+                to: videoPlayer.duration > 0 ? videoPlayer.duration : 1
+                value: videoPlayer.position
+                onMoved: videoPlayer.position = value
+
+                background: Rectangle {
+                    id: progBg
+                    x: progressSlider.leftPadding
+                    y: progressSlider.topPadding + progressSlider.availableHeight / 2 - height / 2
+                    width: progressSlider.availableWidth
+                    // Thin track that thickens on hover, like modern players
+                    height: progressSlider.hovered || progressSlider.pressed ? 6 : 3
+                    radius: height / 2
+                    color: "#4Dc2c6d2"
+                    Behavior on height { NumberAnimation { duration: 100 } }
+
+                    Rectangle {
+                        width: progressSlider.visualPosition * progBg.width
+                        height: progBg.height
+                        color: "#ff8800"
+                        radius: progBg.radius
+                    }
+                }
+                handle: Rectangle {
+                    x: progressSlider.leftPadding + progressSlider.visualPosition * (progressSlider.availableWidth - width)
+                    y: progressSlider.topPadding + progressSlider.availableHeight / 2 - height / 2
+                    implicitWidth: 14
+                    implicitHeight: 14
+                    radius: 7
+                    color: "#ff8800"
+                    scale: progressSlider.pressed || progressSlider.hovered ? 1.0 : 0.0
+                    Behavior on scale { NumberAnimation { duration: 120 } }
+                }
+            }
+
+            // ===== Buttons row =====
             RowLayout {
-                anchors.fill: parent
-                anchors.leftMargin: 24
-                anchors.rightMargin: 24
-                spacing: 20
-                
-                // --- Left: Secondary Controls ---
-                RowLayout {
-                    spacing: 8
-                    
-                    // Subtitles Button
-                    Button {
-                        id: subBtn
-                        implicitWidth: 40
-                        implicitHeight: 40
-                        background: Rectangle { color: subBtn.hovered ? "#232a35" : "transparent"; radius: 20 }
-                        contentItem: Text { text: "💬"; color: subBtn.hovered ? "#dce3f0" : "#dec1ae"; font.pixelSize: 18; horizontalAlignment: Text.AlignHCenter; verticalAlignment: Text.AlignVCenter }
-                        onClicked: subMenu.open()
-                        Menu {
-                            id: subMenu
-                            y: -height - 10
-                            MenuItem { text: "Subtitles"; enabled: false }
-                            MenuItem {
-                                text: "Off"
-                                onTriggered: videoPlayer.setTrack("sub", -1)
-                            }
-                            Repeater {
-                                model: videoPlayer.subtitleTracks
-                                MenuItem {
-                                    text: (modelData.lang ? "[" + modelData.lang + "] " : "") + (modelData.title ? modelData.title : ("Track " + modelData.id))
-                                    onTriggered: videoPlayer.setTrack("sub", modelData.id)
-                                }
-                            }
-                        }
-                    }
-                    
-                    // Audio Tracks Button
-                    Button {
-                        id: audioBtn
-                        implicitWidth: 40
-                        implicitHeight: 40
-                        background: Rectangle { color: audioBtn.hovered ? "#232a35" : "transparent"; radius: 20 }
-                        contentItem: Text { text: "🎵"; color: audioBtn.hovered ? "#dce3f0" : "#dec1ae"; font.pixelSize: 18; horizontalAlignment: Text.AlignHCenter; verticalAlignment: Text.AlignVCenter }
-                        onClicked: audioMenu.open()
-                        Menu {
-                            id: audioMenu
-                            y: -height - 10
-                            MenuItem { text: "Audio Tracks"; enabled: false }
-                            Repeater {
-                                model: videoPlayer.audioTracks
-                                MenuItem {
-                                    text: (modelData.lang ? "[" + modelData.lang + "] " : "") + (modelData.title ? modelData.title : ("Track " + modelData.id))
-                                    onTriggered: videoPlayer.setTrack("audio", modelData.id)
-                                }
-                            }
-                        }
-                    }
+                Layout.fillWidth: true
+                Layout.preferredHeight: 48
+                spacing: 2
 
-                    // Quality Button — only shown when the URL has a
-                    // recognizable 1080p/720p/480p token to rewrite.
-                    Button {
-                        id: qualityBtn
-                        visible: root.detectQuality(root.streamUrl) !== ""
-                        implicitHeight: 40
-                        leftPadding: 12
-                        rightPadding: 12
-                        background: Rectangle {
-                            color: qualityBtn.hovered ? "#232a35" : "transparent"
-                            radius: 20
-                            border.color: "#33c2c6d2"
-                            border.width: 1
-                        }
-                        contentItem: Text {
-                            text: root.detectQuality(root.streamUrl) + "p ▾"
-                            color: qualityBtn.hovered ? "#dce3f0" : "#dec1ae"
-                            font.pixelSize: 13
-                            font.bold: true
-                            horizontalAlignment: Text.AlignHCenter
-                            verticalAlignment: Text.AlignVCenter
-                        }
-                        onClicked: qualityMenu.open()
-                        Menu {
-                            id: qualityMenu
-                            y: -height - 10
-                            MenuItem { text: "Quality"; enabled: false }
-                            Repeater {
-                                model: ["1080", "720", "480"]
-                                MenuItem {
-                                    text: modelData + "p" + (root.detectQuality(root.streamUrl) === modelData ? "   ✓" : "")
-                                    onTriggered: root.setQuality(modelData)
-                                }
-                            }
+                // --- Left: transport + volume + time ---
+                Button {
+                    id: prevBtn
+                    implicitWidth: 40
+                    implicitHeight: 40
+                    background: Rectangle { color: prevBtn.hovered ? "#232a35" : "transparent"; radius: 8 }
+                    contentItem: Item {
+                        anchors.fill: parent
+                        Image {
+                            anchors.centerIn: parent
+                            sourceSize: Qt.size(22, 22)
+                            source: "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' width='22' height='22' fill='" + (prevBtn.hovered ? "%23ffffff" : "%23dce3f0") + "'><path d='M6 6h2v12H6zm3.5 6l8.5 6V6z'/></svg>"
                         }
                     }
+                    ToolTip.visible: prevBtn.hovered
+                    ToolTip.delay: 600
+                    ToolTip.text: "Previous (P)"
+                    onClicked: root.playPrevious()
+                }
 
-                    // Playback Speed Button
-                    Button {
-                        id: speedBtn
-                        implicitHeight: 40
-                        leftPadding: 12
-                        rightPadding: 12
-                        background: Rectangle {
-                            color: speedBtn.hovered ? "#232a35" : "transparent"
-                            radius: 20
-                            border.color: "#33c2c6d2"
-                            border.width: 1
-                        }
-                        contentItem: Text {
-                            text: root.playbackSpeed + "x ▾"
-                            color: speedBtn.hovered ? "#dce3f0" : "#dec1ae"
-                            font.pixelSize: 13
-                            font.bold: true
-                            horizontalAlignment: Text.AlignHCenter
-                            verticalAlignment: Text.AlignVCenter
-                        }
-                        onClicked: speedMenu.open()
-                        Menu {
-                            id: speedMenu
-                            y: -height - 10
-                            MenuItem { text: "Playback Speed"; enabled: false }
-                            Repeater {
-                                model: [0.25, 0.5, 0.75, 1.0, 1.25, 1.5, 1.75, 2.0]
-                                MenuItem {
-                                    text: modelData + "x" + (root.playbackSpeed === modelData ? "   ✓" : "")
-                                    onTriggered: root.setPlaybackSpeed(modelData)
+                // Play/Pause (Primary accent)
+                Button {
+                    id: playBtn
+                    implicitWidth: 44
+                    implicitHeight: 44
+                    background: Rectangle {
+                        color: playBtn.hovered ? "#ffb781" : "#FF8800"
+                        radius: 22
+                    }
+                    contentItem: Item {
+                        anchors.fill: parent
+                        Image {
+                            anchors.centerIn: parent
+                            sourceSize: Qt.size(24, 24)
+                            source: {
+                                let c = "%232f1400";
+                                if (videoPlayer.playing) {
+                                    return "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' width='24' height='24' fill='" + c + "'><path d='M6 19h4V5H6v14zm8-14v14h4V5h-4z'/></svg>";
+                                } else {
+                                    return "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' width='24' height='24' fill='" + c + "'><path d='M8 5v14l11-7z'/></svg>";
                                 }
                             }
                         }
                     }
+                    onClicked: videoPlayer.playing = !videoPlayer.playing
                 }
-                
-                // --- Center: Playback Controls & Progress ---
-                ColumnLayout {
-                    Layout.fillWidth: true
-                    spacing: 4
-                    
-                    RowLayout {
-                        Layout.alignment: Qt.AlignCenter
-                        spacing: 16
-                        
-                        // Prev
-                        Button {
-                            id: prevBtn
-                            implicitWidth: 40
-                            implicitHeight: 40
-                            background: Rectangle { color: prevBtn.hovered ? "#232a35" : "transparent"; radius: 20 }
-                            contentItem: Item {
-                                anchors.fill: parent
-                                Image {
-                                    anchors.centerIn: parent
-                                    sourceSize: Qt.size(24, 24)
-                                    source: "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' width='24' height='24' fill='" + (prevBtn.hovered ? "%23dce3f0" : "%23dec1ae") + "'><path d='M6 6h2v12H6zm3.5 6l8.5 6V6z'/></svg>"
-                                }
-                            }
-                            onClicked: root.playPrevious()
-                        }
-                        
-                        // Play/Pause (Primary)
-                        Button {
-                            id: playBtn
-                            implicitWidth: 52
-                            implicitHeight: 52
-                            background: Rectangle {
-                                color: playBtn.hovered ? "#ffb781" : "#FF8800"
-                                radius: 26
-                            }
-                            contentItem: Item {
-                                anchors.fill: parent
-                                Image {
-                                    anchors.centerIn: parent
-                                    sourceSize: Qt.size(28, 28)
-                                    source: {
-                                        let c = "%232f1400";
-                                        if (videoPlayer.playing) {
-                                            return "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' width='28' height='28' fill='" + c + "'><path d='M6 19h4V5H6v14zm8-14v14h4V5h-4z'/></svg>";
-                                        } else {
-                                            return "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' width='28' height='28' fill='" + c + "'><path d='M8 5v14l11-7z'/></svg>";
-                                        }
-                                    }
-                                }
-                            }
-                            onClicked: videoPlayer.playing = !videoPlayer.playing
-                        }
-                        
-                        // Next
-                        Button {
-                            id: nextBtn
-                            implicitWidth: 40
-                            implicitHeight: 40
-                            background: Rectangle { color: nextBtn.hovered ? "#232a35" : "transparent"; radius: 20 }
-                            contentItem: Item {
-                                anchors.fill: parent
-                                Image {
-                                    anchors.centerIn: parent
-                                    sourceSize: Qt.size(24, 24)
-                                    source: "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' width='24' height='24' fill='" + (nextBtn.hovered ? "%23dce3f0" : "%23dec1ae") + "'><path d='M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z'/></svg>"
-                                }
-                            }
-                            onClicked: root.playNext()
+
+                Button {
+                    id: nextBtn
+                    implicitWidth: 40
+                    implicitHeight: 40
+                    background: Rectangle { color: nextBtn.hovered ? "#232a35" : "transparent"; radius: 8 }
+                    contentItem: Item {
+                        anchors.fill: parent
+                        Image {
+                            anchors.centerIn: parent
+                            sourceSize: Qt.size(22, 22)
+                            source: "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' width='22' height='22' fill='" + (nextBtn.hovered ? "%23ffffff" : "%23dce3f0") + "'><path d='M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z'/></svg>"
                         }
                     }
-                    
-                    // Simplified Progress Bar
-                    RowLayout {
-                        Layout.fillWidth: true
-                        spacing: 12
-                        
-                        Text {
-                            text: {
-                                let p = videoPlayer.position;
-                                let fmt = function(s) {
-                                    let m = Math.floor(s / 60);
-                                    let sc = Math.floor(s % 60);
-                                    return m + ":" + (sc < 10 ? "0" : "") + sc;
-                                }
-                                return fmt(p);
-                            }
-                            color: "#dec1ae"
-                            font.pixelSize: 11
-                        }
-                        
-                        Slider {
-                            id: progressSlider
-                            Layout.fillWidth: true
-                            Layout.preferredHeight: 12
-                            
-                            from: 0
-                            to: videoPlayer.duration > 0 ? videoPlayer.duration : 1
-                            value: videoPlayer.position
-                            
-                            onMoved: videoPlayer.position = value
-                            
-                            background: Rectangle {
-                                id: progBg
-                                x: progressSlider.leftPadding
-                                y: progressSlider.topPadding + progressSlider.availableHeight / 2 - height / 2
-                                width: progressSlider.availableWidth
-                                height: 4
-                                radius: 2
-                                color: "#2e3540" // surface-container-highest
-                                
-                                Rectangle {
-                                    width: progressSlider.visualPosition * progBg.width
-                                    height: progBg.height
-                                    color: "#ffb781" // primary
-                                    radius: 2
-                                }
-                            }
-                            handle: Rectangle {
-                                x: progressSlider.leftPadding + progressSlider.visualPosition * (progressSlider.availableWidth - width) - width/2
-                                y: progressSlider.topPadding + progressSlider.availableHeight / 2 - height / 2
-                                implicitWidth: 10
-                                implicitHeight: 10
-                                radius: 5
-                                color: "#ffb781"
-                                opacity: progressSlider.pressed || progressSlider.hovered ? 1.0 : 0.0
-                                Behavior on opacity { NumberAnimation { duration: 150 } }
-                            }
-                        }
-                        
-                        Text {
-                            text: {
-                                let d = videoPlayer.duration;
-                                let fmt = function(s) {
-                                    let m = Math.floor(s / 60);
-                                    let sc = Math.floor(s % 60);
-                                    return m + ":" + (sc < 10 ? "0" : "") + sc;
-                                }
-                                return fmt(d);
-                            }
-                            color: "#dec1ae"
-                            font.pixelSize: 11
-                        }
-                    }
+                    ToolTip.visible: nextBtn.hovered
+                    ToolTip.delay: 600
+                    ToolTip.text: "Next (N)"
+                    onClicked: root.playNext()
                 }
-                
-                // --- Right: Volume / Settings ---
-                RowLayout {
-                    spacing: 8
-                    
-                    Text {
-                        text: "🔊"
-                        color: "#dec1ae"
+
+                // Volume: click icon = mute toggle, slider beside it
+                Button {
+                    id: muteBtn
+                    implicitWidth: 40
+                    implicitHeight: 40
+                    Layout.leftMargin: 6
+                    background: Rectangle { color: muteBtn.hovered ? "#232a35" : "transparent"; radius: 8 }
+                    contentItem: Text {
+                        text: videoPlayer.volume === 0 ? "🔇" : "🔊"
                         font.pixelSize: 16
+                        horizontalAlignment: Text.AlignHCenter
+                        verticalAlignment: Text.AlignVCenter
                     }
-                    
-                    Slider {
-                        id: volSlider
-                        from: 0
-                        to: 200
-                        value: videoPlayer.volume
-                        Layout.preferredWidth: 80
-                        onMoved: {
-                            videoPlayer.volume = value
+                    ToolTip.visible: muteBtn.hovered
+                    ToolTip.delay: 600
+                    ToolTip.text: "Mute (M)"
+                    onClicked: {
+                        if (videoPlayer.volume > 0) {
+                            root.savedVolume = videoPlayer.volume;
+                            videoPlayer.volume = 0;
+                        } else {
+                            videoPlayer.volume = root.savedVolume;
                         }
-                        background: Rectangle {
-                            id: volBg
-                            x: volSlider.leftPadding
-                            y: volSlider.topPadding + volSlider.availableHeight / 2 - height / 2
-                            width: volSlider.availableWidth
-                            height: 4
+                    }
+                }
+
+                Slider {
+                    id: volSlider
+                    from: 0
+                    to: 200
+                    value: videoPlayer.volume
+                    Layout.preferredWidth: 84
+                    onMoved: videoPlayer.volume = value
+                    background: Rectangle {
+                        id: volBg
+                        x: volSlider.leftPadding
+                        y: volSlider.topPadding + volSlider.availableHeight / 2 - height / 2
+                        width: volSlider.availableWidth
+                        height: 3
+                        radius: 2
+                        color: "#4Dc2c6d2"
+                        Rectangle {
+                            width: volSlider.visualPosition * volBg.width
+                            height: volBg.height
+                            color: "#dce3f0"
                             radius: 2
-                            color: "#2e3540"
-                            Rectangle {
-                                width: volSlider.visualPosition * volBg.width
-                                height: volBg.height
-                                color: "#ffb781"
-                                radius: 2
+                        }
+                    }
+                    handle: Rectangle {
+                        x: volSlider.leftPadding + volSlider.visualPosition * (volSlider.availableWidth - width)
+                        y: volSlider.topPadding + volSlider.availableHeight / 2 - height / 2
+                        implicitWidth: 10
+                        implicitHeight: 10
+                        radius: 5
+                        color: "#dce3f0"
+                        opacity: volSlider.pressed || volSlider.hovered ? 1.0 : 0.0
+                        Behavior on opacity { NumberAnimation { duration: 150 } }
+                    }
+                }
+
+                // Time readout
+                Text {
+                    Layout.leftMargin: 10
+                    text: bottomControls.formatTime(videoPlayer.position)
+                          + " / " + bottomControls.formatTime(videoPlayer.duration)
+                    color: "#dce3f0"
+                    font.pixelSize: 12
+                }
+
+                // --- Spacer pushes tools to the right edge ---
+                Item { Layout.fillWidth: true }
+
+                // --- Right: tools ---
+                // Playback Speed
+                Button {
+                    id: speedBtn
+                    implicitHeight: 40
+                    leftPadding: 10
+                    rightPadding: 10
+                    background: Rectangle { color: speedBtn.hovered ? "#232a35" : "transparent"; radius: 8 }
+                    contentItem: Text {
+                        text: root.playbackSpeed + "x"
+                        color: speedBtn.hovered ? "#ffffff" : "#dce3f0"
+                        font.pixelSize: 13
+                        font.bold: true
+                        horizontalAlignment: Text.AlignHCenter
+                        verticalAlignment: Text.AlignVCenter
+                    }
+                    ToolTip.visible: speedBtn.hovered
+                    ToolTip.delay: 600
+                    ToolTip.text: "Playback speed"
+                    onClicked: speedMenu.open()
+                    Menu {
+                        id: speedMenu
+                        y: -height - 10
+                        MenuItem { text: "Playback Speed"; enabled: false }
+                        Repeater {
+                            model: [0.25, 0.5, 0.75, 1.0, 1.25, 1.5, 1.75, 2.0]
+                            MenuItem {
+                                text: modelData + "x" + (root.playbackSpeed === modelData ? "   ✓" : "")
+                                onTriggered: root.setPlaybackSpeed(modelData)
                             }
                         }
-                        handle: Rectangle {
-                            x: volSlider.leftPadding + volSlider.visualPosition * (volSlider.availableWidth - width) - width/2
-                            y: volSlider.topPadding + volSlider.availableHeight / 2 - height / 2
-                            implicitWidth: 10
-                            implicitHeight: 10
-                            radius: 5
-                            color: "#ffb781"
-                            opacity: volSlider.pressed || volSlider.hovered ? 1.0 : 0.0
-                            Behavior on opacity { NumberAnimation { duration: 150 } }
-                        }
                     }
-                    
-                    // Always on Top (pin) — VLC-style: keeps the app window
-                    // above every other application while enabled.
-                    Button {
-                        id: pinBtn
-                        implicitWidth: 40
-                        implicitHeight: 40
-                        background: Rectangle {
-                            color: root.alwaysOnTop ? "#ff8800" : (pinBtn.hovered ? "#232a35" : "transparent")
-                            radius: 20
-                            border.color: root.alwaysOnTop ? "#ff8800" : "transparent"
-                            border.width: 1
-                        }
-                        contentItem: Text {
-                            text: "📌"
-                            color: root.alwaysOnTop ? "#2f1400" : (pinBtn.hovered ? "#dce3f0" : "#dec1ae")
-                            font.pixelSize: 16
-                            horizontalAlignment: Text.AlignHCenter
-                            verticalAlignment: Text.AlignVCenter
-                        }
-                        ToolTip.visible: pinBtn.hovered
-                        ToolTip.delay: 600
-                        ToolTip.text: "Always on Top (T)"
-                        onClicked: root.toggleAlwaysOnTop()
-                    }
+                }
 
-                    Button {
-                        id: fullscreenBtn
-                        implicitWidth: 40
-                        implicitHeight: 40
-                        background: Rectangle { color: fullscreenBtn.hovered ? "#232a35" : "transparent"; radius: 20 }
-                        contentItem: Text { text: "⛶"; color: fullscreenBtn.hovered ? "#dce3f0" : "#dec1ae"; font.pixelSize: 18; horizontalAlignment: Text.AlignHCenter; verticalAlignment: Text.AlignVCenter }
-                        onClicked: {
-                            root.toggleFullscreen();
+                // Quality — only shown when the URL has a recognizable
+                // 1080p/720p/480p token to rewrite.
+                Button {
+                    id: qualityBtn
+                    visible: root.detectQuality(root.streamUrl) !== ""
+                    implicitHeight: 40
+                    leftPadding: 10
+                    rightPadding: 10
+                    background: Rectangle { color: qualityBtn.hovered ? "#232a35" : "transparent"; radius: 8 }
+                    contentItem: Text {
+                        text: root.detectQuality(root.streamUrl) + "p"
+                        color: qualityBtn.hovered ? "#ffffff" : "#dce3f0"
+                        font.pixelSize: 13
+                        font.bold: true
+                        horizontalAlignment: Text.AlignHCenter
+                        verticalAlignment: Text.AlignVCenter
+                    }
+                    ToolTip.visible: qualityBtn.hovered
+                    ToolTip.delay: 600
+                    ToolTip.text: "Quality"
+                    onClicked: qualityMenu.open()
+                    Menu {
+                        id: qualityMenu
+                        y: -height - 10
+                        MenuItem { text: "Quality"; enabled: false }
+                        Repeater {
+                            model: ["1080", "720", "480"]
+                            MenuItem {
+                                text: modelData + "p" + (root.detectQuality(root.streamUrl) === modelData ? "   ✓" : "")
+                                onTriggered: root.setQuality(modelData)
+                            }
                         }
                     }
+                }
+
+                // Subtitles
+                Button {
+                    id: subBtn
+                    implicitWidth: 40
+                    implicitHeight: 40
+                    background: Rectangle { color: subBtn.hovered ? "#232a35" : "transparent"; radius: 8 }
+                    contentItem: Text { text: "💬"; font.pixelSize: 16; horizontalAlignment: Text.AlignHCenter; verticalAlignment: Text.AlignVCenter }
+                    ToolTip.visible: subBtn.hovered
+                    ToolTip.delay: 600
+                    ToolTip.text: "Subtitles"
+                    onClicked: subMenu.open()
+                    Menu {
+                        id: subMenu
+                        y: -height - 10
+                        MenuItem { text: "Subtitles"; enabled: false }
+                        MenuItem {
+                            text: "Off"
+                            onTriggered: videoPlayer.setTrack("sub", -1)
+                        }
+                        Repeater {
+                            model: videoPlayer.subtitleTracks
+                            MenuItem {
+                                text: (modelData.lang ? "[" + modelData.lang + "] " : "") + (modelData.title ? modelData.title : ("Track " + modelData.id))
+                                onTriggered: videoPlayer.setTrack("sub", modelData.id)
+                            }
+                        }
+                    }
+                }
+
+                // Audio tracks
+                Button {
+                    id: audioBtn
+                    implicitWidth: 40
+                    implicitHeight: 40
+                    background: Rectangle { color: audioBtn.hovered ? "#232a35" : "transparent"; radius: 8 }
+                    contentItem: Text { text: "🎵"; font.pixelSize: 16; horizontalAlignment: Text.AlignHCenter; verticalAlignment: Text.AlignVCenter }
+                    ToolTip.visible: audioBtn.hovered
+                    ToolTip.delay: 600
+                    ToolTip.text: "Audio tracks"
+                    onClicked: audioMenu.open()
+                    Menu {
+                        id: audioMenu
+                        y: -height - 10
+                        MenuItem { text: "Audio Tracks"; enabled: false }
+                        Repeater {
+                            model: videoPlayer.audioTracks
+                            MenuItem {
+                                text: (modelData.lang ? "[" + modelData.lang + "] " : "") + (modelData.title ? modelData.title : ("Track " + modelData.id))
+                                onTriggered: videoPlayer.setTrack("audio", modelData.id)
+                            }
+                        }
+                    }
+                }
+
+                // Always on Top (pin) — VLC-style: keeps the app window
+                // above every other application while enabled.
+                Button {
+                    id: pinBtn
+                    implicitWidth: 40
+                    implicitHeight: 40
+                    background: Rectangle {
+                        color: root.alwaysOnTop ? "#ff8800" : (pinBtn.hovered ? "#232a35" : "transparent")
+                        radius: 8
+                    }
+                    contentItem: Text {
+                        text: "📌"
+                        font.pixelSize: 16
+                        horizontalAlignment: Text.AlignHCenter
+                        verticalAlignment: Text.AlignVCenter
+                    }
+                    ToolTip.visible: pinBtn.hovered
+                    ToolTip.delay: 600
+                    ToolTip.text: "Always on Top (T)"
+                    onClicked: root.toggleAlwaysOnTop()
+                }
+
+                // Fullscreen
+                Button {
+                    id: fullscreenBtn
+                    implicitWidth: 40
+                    implicitHeight: 40
+                    background: Rectangle { color: fullscreenBtn.hovered ? "#232a35" : "transparent"; radius: 8 }
+                    contentItem: Text { text: "⛶"; color: fullscreenBtn.hovered ? "#ffffff" : "#dce3f0"; font.pixelSize: 18; horizontalAlignment: Text.AlignHCenter; verticalAlignment: Text.AlignVCenter }
+                    ToolTip.visible: fullscreenBtn.hovered
+                    ToolTip.delay: 600
+                    ToolTip.text: "Fullscreen (F)"
+                    onClicked: root.toggleFullscreen()
                 }
             }
         }
@@ -1208,6 +1246,6 @@ Item {
         root.saveResumeProgress();
         // Release always-on-top — the toggle lives in this view, so leaving
         // the player must not leave the window stuck topmost.
-        if (root.alwaysOnTop) AppController.setAlwaysOnTop(false);
+        if (root.alwaysOnTop) AppController.setAlwaysOnTop(false, root.Window.window);
     }
 }

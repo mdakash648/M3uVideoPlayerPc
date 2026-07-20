@@ -14,6 +14,8 @@
 #include "GroupViewModel.h"
 #include "ChannelViewModel.h"
 
+class QWindow;
+
 // namespace UI removed for QML registrar compatibility
 class AppController : public QObject {
     Q_OBJECT
@@ -32,10 +34,13 @@ public:
     Q_INVOKABLE void init();
     Q_INVOKABLE QString getClipboardText() const;
     Q_INVOKABLE void triggerBackgroundSync();
-    Q_INVOKABLE void enterFullscreen();
-    Q_INVOKABLE void exitFullscreen(bool wasMaximized, qreal x, qreal y, qreal width, qreal height);
-    // Keeps the app window above every other window (VLC's "Always on top").
-    Q_INVOKABLE void setAlwaysOnTop(bool enabled);
+    // targetWin selects which window to act on (multi-window playback);
+    // when omitted, falls back to the currently focused window.
+    Q_INVOKABLE void enterFullscreen(QWindow* targetWin = nullptr);
+    Q_INVOKABLE void exitFullscreen(bool wasMaximized, qreal x, qreal y, qreal width, qreal height,
+                                    QWindow* targetWin = nullptr);
+    // Keeps the given window above every other window (VLC's "Always on top").
+    Q_INVOKABLE void setAlwaysOnTop(bool enabled, QWindow* targetWin = nullptr);
     // Saves a direct-link stream into the auto-created "History" playlist
     // (group "Movie"). Returns the display name derived from the URL.
     Q_INVOKABLE QString addToHistory(const QString& url, const QString& referer, const QString& userAgent);
@@ -48,10 +53,21 @@ public:
     // the file picker and double-clicked files).
     Q_INVOKABLE void openM3uFile(const QString& fileUrlOrPath);
     // Plays a local video file (mkv/mp4/...) WITHOUT saving it to History.
-    // Loads every video in the file's folder into channelViewModel so the
-    // in-player playlist panel can navigate the folder. Answers via
-    // localVideoReady().
+    // Answers via localVideoReady(); the QML side decides which window plays
+    // it and which channel model receives the file's folder.
     Q_INVOKABLE void openLocalVideo(const QString& fileUrlOrPath);
+    // Creates a standalone ChannelViewModel pre-loaded with the video files
+    // in the given file's folder. Used by detached player windows so their
+    // Next/Previous/playlist panel never clobber the shared channelViewModel.
+    // The returned object is JavaScript-owned: the QML GC destroys it along
+    // with the window that references it.
+    Q_INVOKABLE ChannelViewModel* createLocalChannelModel(const QString& fileUrlOrPath);
+    // Same idea for database channels: a standalone ChannelViewModel loaded
+    // with the given group (or the whole playlist when groupId <= 0), so a
+    // channel opened in a new window keeps its own Next/Previous/playlist
+    // panel even while the user keeps browsing in the main window.
+    // JavaScript-owned like createLocalChannelModel().
+    Q_INVOKABLE ChannelViewModel* createDetachedChannelModel(int groupId, int playlistId);
     // True if the path/URL has a recognized video file extension.
     Q_INVOKABLE bool isLocalVideoFile(const QString& fileUrlOrPath) const;
 
@@ -110,8 +126,9 @@ signals:
     void directLinkReady(const QString& streamUrl, const QString& name,
                          const QString& referer, const QString& userAgent);
     void directLinkFailed(const QString& message);
-    // Result of openLocalVideo(): a local file ready to play. The folder's
-    // videos are already loaded into channelViewModel. Never touches History.
+    // Result of openLocalVideo(): a local file ready to play. The receiver
+    // decides which window plays it and loads the folder into the matching
+    // channel model. Never touches History.
     void localVideoReady(const QString& filePath, const QString& name);
     // Update-all from Settings: emitted per playlist and once at the end.
     void refreshAllProgress(int done, int total, const QString& playlistName);

@@ -26,6 +26,10 @@ Rectangle {
     signal backRequested()
     signal channelOpened(string streamUrl, string channelName, string referer, string userAgent,
                          int channelType, int channelPlaylistId, int channelGroupId)
+    // Middle-click (mouse wheel button): open the channel in a new,
+    // independent player window instead of the embedded player.
+    signal channelOpenedNewWindow(string streamUrl, string channelName, string referer, string userAgent,
+                                  int channelType, int channelPlaylistId, int channelGroupId)
     // Floating play button: resume the playlist's last-played video
     signal resumeRequested(var resume)
 
@@ -263,12 +267,17 @@ Rectangle {
                 MouseArea {
                     anchors.fill: parent
                     hoverEnabled: true
+                    acceptedButtons: Qt.LeftButton | Qt.MiddleButton
                     z: -1
                     onEntered: parent.border.color = "#FFD54F"
                     onExited: parent.border.color = (channelList.activeFocus && ListView.isCurrentItem) ? "#FFD54F" : "#333333"
-                    onClicked: {
+                    onClicked: (mouse) => {
                         channelList.currentIndex = index;
-                        channelOpened(model.streamUrl, model.name, model.referer, model.userAgent, model.type, model.playlistId, model.groupId);
+                        if (mouse.button === Qt.MiddleButton) {
+                            channelOpenedNewWindow(model.streamUrl, model.name, model.referer, model.userAgent, model.type, model.playlistId, model.groupId);
+                        } else {
+                            channelOpened(model.streamUrl, model.name, model.referer, model.userAgent, model.type, model.playlistId, model.groupId);
+                        }
                     }
                 }
 
@@ -391,10 +400,15 @@ Rectangle {
                         id: hoverArea
                         anchors.fill: parent
                         hoverEnabled: true
+                        acceptedButtons: Qt.LeftButton | Qt.MiddleButton
                         z: -1
-                        onClicked: {
+                        onClicked: (mouse) => {
                             channelGrid.currentIndex = index;
-                            channelOpened(model.streamUrl, model.name, model.referer, model.userAgent, model.type, model.playlistId, model.groupId);
+                            if (mouse.button === Qt.MiddleButton) {
+                                channelOpenedNewWindow(model.streamUrl, model.name, model.referer, model.userAgent, model.type, model.playlistId, model.groupId);
+                            } else {
+                                channelOpened(model.streamUrl, model.name, model.referer, model.userAgent, model.type, model.playlistId, model.groupId);
+                            }
                         }
                     }
 

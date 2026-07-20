@@ -36,7 +36,13 @@ public:
         , m_mpv_gl(nullptr)
     {
         mpv_opengl_init_params gl_init_params{get_proc_address_mpv, nullptr};
-        int advanced_control = 1;
+        // advanced_control MUST stay 0 for multi-window playback: with 1,
+        // mpv's core blocks waiting for the Qt render thread to service the
+        // render context, the render thread waits on the GUI thread (scene-
+        // graph sync — e.g. while a second player window is being created),
+        // and the GUI thread waits on mpv's core in a blocking
+        // mpv_get_property → three-way deadlock, every window freezes.
+        int advanced_control = 0;
         mpv_render_param params[] = {
             {MPV_RENDER_PARAM_API_TYPE, const_cast<char *>(MPV_RENDER_API_TYPE_OPENGL)},
             {MPV_RENDER_PARAM_OPENGL_INIT_PARAMS, &gl_init_params},
@@ -478,43 +484,51 @@ void MpvVideoItem::setTrack(const QString &type, int id) {
 }
 
 void MpvVideoItem::updateTrackList() {
-    int count = 0;
-    if (mpv_get_property(m_mpv, "track-list/count", MPV_FORMAT_INT64, &count) < 0) {
+    // Single node read instead of ~5 blocking mpv_get_property calls per
+    // track: every blocking call takes mpv's core lock, and with several
+    // player windows (multi-window playback) long lock-holding sequences on
+    // the GUI thread are what turned a busy core into a full UI freeze.
+    mpv_node node;
+    if (mpv_get_property(m_mpv, "track-list", MPV_FORMAT_NODE, &node) < 0) {
         return;
     }
 
     QVariantList videoTracks, audioTracks, subtitleTracks;
 
-    for (int i = 0; i < count; ++i) {
-        QString prefix = QString("track-list/%1/").arg(i);
-        
-        char *type_str = nullptr;
-        mpv_get_property(m_mpv, (prefix + "type").toUtf8().constData(), MPV_FORMAT_STRING, &type_str);
-        
-        int64_t id = -1;
-        mpv_get_property(m_mpv, (prefix + "id").toUtf8().constData(), MPV_FORMAT_INT64, &id);
-        
-        char *title_str = nullptr;
-        mpv_get_property(m_mpv, (prefix + "title").toUtf8().constData(), MPV_FORMAT_STRING, &title_str);
-        
-        char *lang_str = nullptr;
-        mpv_get_property(m_mpv, (prefix + "lang").toUtf8().constData(), MPV_FORMAT_STRING, &lang_str);
+    if (node.format == MPV_FORMAT_NODE_ARRAY && node.u.list) {
+        for (int i = 0; i < node.u.list->num; ++i) {
+            const mpv_node &entry = node.u.list->values[i];
+            if (entry.format != MPV_FORMAT_NODE_MAP || !entry.u.list) continue;
 
-        QVariantMap track;
-        track["id"] = static_cast<int>(id);
-        QString tType = type_str ? QString(type_str) : QString();
-        track["type"] = tType;
-        track["title"] = title_str ? QString(title_str) : QString("Track %1").arg(id);
-        track["lang"] = lang_str ? QString(lang_str) : QString();
+            QString type, title, lang;
+            qint64 id = -1;
+            for (int k = 0; k < entry.u.list->num; ++k) {
+                const char *key = entry.u.list->keys[k];
+                const mpv_node &val = entry.u.list->values[k];
+                if (!key) continue;
+                if (qstrcmp(key, "type") == 0 && val.format == MPV_FORMAT_STRING) {
+                    type = QString::fromUtf8(val.u.string);
+                } else if (qstrcmp(key, "id") == 0 && val.format == MPV_FORMAT_INT64) {
+                    id = val.u.int64;
+                } else if (qstrcmp(key, "title") == 0 && val.format == MPV_FORMAT_STRING) {
+                    title = QString::fromUtf8(val.u.string);
+                } else if (qstrcmp(key, "lang") == 0 && val.format == MPV_FORMAT_STRING) {
+                    lang = QString::fromUtf8(val.u.string);
+                }
+            }
 
-        if (tType == "video") videoTracks.append(track);
-        else if (tType == "audio") audioTracks.append(track);
-        else if (tType == "sub") subtitleTracks.append(track);
+            QVariantMap track;
+            track["id"] = static_cast<int>(id);
+            track["type"] = type;
+            track["title"] = !title.isEmpty() ? title : QString("Track %1").arg(id);
+            track["lang"] = lang;
 
-        if (type_str) mpv_free(type_str);
-        if (title_str) mpv_free(title_str);
-        if (lang_str) mpv_free(lang_str);
+            if (type == "video") videoTracks.append(track);
+            else if (type == "audio") audioTracks.append(track);
+            else if (type == "sub") subtitleTracks.append(track);
+        }
     }
+    mpv_free_node_contents(&node);
 
     m_videoTracks = videoTracks;
     m_audioTracks = audioTracks;

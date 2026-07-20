@@ -143,8 +143,8 @@ void AppController::triggerBackgroundSync() {
     onSyncTimerFired();
 }
 
-void AppController::enterFullscreen() {
-    QWindow *win = QGuiApplication::focusWindow();
+void AppController::enterFullscreen(QWindow* targetWin) {
+    QWindow *win = targetWin ? targetWin : QGuiApplication::focusWindow();
     if (!win) {
         return;
     }
@@ -165,8 +165,9 @@ void AppController::enterFullscreen() {
     win->setGeometry(screen->geometry());
 }
 
-void AppController::exitFullscreen(bool wasMaximized, qreal x, qreal y, qreal width, qreal height) {
-    QWindow *win = QGuiApplication::focusWindow();
+void AppController::exitFullscreen(bool wasMaximized, qreal x, qreal y, qreal width, qreal height,
+                                   QWindow* targetWin) {
+    QWindow *win = targetWin ? targetWin : QGuiApplication::focusWindow();
     if (!win) {
         return;
     }
@@ -184,8 +185,8 @@ void AppController::exitFullscreen(bool wasMaximized, qreal x, qreal y, qreal wi
     }
 }
 
-void AppController::setAlwaysOnTop(bool enabled) {
-    QWindow *win = QGuiApplication::focusWindow();
+void AppController::setAlwaysOnTop(bool enabled, QWindow* targetWin) {
+    QWindow *win = targetWin ? targetWin : QGuiApplication::focusWindow();
     if (!win) {
         // Fall back to the first top-level window (e.g. when triggered
         // while the window doesn't have keyboard focus).
@@ -465,13 +466,33 @@ void AppController::openLocalVideo(const QString& fileUrlOrPath) {
     }
 
     // Local videos are deliberately NOT saved to History — only m3u entries
-    // and direct links belong there. Instead, load the sibling videos of the
-    // file's folder into the shared channel model so the player's playlist
-    // panel / Next / Previous navigate within that folder.
-    if (m_channelViewModel) {
-        m_channelViewModel->loadLocalFolder(info.absoluteFilePath());
-    }
+    // and direct links belong there. The folder is loaded by the receiver of
+    // localVideoReady() into whichever channel model belongs to the window
+    // that will play the file (shared model for the main window, a
+    // createLocalChannelModel() instance for a detached window).
     emit localVideoReady(info.absoluteFilePath(), info.completeBaseName());
+}
+
+ChannelViewModel* AppController::createLocalChannelModel(const QString& fileUrlOrPath) {
+    QString localPath = fileUrlOrPath;
+    if (localPath.startsWith("file:", Qt::CaseInsensitive)) {
+        localPath = QUrl(localPath).toLocalFile();
+    }
+    auto* model = new ChannelViewModel(m_channelRepo); // parentless: QML GC owns it
+    QQmlEngine::setObjectOwnership(model, QQmlEngine::JavaScriptOwnership);
+    model->loadLocalFolder(QFileInfo(localPath).absoluteFilePath());
+    return model;
+}
+
+ChannelViewModel* AppController::createDetachedChannelModel(int groupId, int playlistId) {
+    auto* model = new ChannelViewModel(m_channelRepo); // parentless: QML GC owns it
+    QQmlEngine::setObjectOwnership(model, QQmlEngine::JavaScriptOwnership);
+    if (groupId > 0) {
+        model->loadChannels(groupId);
+    } else if (playlistId > 0) {
+        model->loadAllChannels(playlistId);
+    }
+    return model;
 }
 
 void AppController::onSyncTimerFired() {

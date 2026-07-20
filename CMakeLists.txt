@@ -104,6 +104,7 @@ qt_add_qml_module(${PROJECT_NAME}
     VERSION 1.0
     QML_FILES
         src/ui/main.qml
+        src/ui/PlayerWindow.qml
         src/ui/components/Sidebar.qml
         src/ui/components/SidebarButton.qml
         src/ui/components/AddPlaylistDialog.qml

@@ -15,10 +15,96 @@ ApplicationWindow {
     title: qsTr("M3U Video Player Desktop")
     color: "#121212"
 
-    property bool isPlayerActive: stackView.currentItem instanceof PlayerView
-    
+    property bool isPlayerActive: stackView.currentItem && stackView.currentItem.objectName === "playerView"
+
     // Focus Navigation: 0 = Main, 1 = Header, 2 = Sidebar
     property int currentFocusSection: 0
+
+    // Detached player windows (VLC-style multi-window). Keeping the refs here
+    // stops the JS GC from collecting a still-visible Window; main.qml itself
+    // stays alive when the main window is closed (closing only hides it), so
+    // detached windows survive until they are closed themselves. Qt quits the
+    // app automatically once the last visible window is closed.
+    property var detachedWindows: []
+
+    // Creates one independent PlayerWindow from a full property map
+    // (streamUrl/streamTitle/channelModel/...). Windows are unlimited and
+    // fully separate: each has its own mpv instance, channel model and
+    // fullscreen/always-on-top state, and closing one never affects another.
+    function openDetachedWindow(props) {
+        var index = detachedWindows.length
+        var win = playerWindowComponent.createObject(null, props)
+        if (!win) {
+            console.warn("Failed to create detached player window:",
+                         playerWindowComponent.errorString())
+            return null
+        }
+        // Cascade like VLC so stacked windows stay grabbable
+        win.x = mainWindow.x + 48 + (index % 8) * 32
+        win.y = mainWindow.y + 48 + (index % 8) * 32
+        detachedWindows.push(win)
+        win.windowClosed.connect(function() {
+            var i = mainWindow.detachedWindows.indexOf(win)
+            if (i >= 0) mainWindow.detachedWindows.splice(i, 1)
+        })
+        win.show()
+        win.raise()
+        win.requestActivate()
+        return win
+    }
+
+    // Local file: always a separate window (never mixed into a window that is
+    // already playing). The main window's player is paused so its audio can't
+    // bleed under the new video.
+    function openDetachedPlayer(filePath, name) {
+        if (isPlayerActive && stackView.currentItem && typeof stackView.currentItem.pause === "function") {
+            stackView.currentItem.pause();
+        }
+        // Own folder model per window: Next/Previous/playlist panel navigate
+        // this file's folder without clobbering the shared channelViewModel.
+        var model = AppController.createLocalChannelModel(filePath)
+        openDetachedWindow({
+            "streamUrl": filePath,
+            "streamTitle": name,
+            "channelModel": model,
+            "channelType": 1,  // MOVIE: VOD seek behavior + folder auto-next
+            "playlistId": 0,   // local files never write history/resume rows
+            "groupId": 0
+        })
+    }
+
+    // Database channel in its own window (middle-click on a channel). Keeps
+    // the channel's real playlist/group context so resume and the in-player
+    // playlist panel work exactly like in the main window.
+    function openChannelInNewWindow(info, resumePositionMs) {
+        var model = AppController.createDetachedChannelModel(
+            info.groupId !== undefined ? info.groupId : 0,
+            info.playlistId !== undefined ? info.playlistId : 0)
+        openDetachedWindow({
+            "streamUrl": info.streamUrl,
+            "streamTitle": info.channelName,
+            "streamReferer": info.referer !== undefined ? info.referer : "",
+            "streamUserAgent": info.userAgent !== undefined ? info.userAgent : "",
+            "channelType": info.channelType !== undefined ? info.channelType : 3,
+            "playlistId": info.playlistId !== undefined ? info.playlistId : 0,
+            "groupId": info.groupId !== undefined ? info.groupId : 0,
+            "groupTitle": info.groupTitle !== undefined ? info.groupTitle : "",
+            "resumePositionMs": resumePositionMs !== undefined ? resumePositionMs : 0,
+            "channelModel": model
+        })
+    }
+
+    Component {
+        id: playerWindowComponent
+        PlayerWindow {}
+    }
+
+    onClosing: {
+        // With detached windows open the app keeps running and this window
+        // only hides — pop a playing PlayerView so it can't keep playing
+        // invisibly (Component.onDestruction also saves its resume position).
+        if (isPlayerActive) doPop()
+    }
 
     property var forwardHistory: []
     property bool isNavigatingForward: false
@@ -44,7 +130,7 @@ ApplicationWindow {
         if (item instanceof PlaylistListView) return { type: "PlaylistListView", props: {} };
         if (item instanceof GroupListView) return { type: "GroupListView", props: { playlistId: item.playlistId, playlistName: item.playlistName } };
         if (item instanceof ChannelListView) return { type: "ChannelListView", props: { groupId: item.groupId, groupName: item.groupName, playlistId: item.playlistId, deletable: item.deletable, favoritesMode: item.favoritesMode } };
-        if (item instanceof PlayerView) return { type: "PlayerView", props: { streamUrl: item.streamUrl, streamTitle: item.streamTitle, streamReferer: item.streamReferer, streamUserAgent: item.streamUserAgent, channelType: item.channelType, playlistId: item.playlistId, groupId: item.groupId, groupTitle: item.groupTitle, resumePositionMs: item.resumePositionMs } };
+        if (item && item.objectName === "playerView") return { type: "PlayerView", props: { streamUrl: item.streamUrl, streamTitle: item.streamTitle, streamReferer: item.streamReferer, streamUserAgent: item.streamUserAgent, channelType: item.channelType, playlistId: item.playlistId, groupId: item.groupId, groupTitle: item.groupTitle, resumePositionMs: item.resumePositionMs } };
         if (item instanceof SettingsView) return { type: "SettingsView", props: {} };
         if (item instanceof SettingsPlaylistsView) return { type: "SettingsPlaylistsView", props: {} };
         if (item instanceof DirectLinkView) return { type: "DirectLinkView", props: {} };
@@ -103,7 +189,7 @@ ApplicationWindow {
     }
 
     function handleBack() {
-        if (stackView.currentItem && stackView.currentItem instanceof PlayerView) {
+        if (stackView.currentItem && stackView.currentItem.objectName === "playerView") {
             var player = stackView.currentItem;
             if (player.isFullscreen) {
                 player.toggleFullscreen();
@@ -294,6 +380,19 @@ ApplicationWindow {
                     "groupTitle": groupName
                 })
             }
+            onChannelOpenedNewWindow: function(streamUrl, channelName, referer, userAgent, channelType, channelPlaylistId, channelGroupId) {
+                mainWindow.openChannel({
+                    "streamUrl": streamUrl,
+                    "channelName": channelName,
+                    "referer": referer !== undefined ? referer : "",
+                    "userAgent": userAgent !== undefined ? userAgent : "",
+                    "channelType": channelType !== undefined ? channelType : 3,
+                    "playlistId": channelPlaylistId !== undefined ? channelPlaylistId : 0,
+                    "groupId": channelGroupId !== undefined ? channelGroupId : 0,
+                    "groupTitle": groupName,
+                    "newWindow": true
+                })
+            }
             onResumeRequested: (resume) => mainWindow.resumeLastPlayed(resume)
         }
     }
@@ -302,6 +401,8 @@ ApplicationWindow {
     // Single choke point for opening a channel from any list/grid/key press.
     // Movies/series with a saved position (>30s, <95%) ask Continue/StartOver;
     // everything else (live TV, unwatched, direct links) plays immediately.
+    // info.newWindow === true routes playback into a separate window
+    // (middle-click) instead of the embedded player.
     function openChannel(info) {
         var isVod = info.channelType === 1 || info.channelType === 2; // MOVIE || SERIES
         if (isVod) {
@@ -316,6 +417,10 @@ ApplicationWindow {
     }
 
     function pushPlayer(info, resumePositionMs) {
+        if (info.newWindow === true) {
+            openChannelInNewWindow(info, resumePositionMs)
+            return
+        }
         doPush(playerViewComponent, {
             "streamUrl": info.streamUrl,
             "streamTitle": info.channelName,
@@ -398,33 +503,37 @@ ApplicationWindow {
     }
 
     // Direct link resolved: play it with the headers that came either from
-    // the input fields or from the parsed M3U entry itself.
+    // the input fields or from the parsed M3U entry itself. If a video is
+    // already playing in this window (e.g. a double-clicked .m3u arrives
+    // mid-playback), the stream opens in its own detached window instead of
+    // hijacking the current one — same VLC rule as local files.
     Connections {
         target: AppController
         function onDirectLinkReady(streamUrl, name, referer, userAgent) {
-            doPush(playerViewComponent, {
+            var props = {
                 "streamUrl": streamUrl,
                 "streamTitle": name !== "" ? name : "Direct Stream",
                 "streamReferer": referer,
                 "streamUserAgent": userAgent
-            })
+            }
+            if (mainWindow.isPlayerActive) {
+                props["channelType"] = AppController.channelTypeForUrl(streamUrl)
+                openDetachedWindow(props)
+            } else {
+                doPush(playerViewComponent, props)
+            }
         }
     }
 
     // Local video file opened (double-click / "Open with"): play it WITHOUT
     // saving to History (playlistId 0 disables progress/history writes).
-    // AppController already loaded the file's folder into channelViewModel,
-    // so the player's playlist panel / Next / Previous cover the folder.
+    // ALWAYS opens in its own independent window (VLC-style multi-window)
+    // with its own folder model — never in the main window, so it can never
+    // mix with a video already playing there.
     Connections {
         target: AppController
         function onLocalVideoReady(filePath, name) {
-            doPush(playerViewComponent, {
-                "streamUrl": filePath,
-                "streamTitle": name,
-                "channelType": 1, // MOVIE: VOD seek behavior + folder auto-next
-                "playlistId": 0,
-                "groupId": 0
-            })
+            mainWindow.openDetachedPlayer(filePath, name)
         }
     }
 
