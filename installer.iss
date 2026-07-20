@@ -1,7 +1,7 @@
 [Setup]
 ; App Information
 AppName=M3u Video Player PC
-AppVersion=1.0
+AppVersion=2.0.0
 AppPublisher=Akash
 DefaultDirName={autopf}\M3uVideoPlayerPc
 DefaultGroupName=M3u Video Player PC

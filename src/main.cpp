@@ -97,7 +97,7 @@ int main(int argc, char *argv[])
     app.setOrganizationName("M3UPlayerTeam");
     app.setOrganizationDomain("m3uplayer.local");
     app.setApplicationName("M3U Video Player Desktop");
-    app.setApplicationVersion("1.0.0");
+    app.setApplicationVersion("2.0.0");
 
     // Extract a playable file path passed on the command line (double-click /
     // "Open with"), if any: either an .m3u/.m3u8 playlist or a local video.

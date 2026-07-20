@@ -304,6 +304,13 @@ std::optional<Domain::Channel> AppController::importIntoHistory(const Data::Pars
         m_posterFetchService->fetchPostersForPlaylist(historyId, /*onlyMissing=*/true);
     }
 
+    // Load the imported entries into the shared channel model so the player's
+    // playlist panel / Next / Previous immediately cover them (the panel was
+    // empty when playback started straight from a double-clicked .m3u).
+    if (first && m_channelViewModel) {
+        m_channelViewModel->loadAllChannels(historyId);
+    }
+
     return first;
 }
 

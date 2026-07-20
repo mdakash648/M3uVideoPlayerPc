@@ -3,6 +3,7 @@ import QtQuick.Window
 import QtQuick.Controls.Basic
 import QtQuick.Layouts
 import M3uVideoPlayer
+import "../components"
 
 Item {
     id: root
@@ -692,7 +693,7 @@ Item {
                 Layout.fillWidth: true
                 Layout.leftMargin: 20
                 Layout.rightMargin: 12
-                Layout.bottomMargin: 12
+                Layout.bottomMargin: 8
 
                 Text {
                     text: "PLAYLIST"
@@ -726,6 +727,61 @@ Item {
                 }
             }
 
+            // Search box: filters the playlist as you type (name match).
+            // The query lives on the channel model, so Next/Previous follow
+            // the filtered list; it is cleared when the player closes so a
+            // shared model never leaks the filter back to the channel pages.
+            TextField {
+                id: playlistSearchField
+                Layout.fillWidth: true
+                Layout.leftMargin: 20
+                Layout.rightMargin: 12
+                Layout.bottomMargin: 10
+                placeholderText: qsTr("Search video...")
+                placeholderTextColor: "#7a8a9e"
+                color: "#dce3f0"
+                font.pixelSize: 13
+                leftPadding: 34
+                rightPadding: clearSearchBtn.visible ? 34 : 12
+                background: Rectangle {
+                    color: "#1a2129"
+                    radius: 8
+                    implicitHeight: 38
+                    border.color: playlistSearchField.activeFocus ? "#ff8800" : "#33c2c6d2"
+                    border.width: 1
+                }
+                onTextChanged: root.channelModel.setSearchQuery(text)
+                // Don't let player shortcuts (space, arrows...) steal typing;
+                // Escape just leaves the field instead of closing the panel.
+                Keys.onEscapePressed: {
+                    if (text !== "") text = "";
+                    else root.forceActiveFocus();
+                }
+
+                Text {
+                    anchors.left: parent.left
+                    anchors.leftMargin: 12
+                    anchors.verticalCenter: parent.verticalCenter
+                    text: "🔍"
+                    font.pixelSize: 13
+                    opacity: 0.7
+                }
+
+                // Clear button (appears while a query is active)
+                Button {
+                    id: clearSearchBtn
+                    anchors.right: parent.right
+                    anchors.rightMargin: 6
+                    anchors.verticalCenter: parent.verticalCenter
+                    visible: playlistSearchField.text !== ""
+                    implicitWidth: 24
+                    implicitHeight: 24
+                    background: Rectangle { color: clearSearchBtn.hovered ? "#2e3540" : "transparent"; radius: 12 }
+                    contentItem: Text { text: "✕"; color: clearSearchBtn.hovered ? "#ffb781" : "#7a8a9e"; font.pixelSize: 12; horizontalAlignment: Text.AlignHCenter; verticalAlignment: Text.AlignVCenter }
+                    onClicked: playlistSearchField.text = ""
+                }
+            }
+
             // Separator
             Rectangle {
                 Layout.fillWidth: true
@@ -754,41 +810,45 @@ Item {
                 delegate: Rectangle {
                     id: channelDelegate
                     width: playlistListView.width
-                    height: 56
+                    height: 64
                     property bool isCurrent: model.streamUrl === root.canonicalUrl
                     color: isCurrent ? "#33ff8800" : (channelMouse.containsMouse ? "#1Ac2c6d2" : "transparent")
 
                     RowLayout {
                         anchors.fill: parent
-                        anchors.leftMargin: 20
-                        anchors.rightMargin: 20
-                        spacing: 12
+                        anchors.leftMargin: 16
+                        anchors.rightMargin: 16
+                        spacing: 10
 
-                        // Playing indicator or index number
-                        Rectangle {
-                            implicitWidth: 28
-                            implicitHeight: 28
-                            radius: 14
-                            color: channelDelegate.isCurrent ? "#ff8800" : "transparent"
-                            border.color: channelDelegate.isCurrent ? "#ff8800" : "#33c2c6d2"
-                            border.width: channelDelegate.isCurrent ? 0 : 1
-
-                            Text {
-                                anchors.centerIn: parent
-                                text: channelDelegate.isCurrent ? "▶" : (index + 1)
-                                color: channelDelegate.isCurrent ? "#2f1400" : "#7a8a9e"
-                                font.pixelSize: channelDelegate.isCurrent ? 12 : 11
-                                font.bold: channelDelegate.isCurrent
-                            }
+                        // Index number — "▶" marks the playing entry
+                        Text {
+                            text: channelDelegate.isCurrent ? "▶" : ("(" + (index + 1) + ")")
+                            color: channelDelegate.isCurrent ? "#ff8800" : "#7a8a9e"
+                            font.pixelSize: channelDelegate.isCurrent ? 13 : 12
+                            font.bold: channelDelegate.isCurrent
+                            Layout.preferredWidth: 34
+                            horizontalAlignment: Text.AlignHCenter
                         }
 
-                        // Channel name
+                        // Poster (tvg-logo / fetched movie poster). Falls back
+                        // to a film icon for entries without artwork (e.g.
+                        // local files).
+                        ChannelLogo {
+                            Layout.preferredWidth: 38
+                            Layout.preferredHeight: 52
+                            source: model.logoUrl ? model.logoUrl : ""
+                            fallbackText: "🎬"
+                        }
+
+                        // Video name
                         Text {
                             text: model.name
                             color: channelDelegate.isCurrent ? "#ffb781" : "#dce3f0"
-                            font.pixelSize: 14
+                            font.pixelSize: 13
                             font.bold: channelDelegate.isCurrent
                             elide: Text.ElideRight
+                            maximumLineCount: 2
+                            wrapMode: Text.WordWrap
                             Layout.fillWidth: true
                         }
                     }
@@ -798,8 +858,8 @@ Item {
                         anchors.bottom: parent.bottom
                         anchors.left: parent.left
                         anchors.right: parent.right
-                        anchors.leftMargin: 20
-                        anchors.rightMargin: 20
+                        anchors.leftMargin: 16
+                        anchors.rightMargin: 16
                         height: 1
                         color: "#1Ac2c6d2"
                     }
@@ -1244,6 +1304,10 @@ Item {
     Component.onDestruction: {
         // Final position save when leaving the player
         root.saveResumeProgress();
+        // Drop any playlist-panel search filter: with the shared channel
+        // model, a leftover query would silently keep filtering the channel
+        // pages after leaving the player.
+        root.channelModel.setSearchQuery("");
         // Release always-on-top — the toggle lives in this view, so leaving
         // the player must not leave the window stuck topmost.
         if (root.alwaysOnTop) AppController.setAlwaysOnTop(false, root.Window.window);
